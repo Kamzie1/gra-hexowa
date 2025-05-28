@@ -1,1 +1,2 @@
 # gra-hexowa
+Strona serwera
