@@ -10,4 +10,5 @@ Yukimura_Sanada = {
     "pancerz": 8,
     "atak": 20,
     "koszt_ataku": 3,
+    "image": "Yukimura_Sanada.png",
 }

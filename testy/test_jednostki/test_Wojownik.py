@@ -5,7 +5,7 @@ from projekt.jednostki import Wojownik
 
 # test inicjalizacji klasy
 def test_inicjalizacje_klasy():
-    w = Wojownik(100, 50, 12, 5, 3, 7, 3)
+    w = Wojownik(100, 50, 12, 5, 3, 7, 3, "test.png", (100, 100))
     assert w.zdrowie == 100
     assert w.morale == 50
     assert w.ruch == 12
@@ -17,7 +17,7 @@ def test_inicjalizacje_klasy():
 
 # test wypisu informacji na temat jednostki o klasie wojownik
 def test_printa():
-    w = Wojownik(50, 20, 12, 5, 3, 7, 3)
+    w = Wojownik(50, 20, 12, 5, 3, 7, 3, "test.png", (100, 100))
     output = str(w)
     assert "zdrowie: 50" in output
     assert "morale: 20" in output

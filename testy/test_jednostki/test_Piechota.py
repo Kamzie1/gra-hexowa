@@ -5,7 +5,7 @@ from projekt.jednostki import Piechota
 
 # test inicjalizacji klasy
 def test_inicjalizacje_klasy():
-    p = Piechota(100, 50, 12, 5, 3, 7, 3)
+    p = Piechota(100, 50, 12, 5, 3, 7, 3, "test.png", (100, 100))
     assert p.zdrowie == 100
     assert p.morale == 50
     assert p.ruch == 12
@@ -17,7 +17,7 @@ def test_inicjalizacje_klasy():
 
 # test wypisu informacji na temat jednostki
 def test_printa():
-    p = Piechota(50, 20, 12, 5, 3, 7, 3)
+    p = Piechota(50, 20, 12, 5, 3, 7, 3, "test.png", (100, 100))
     output = str(p)
     assert "zdrowie: 50" in output
     assert "morale: 20" in output

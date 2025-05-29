@@ -1,6 +1,8 @@
 import pygame
 from sys import exit
+from os.path import join
 from ustawienia import *  # plik z ustawieniami
+from jednostki import Wojownik, Yukimura_Sanada as y
 
 
 # klasa reprezentująca grę
@@ -14,6 +16,17 @@ class Gra:
 
     # metoda uruchamiająca grę
     def run(self):
+        w = Wojownik(
+            y["zdrowie"],
+            y["morale"],
+            y["ruch"],
+            y["przebicie"],
+            y["pancerz"],
+            y["atak"],
+            y["koszt_ataku"],
+            y["image"],
+            (100, 500),
+        )
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # wyjdź z programu
@@ -21,6 +34,9 @@ class Gra:
                     exit()
 
             self.screen.fill("blue")  # wypełnia screena na niebiesko
+            w.marsz()
+            if w.rect is not None:
+                self.screen.blit(w.surf, w.rect)
             pygame.display.update()  # odświeża display
 
             self.clock.tick(FPS)  # maks 60 FPS
