@@ -1,6 +1,9 @@
 from projekt.jednostki import Piechota
 
+# test klasy Piechota dziedzica klasy Wojownik
 
+
+# test inicjalizacji klasy
 def test_inicjalizacje_klasy():
     p = Piechota(100, 50, 12, 5, 3, 7, 3)
     assert p.zdrowie == 100
@@ -12,6 +15,7 @@ def test_inicjalizacje_klasy():
     assert p.koszt_ataku == 3
 
 
+# test wypisu informacji na temat jednostki
 def test_printa():
     p = Piechota(50, 20, 12, 5, 3, 7, 3)
     output = str(p)

@@ -1,7 +1,10 @@
 from projekt.jednostki import Yukimura_Sanada as y
 from projekt.jednostki import Piechota
 
+# test wczytywania danych jednostki z danych zapisanych w folderze jednostki/dane
 
+
+# test inicjalizacji jednostki Yukimura Sanda
 def test_inicjalizacja():
     Yukimura_Sanada = Piechota(
         y["zdrowie"],
