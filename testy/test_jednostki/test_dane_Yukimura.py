@@ -14,6 +14,8 @@ def test_inicjalizacja():
         y["pancerz"],
         y["atak"],
         y["koszt_ataku"],
+        y["image"],
+        (100, 100),
     )
 
     assert Yukimura_Sanada.zdrowie == y["zdrowie"]
