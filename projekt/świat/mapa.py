@@ -6,27 +6,32 @@ from .tile import Tile
 
 
 class Mapa:
-    def __init__(self, Szerokosc, Wysokosc, pos):
-        self.Wysokosc = Wysokosc
-        self.Szerokosc = Szerokosc
-        self.origin = pos
-        self.mapSurf = pygame.Surface((self.Szerokosc, self.Wysokosc))
+    def __init__(self):
+        self.origin = map_original_pos
+        self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
-        self.tmx = load_pygame(join("grafika", plik_mapy))
+        self.tmx = load_pygame(join(folder_grafiki, plik_mapy))
         self.tiles_group = pygame.sprite.Group()
         self.load_tiles()
 
-    def update(self, original_origin, original_pos) -> None:
-        # aktualizacja pozycji mapy względem ekranu
+    def update(self) -> None:
+        if pygame.mouse.get_pressed()[1]:
+            # aktualizacja pozycji mapy względem ekranu
+            self.update_pos()
+        elif not pygame.mouse.get_pressed()[1]:
+            self.original_origin = self.origin
+            self.original_mouse_pos = pygame.mouse.get_pos()
+
+    def update_pos(self):
         mouse_pos = pygame.mouse.get_pos()
         offset = (
-            mouse_pos[0] - original_pos[0],  # type: ignore (mój pylance świruje, więc to wyłącza podświetlenie błędu)
-            mouse_pos[1] - original_pos[1],  # type: ignore
+            mouse_pos[0] - self.original_mouse_pos[0],  # type: ignore (mój pylance świruje, więc to wyłącza podświetlenie błędu)
+            mouse_pos[1] - self.original_mouse_pos[1],  # type: ignore
         )
-        if self.validateOffset(offset, original_origin):
+        if self.validateOffset(offset, self.original_origin):
             self.origin = (
-                original_origin[0] + offset[0],  # type: ignore
-                original_origin[1] + offset[1],  # type: ignore
+                self.original_origin[0] + offset[0],  # type: ignore
+                self.original_origin[1] + offset[1],  # type: ignore
             )
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
 
@@ -34,11 +39,11 @@ class Mapa:
         # sprawdza, czy nie wychodzisz poza mapę
         if original_origin[0] + offset[0] > mapa_x_offset:
             return False
-        if original_origin[0] + offset[0] + self.Szerokosc < Width - mapa_x_offset:
+        if original_origin[0] + offset[0] + Mapa_width < Width - mapa_x_offset:
             return False
         if original_origin[1] + offset[1] > mapa_y_offset:
             return False
-        if original_origin[1] + offset[1] + self.Wysokosc < Height - mapa_y_offset:
+        if original_origin[1] + offset[1] + Mapa_height < Height - mapa_y_offset:
             return False
         return True
 
@@ -66,14 +71,10 @@ class Mapa:
 
 
 class Mini_map:
-    def __init__(self, Szerokosc, Wysokosc, color, pos):
-        self.Wysokosc = Wysokosc
-        self.Szerokosc = Szerokosc
-        self.origin = pos
-        self.mapSurf = pygame.Surface((self.Szerokosc, self.Wysokosc))
-        self.color = color
-        self.mapSurf.fill(self.color)
-        self.mapRect = self.mapSurf.get_frect(topright=pos)
-
-    def fill(self):
-        self.mapSurf.fill(self.color)
+    def __init__(self):
+        self.origin = mini_map_pos
+        self.image = pygame.image.load(join(folder_grafiki, minimapa_image)).convert()
+        self.scaledSurf = pygame.transform.smoothscale(
+            self.image, (mini_width, mini_height)
+        )
+        self.mapRect = self.scaledSurf.get_frect(topright=mini_map_pos)

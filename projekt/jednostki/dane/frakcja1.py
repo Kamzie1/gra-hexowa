@@ -12,3 +12,14 @@ Yukimura_Sanada = {
     "koszt_ataku": 3,
     "image": "Yukimura_Sanada.png",
 }
+
+Bodyguard = {
+    "zdrowie": 100,
+    "morale": 70,
+    "ruch": 10,
+    "przebicie": 6,
+    "pancerz": 4,
+    "atak": 10,
+    "koszt_ataku": 3,
+    "image": "Bodyguard.png",
+}

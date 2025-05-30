@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 from os.path import join
 from ustawienia import *  # plik z ustawieniami
-from jednostki import Wojownik, Yukimura_Sanada as y
+from jednostki import Wojownik, Bodyguard as b, Yukimura_Sanada as y
 from świat import Mapa, Mini_map
 
 
@@ -15,49 +15,49 @@ class Gra:
         pygame.display.set_caption(Title)
         self.clock = pygame.time.Clock()
         self.track = False
+        self.mapa = Mapa()
+        self.mini_mapa = Mini_map()
 
     # metoda uruchamiająca grę
     def run(self):
-        w = Wojownik(
-            y["zdrowie"],
-            y["morale"],
-            y["ruch"],
-            y["przebicie"],
-            y["pancerz"],
-            y["atak"],
-            y["koszt_ataku"],
-            y["image"],
-            (100, 100),
-        )
-        mapa = Mapa(Mapa_width, Mapa_height, (0, 0))
-        mini_map = Mini_map(mini_width, mini_height, "blue", (Width, 0))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # wyjdź z programu
                     pygame.quit()
                     exit()
-                # poruszanie się po mapie
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    original_pos = event.pos
-                    original_origin = mapa.origin
-                    self.track = True
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    self.track = False
             # aktualizacja położenia mapy
-            if self.track:
-                mapa.update(original_origin, original_pos)  # type: ignore pylance mi świruje i widzi to jako błąd, być może tak jest, ale na razie wszystko działa
+            self.mapa.update()  # type: ignore pylance mi świruje i widzi to jako błąd, być może tak jest, ale na razie wszystko działa
+            self.update_minimap()  # obsługa minimapy
+            self.draw()  # rysuje wszystkie elementy
 
-            self.screen.fill("black")  # wypełnia screena
-            self.screen.blit(mapa.mapSurf, mapa.mapRect)  # rysuje mapę
-            mapa.tiles_group.draw(mapa.mapSurf)  # rysuje tilesy
-            self.screen.blit(mini_map.mapSurf, mini_map.mapRect)  # rysuje mini mapę
-            mini_map.fill()  # odświeża minimapę
-
-            w.marsz()  # marsz Yukimury
-            mapa.mapSurf.blit(w.surf, w.rect)  # type: ignore
             pygame.display.update()  # odświeża display
 
             self.clock.tick(FPS)  # maks 60 FPS
+
+    def update_minimap(self):
+        if pygame.mouse.get_pressed()[0]:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.mini_mapa.mapRect.collidepoint(mouse_pos):
+                # jeżeli zachodzi interakcja z mini mapą, to licz współrzędne (odpowiednio zeskalowane)
+                pos_y = mouse_pos[1] - mapa_y_offset / 10
+                pos_x = mouse_pos[0] - Width + mini_width - mapa_x_offset / 10
+                mapa_pos_y = pos_y * skala
+                mapa_pos_x = pos_x * skala
+                self.mapa.origin = (-mapa_pos_x, -mapa_pos_y)  # type: ignore
+                self.mapa.mapRect = self.mapa.mapSurf.get_frect(
+                    topleft=self.mapa.origin  # zaktualizuj położenie mapy
+                )
+
+    def draw(self):
+        self.screen.fill("black")  # wypełnia screena
+        self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
+        self.mapa.tiles_group.draw(self.mapa.mapSurf)  # rysuje tilesy
+        self.screen.blit(
+            self.mini_mapa.scaledSurf, self.mini_mapa.mapRect
+        )  # rysuje mini mapę
+        pygame.draw.rect(
+            self.screen, (0, 0, 0), self.mini_mapa.mapRect, width=2
+        )  # rysuje border
 
 
 # ważne!!! Odpala tylko, jeżeli został uruchomiony sam z siebie, a nie w formie zainportowanego modułu. Bez tego, gdybyśmy importwali ten program to przy imporcie uruchamiałby się gra.run()
