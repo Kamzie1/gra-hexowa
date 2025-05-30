@@ -33,6 +33,4 @@ class Wojownik(pygame.sprite.Sprite):
         return f"Statystyki klasy: \n ruch: {self.ruch}, \n atak: {self.atak}, \n pancerz: {self.pancerz}, \n przebicie: {self.przebicie}, \n koszt_ataku: {self.koszt_ataku} \nStatystyki jednostki: \n zdrowie: {self.zdrowie}, \n morale: {self.morale}"
 
     def marsz(self):
-        if self.rect is None:
-            return
-        self.rect.x += self.ruch / 10
+        self.rect.x += self.ruch / 10  # type: ignore

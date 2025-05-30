@@ -1,2 +1,2 @@
-from .mapa.mapa import Mapa
-from .mapa.mapa import Mini_map
+from .mapa import Mapa
+from .mapa import Mini_map

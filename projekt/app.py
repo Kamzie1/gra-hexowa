@@ -29,44 +29,32 @@ class Gra:
             y["image"],
             (100, 100),
         )
-        mapa = Mapa(3416, 1674, "grey", (400, 400))
-        mini_map = Mini_map(200, 100, "blue", (Width, Height))
+        mapa = Mapa(Mapa_width, Mapa_height, (0, 0))
+        mini_map = Mini_map(mini_width, mini_height, "blue", (Width, 0))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # wyjdź z programu
                     pygame.quit()
                     exit()
+                # poruszanie się po mapie
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     original_pos = event.pos
                     original_origin = mapa.origin
-                    print(original_pos)
                     self.track = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.track = False
-            if self.track == True:
-                mouse_pos = pygame.mouse.get_pos()
-                print("mouse: ", mouse_pos)
-                offset = (
-                    mouse_pos[0] - original_pos[0],
-                    mouse_pos[1] - original_pos[1],
-                )
-                mapa.origin = (
-                    original_origin[0] + offset[0],
-                    original_origin[1] + offset[1],
-                )
-                print("origin: ", mapa.origin)
+            # aktualizacja położenia mapy
+            if self.track:
+                mapa.update(original_origin, original_pos)  # type: ignore pylance mi świruje i widzi to jako błąd, być może tak jest, ale na razie wszystko działa
 
-            mapa.update()
+            self.screen.fill("black")  # wypełnia screena
+            self.screen.blit(mapa.mapSurf, mapa.mapRect)  # rysuje mapę
+            mapa.tiles_group.draw(mapa.mapSurf)  # rysuje tilesy
+            self.screen.blit(mini_map.mapSurf, mini_map.mapRect)  # rysuje mini mapę
+            mini_map.fill()  # odświeża minimapę
 
-            self.screen.fill("black")  # wypełnia screena na niebiesko
-            self.screen.blit(mapa.mapSurf, mapa.mapRect)
-            mapa.fill()
-            self.screen.blit(mini_map.mapSurf, mini_map.mapRect)
-            mini_map.fill()
-
-            w.marsz()
-            if w.rect is not None:
-                mapa.mapSurf.blit(w.surf, w.rect)
+            w.marsz()  # marsz Yukimury
+            mapa.mapSurf.blit(w.surf, w.rect)  # type: ignore
             pygame.display.update()  # odświeża display
 
             self.clock.tick(FPS)  # maks 60 FPS
