@@ -2,7 +2,6 @@ import pygame
 from sys import exit
 from os.path import join
 from ustawienia import *  # plik z ustawieniami
-from jednostki import Wojownik, Bodyguard as b, Yukimura_Sanada as y
 from świat import Mapa, Mini_map
 
 
@@ -39,11 +38,11 @@ class Gra:
             mouse_pos = pygame.mouse.get_pos()
             if self.mini_mapa.mapRect.collidepoint(mouse_pos):
                 # jeżeli zachodzi interakcja z mini mapą, to licz współrzędne (odpowiednio zeskalowane)
-                pos_y = mouse_pos[1] - mapa_y_offset / 10
-                pos_x = mouse_pos[0] - Width + mini_width - mapa_x_offset / 10
+                pos_y = mouse_pos[1]
+                pos_x = mouse_pos[0] - Width + mini_width
                 mapa_pos_y = pos_y * skala
                 mapa_pos_x = pos_x * skala
-                self.mapa.origin = (-mapa_pos_x, -mapa_pos_y)  # type: ignore
+                self.mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])  # type: ignore
                 self.mapa.mapRect = self.mapa.mapSurf.get_frect(
                     topleft=self.mapa.origin  # zaktualizuj położenie mapy
                 )

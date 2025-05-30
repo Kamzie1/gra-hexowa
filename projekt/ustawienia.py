@@ -2,8 +2,8 @@
 folder_grafiki = "grafika"
 # ekran
 Width = 1200
-Height = 800
-srodek = (600, 400)
+Height = 600
+srodek = (Width / 2, Height / 2)
 Title = "Gra"
 
 FPS = 60
@@ -12,8 +12,8 @@ FPS = 60
 Mapa_width = 3416
 Mapa_height = 2500
 
-mapa_x_offset = 50
-mapa_y_offset = 50
+mapa_x_offset = srodek[0]
+mapa_y_offset = srodek[1]
 
 plik_mapy = "mapa_test.tmx"
 
@@ -21,8 +21,8 @@ map_original_pos = (0, 0)
 
 # mini_mapa
 skala = 10
-mini_width = Mapa_width / skala / 1.4
-mini_height = Mapa_height / skala / 1.4
+mini_width = Mapa_width / skala
+mini_height = Mapa_height / skala
 
 mini_map_pos = (Width, 0)
 minimapa_image = "mapa_test.png"
