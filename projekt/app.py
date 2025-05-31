@@ -38,8 +38,8 @@ class Gra:
             mouse_pos = pygame.mouse.get_pos()
             if self.mini_mapa.mapRect.collidepoint(mouse_pos):
                 # jeżeli zachodzi interakcja z mini mapą, to licz współrzędne (odpowiednio zeskalowane)
-                pos_y = mouse_pos[1]
-                pos_x = mouse_pos[0] - Width + mini_width
+                pos_y = mouse_pos[1] - mini_map_pos[1]
+                pos_x = mouse_pos[0] + mini_width - mini_map_pos[0]
                 mapa_pos_y = pos_y * skala
                 mapa_pos_x = pos_x * skala
                 self.mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])  # type: ignore , srodek wyrównuje widok, przenosi origin o połowę wektora przekątnej ekranu

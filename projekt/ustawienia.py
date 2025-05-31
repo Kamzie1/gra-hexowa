@@ -1,7 +1,7 @@
 # Plik ze stałymi służącymi do ustawień, będzie ich duża zapewne, a takie rozmieszczenie ułatwi ich edycję
 folder_grafiki = "grafika"
 # ekran
-Width = 1200
+Width = 1600
 Height = 800
 srodek = (Width / 2, Height / 2)
 Title = "Gra"
@@ -10,7 +10,7 @@ FPS = 60
 
 # mapa
 Mapa_width = 3416
-Mapa_height = 2500
+Mapa_height = 2457
 
 mapa_x_offset = srodek[0]
 mapa_y_offset = srodek[1]
