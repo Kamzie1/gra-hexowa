@@ -2,7 +2,7 @@
 folder_grafiki = "grafika"
 # ekran
 Width = 1200
-Height = 600
+Height = 800
 srodek = (Width / 2, Height / 2)
 Title = "Gra"
 
@@ -30,3 +30,8 @@ minimapa_image = "mapa_test.png"
 # tiles
 tile_height = 108
 tile_width = 112
+
+
+# mini map rect
+mini_map_mouse_rect_width = Width / skala
+mini_map_mouse_rect_height = Height / skala

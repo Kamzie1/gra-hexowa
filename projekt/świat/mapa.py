@@ -77,4 +77,14 @@ class Mini_map:
         self.scaledSurf = pygame.transform.smoothscale(
             self.image, (mini_width, mini_height)
         )
-        self.mapRect = self.scaledSurf.get_frect(topright=mini_map_pos)
+        self.surf = self.scaledSurf
+        self.mapRect = self.surf.get_frect(topright=mini_map_pos)
+
+        self.origin = map_original_pos
+        self.rectsurf = pygame.Surface(
+            (mini_map_mouse_rect_width, mini_map_mouse_rect_height)
+        )
+        self.rect = self.rectsurf.get_frect(topleft=self.origin)
+
+    def update(self):
+        self.surf = self.scaledSurf.copy()

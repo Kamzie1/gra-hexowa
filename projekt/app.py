@@ -42,17 +42,26 @@ class Gra:
                 pos_x = mouse_pos[0] - Width + mini_width
                 mapa_pos_y = pos_y * skala
                 mapa_pos_x = pos_x * skala
-                self.mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])  # type: ignore
+                self.mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])  # type: ignore , srodek wyrównuje widok, przenosi origin o połowę wektora przekątnej ekranu
                 self.mapa.mapRect = self.mapa.mapSurf.get_frect(
                     topleft=self.mapa.origin  # zaktualizuj położenie mapy
                 )
 
     def draw(self):
+        self.mini_mapa.update()
+        self.mini_mapa.origin = (  # type: ignore
+            -self.mapa.origin[0] / skala,
+            -self.mapa.origin[1] / skala,
+        )
+        self.mini_mapa.rect = self.mini_mapa.rectsurf.get_frect(
+            topleft=self.mini_mapa.origin
+        )
+        pygame.draw.rect(self.mini_mapa.surf, "red", self.mini_mapa.rect, width=1)
         self.screen.fill("black")  # wypełnia screena
         self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
         self.mapa.tiles_group.draw(self.mapa.mapSurf)  # rysuje tilesy
         self.screen.blit(
-            self.mini_mapa.scaledSurf, self.mini_mapa.mapRect
+            self.mini_mapa.surf, self.mini_mapa.mapRect
         )  # rysuje mini mapę
         pygame.draw.rect(
             self.screen, (0, 0, 0), self.mini_mapa.mapRect, width=2
