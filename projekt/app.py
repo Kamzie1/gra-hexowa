@@ -80,7 +80,7 @@ class Gra:
         pygame.draw.rect(
             self.screen, (0, 0, 0), self.mini_mapa.mapRect, width=2
         )  # rysuje border
-
+##nigger
     def draw_resource(self):
         self.screen.blit(self.resource.surf, self.resource.rect)
         self.resource.fill()
