@@ -2,7 +2,8 @@ import pygame
 from sys import exit
 from os.path import join
 from ustawienia import *  # plik z ustawieniami
-from świat import Mapa, Mini_map
+from świat import Mapa, Mini_map, Resource, SideMenu
+from player import Player
 
 
 # klasa reprezentująca grę
@@ -16,6 +17,9 @@ class Gra:
         self.track = False
         self.mapa = Mapa()
         self.mini_mapa = Mini_map()
+        self.player = Player()
+        self.resource = Resource()
+        self.menu = SideMenu()
 
     # metoda uruchamiająca grę
     def run(self):
@@ -48,6 +52,17 @@ class Gra:
                 )
 
     def draw(self):
+        self.screen.fill("black")  # wypełnia screena
+        self.draw_map()
+        # self.draw_menu()
+        self.draw_resource()
+        self.draw_mini_map()
+
+    def draw_map(self):
+        self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
+        self.mapa.tiles_group.draw(self.mapa.mapSurf)  # rysuje tilesy
+
+    def draw_mini_map(self):
         self.mini_mapa.update()
         self.mini_mapa.origin = (  # type: ignore
             -self.mapa.origin[0] / skala,
@@ -56,16 +71,24 @@ class Gra:
         self.mini_mapa.rect = self.mini_mapa.rectsurf.get_frect(
             topleft=self.mini_mapa.origin
         )
-        pygame.draw.rect(self.mini_mapa.surf, "red", self.mini_mapa.rect, width=1)
-        self.screen.fill("black")  # wypełnia screena
-        self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
-        self.mapa.tiles_group.draw(self.mapa.mapSurf)  # rysuje tilesy
+        pygame.draw.rect(
+            self.mini_mapa.surf, mini_map_rect_color, self.mini_mapa.rect, width=1
+        )
         self.screen.blit(
             self.mini_mapa.surf, self.mini_mapa.mapRect
         )  # rysuje mini mapę
         pygame.draw.rect(
             self.screen, (0, 0, 0), self.mini_mapa.mapRect, width=2
         )  # rysuje border
+
+    def draw_resource(self):
+        self.screen.blit(self.resource.surf, self.resource.rect)
+        self.resource.fill()
+        self.resource.display_gold(self.player, (10, (resource_height - font_size) / 2))
+
+    def draw_menu(self):
+        self.menu.fill()
+        self.screen.blit(self.menu.surf, self.menu.rect)
 
 
 # ważne!!! Odpala tylko, jeżeli został uruchomiony sam z siebie, a nie w formie zainportowanego modułu. Bez tego, gdybyśmy importwali ten program to przy imporcie uruchamiałby się gra.run()

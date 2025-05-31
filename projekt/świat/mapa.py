@@ -12,6 +12,9 @@ class Mapa:
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
         self.tmx = load_pygame(join(folder_grafiki, plik_mapy))
         self.tiles_group = pygame.sprite.Group()
+        self.Tile_array = [
+            [0 for _ in range(map_tile_height)] for _ in range(map_tile_width)
+        ]
         self.load_tiles()
 
     def update(self) -> None:
@@ -62,7 +65,10 @@ class Mapa:
                             x * tile_width + tile_width,
                             y * tile_height / 4 * 3 + tile_height / 2,
                         )
-                    Tile(surf=surf, pos=pos, group=self.tiles_group)
+                    tile = Tile(
+                        surf=surf, pos=pos, group=self.tiles_group, id=x + 30 * y
+                    )
+                    self.Tile_array[x][y] = tile
 
     def __str__(self):
         for layer in self.tmx.layers:

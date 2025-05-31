@@ -11,6 +11,8 @@ FPS = 60
 # mapa
 Mapa_width = 3416
 Mapa_height = 2457
+map_tile_width = 30
+map_tile_height = 30
 
 mapa_x_offset = srodek[0]
 mapa_y_offset = srodek[1]
@@ -31,7 +33,23 @@ minimapa_image = "mapa_test.png"
 tile_height = 108
 tile_width = 112
 
+# side-menu
+menu_width = 200
+menu_height = Height
+menu_color = "grey"
+menu_pos = (0, 0)
+
+# resource
+resource_width = Width
+resource_height = 50
+
+resource_pos = (0, 0)
+resource_color = "grey"
+font = "consolas.ttf"
+font_size = 32
+font_color = "black"
 
 # mini map rect
-mini_map_mouse_rect_width = Width / skala
-mini_map_mouse_rect_height = Height / skala
+mini_map_mouse_rect_width = (Width) / skala
+mini_map_mouse_rect_height = (Height) / skala
+mini_map_rect_color = "red"
