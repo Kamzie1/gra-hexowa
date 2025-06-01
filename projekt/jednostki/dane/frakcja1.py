@@ -3,6 +3,7 @@
 
 # dane jednostki Yukimura Sanda w schemacie słownika, dostęp do danych: Yukimura_Sanda['nazwa_informacji'] np. Yukimura_Sanda['zdrowie'] da nam 500
 Yukimura_Sanada = {
+    "nazwa": "Yukimura Sanada",
     "zdrowie": 500,
     "morale": 100,
     "ruch": 15,
@@ -15,6 +16,7 @@ Yukimura_Sanada = {
 }
 
 Bodyguard = {
+    "nazwa": "Bodyguard",
     "zdrowie": 100,
     "morale": 70,
     "ruch": 10,

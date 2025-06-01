@@ -1,8 +1,8 @@
 # Plik ze stałymi służącymi do ustawień, będzie ich duża zapewne, a takie rozmieszczenie ułatwi ich edycję
 folder_grafiki = "grafika"
 # ekran
-Width = 1600
-Height = 800
+Width = 1200
+Height = 600
 srodek = (Width / 2, Height / 2)
 Title = "Gra"
 
@@ -11,6 +11,7 @@ FPS = 60
 # recruit
 pos_rec_x = 6
 pos_rec_y = 6
+recruit_pos = (728, 540)
 budynek_img = "recruit_test.png"
 
 # mapa
