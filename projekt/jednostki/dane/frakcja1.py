@@ -11,6 +11,7 @@ Yukimura_Sanada = {
     "atak": 20,
     "koszt_ataku": 3,
     "image": "Yukimura_Sanada.png",
+    "cost": 500,
 }
 
 Bodyguard = {
@@ -22,4 +23,5 @@ Bodyguard = {
     "atak": 10,
     "koszt_ataku": 3,
     "image": "Bodyguard.png",
+    "cost": 100,
 }

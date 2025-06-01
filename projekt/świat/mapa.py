@@ -91,15 +91,11 @@ class Mapa:
                             pos=pos,
                             group=self.tiles_group,
                             id=x + 30 * y,
-                            object=budynek,
+                            budynek=budynek,
                         )
                     else:
                         tile = Tile(
-                            surf=surf,
-                            pos=pos,
-                            group=self.tiles_group,
-                            id=x + 30 * y,
-                            object=None,
+                            surf=surf, pos=pos, group=self.tiles_group, id=x + 30 * y
                         )
                     self.Tile_array[x][y] = tile
 

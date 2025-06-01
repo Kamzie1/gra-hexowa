@@ -5,7 +5,7 @@ import pygame
 
 class Resource:
     def __init__(self):
-        self.surf = pygame.Surface((resource_width, resource_height))
+        self.surf = pygame.Surface((resource_width, resource_height), pygame.SRCALPHA)
         self.surf.fill(resource_color)
         self.rect = self.surf.get_frect(topleft=resource_pos)
         self.font = pygame.font.Font(join(folder_grafiki, font), font_size)

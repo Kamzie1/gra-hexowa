@@ -5,6 +5,7 @@ from ustawienia import *  # plik z ustawieniami
 from świat import Mapa, Mini_map, Resource, SideMenu
 from player import Player
 from jednostki import Yukimura_Sanada, Wojownik
+from random import randint
 
 
 # klasa reprezentująca grę
@@ -22,6 +23,7 @@ class Gra:
         self.resource = Resource()
         self.menu = SideMenu()
         self.army_group = pygame.sprite.Group()
+        self.click_flag = False
 
     # metoda uruchamiająca grę
     def run(self):
@@ -30,6 +32,33 @@ class Gra:
                 if event.type == pygame.QUIT:  # wyjdź z programu
                     pygame.quit()
                     exit()
+                elif (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    and pygame.mouse.get_pressed()[0]
+                ):
+                    self.click_flag = True
+                elif event.type == pygame.MOUSEBUTTONUP and self.click_flag == True:
+                    mouse_pos = pygame.mouse.get_pos()
+                    mouse_pos = (
+                        mouse_pos[0] - self.mapa.origin[0],
+                        mouse_pos[1] - self.mapa.origin[1],
+                    )
+                    for tiles in self.mapa.Tile_array:
+                        for tile in tiles:
+                            if tile.hitbox.collidepoint(mouse_pos):
+                                if not tile.budynek is None:
+                                    print("kliknąłem budynek")
+                                    Wojownik(
+                                        Yukimura_Sanada,
+                                        self.army_group,
+                                        (
+                                            randint(0, Mapa_width),
+                                            randint(0, Mapa_height),
+                                        ),
+                                    )
+                                    self.player.gold -= Yukimura_Sanada["cost"]
+                                else:
+                                    print(f"kliknąłem heksa{tile.id}")
             # aktualizacja położenia mapy
             self.mapa.update()
             self.update_minimap()  # obsługa minimapy
@@ -56,10 +85,10 @@ class Gra:
     def draw(self):
         self.screen.fill("black")  # wypełnia screena
         self.draw_map()
-        self.army_group.draw(self.mapa.mapSurf)
-        # self.draw_menu()
+        self.draw_menu()
         self.draw_resource()
         self.draw_mini_map()
+        self.army_group.draw(self.mapa.mapSurf)
 
     def draw_map(self):
         self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
