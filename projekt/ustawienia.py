@@ -8,6 +8,11 @@ Title = "Gra"
 
 FPS = 60
 
+# recruit
+pos_rec_x = 6
+pos_rec_y = 6
+budynek_img = "recruit_test.png"
+
 # mapa
 Mapa_width = 3416
 Mapa_height = 2457
@@ -23,7 +28,7 @@ mouse_border_speed = 20
 
 plik_mapy = "mapa_test.tmx"
 
-map_original_pos = (0, 0)
+map_original_pos = (-728 + srodek[0], -540 + srodek[1])
 
 # mini_mapa
 skala = 10

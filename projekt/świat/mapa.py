@@ -3,6 +3,7 @@ from ustawienia import *
 from pytmx.util_pygame import load_pygame
 from os.path import join
 from .tile import Tile
+from .budynek import Budynek
 
 
 class Mapa:
@@ -13,8 +14,9 @@ class Mapa:
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
         self.tmx = load_pygame(join(folder_grafiki, plik_mapy))
         self.tiles_group = pygame.sprite.Group()
+        self.building_group = pygame.sprite.Group()
         self.Tile_array = [
-            [0 for _ in range(map_tile_height)] for _ in range(map_tile_width)
+            [None for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
         self.load_tiles()
 
@@ -82,9 +84,23 @@ class Mapa:
                             x * tile_width + tile_width,
                             y * tile_height / 4 * 3 + tile_height / 2,
                         )
-                    tile = Tile(
-                        surf=surf, pos=pos, group=self.tiles_group, id=x + 30 * y
-                    )
+                    if x == pos_rec_x and y == pos_rec_y:
+                        budynek = Budynek(pos, self.building_group, budynek_img)
+                        tile = Tile(
+                            surf=surf,
+                            pos=pos,
+                            group=self.tiles_group,
+                            id=x + 30 * y,
+                            object=budynek,
+                        )
+                    else:
+                        tile = Tile(
+                            surf=surf,
+                            pos=pos,
+                            group=self.tiles_group,
+                            id=x + 30 * y,
+                            object=None,
+                        )
                     self.Tile_array[x][y] = tile
 
     def __str__(self):

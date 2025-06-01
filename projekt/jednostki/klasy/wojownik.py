@@ -5,26 +5,27 @@ from os.path import join
 # klasa wojownik, podstawowa klasa reprezentująca mechanikę każdej jednostki, czyli jej ruch i atak, dziedziczy od specjalnej klasy Sprite od pygame pozwalajacej na lepszą kontrolę w pygame
 class Wojownik(pygame.sprite.Sprite):
     # inicjalizacja
-    def __init__(
-        self, zdrowie, morale, ruch, przebicie, pancerz, atak, koszt_ataku, image, pos
-    ):
-        self.zdrowie = zdrowie
-        self.morale = morale
-        self.ruch = ruch
-        self.przebicie = przebicie
-        self.pancerz = pancerz
-        self.atak = atak
-        self.koszt_ataku = koszt_ataku
+    def __init__(self, jednostka, group, pos):
+        super().__init__(group)
+        self.zdrowie = jednostka["zdrowie"]
+        self.morale = jednostka["morale"]
+        self.ruch = jednostka["ruch"]
+        self.przebicie = jednostka["przebicie"]
+        self.pancerz = jednostka["pancerz"]
+        self.atak = jednostka["atak"]
+        self.koszt_ataku = jednostka["koszt_ataku"]
         self.pos = pos
 
         try:
             if not pygame.display.get_init():
                 pygame.display.init()
                 pygame.display.set_mode((1, 1))
-            self.surf = pygame.image.load(join("grafika", image)).convert_alpha()
+            self.image = pygame.image.load(
+                join("grafika", jednostka["image"])
+            ).convert_alpha()
         except (FileNotFoundError, pygame.error):
-            self.surf = pygame.Surface((1, 1), pygame.SRCALPHA)
-        self.rect = self.surf.get_frect(center=pos)
+            self.image = pygame.Surface((1, 1), pygame.SRCALPHA)
+        self.rect = self.image.get_frect(center=pos)
         if self.rect is None:
             raise ValueError("błąd rect klasa wojownika")
 

@@ -4,6 +4,7 @@ from os.path import join
 from ustawienia import *  # plik z ustawieniami
 from świat import Mapa, Mini_map, Resource, SideMenu
 from player import Player
+from jednostki import Yukimura_Sanada, Wojownik
 
 
 # klasa reprezentująca grę
@@ -20,6 +21,7 @@ class Gra:
         self.player = Player()
         self.resource = Resource()
         self.menu = SideMenu()
+        self.army_group = pygame.sprite.Group()
 
     # metoda uruchamiająca grę
     def run(self):
@@ -29,7 +31,7 @@ class Gra:
                     pygame.quit()
                     exit()
             # aktualizacja położenia mapy
-            self.mapa.update()  # type: ignore pylance mi świruje i widzi to jako błąd, być może tak jest, ale na razie wszystko działa
+            self.mapa.update()
             self.update_minimap()  # obsługa minimapy
             self.draw()  # rysuje wszystkie elementy
 
@@ -54,6 +56,7 @@ class Gra:
     def draw(self):
         self.screen.fill("black")  # wypełnia screena
         self.draw_map()
+        self.army_group.draw(self.mapa.mapSurf)
         # self.draw_menu()
         self.draw_resource()
         self.draw_mini_map()
@@ -61,6 +64,7 @@ class Gra:
     def draw_map(self):
         self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
         self.mapa.tiles_group.draw(self.mapa.mapSurf)  # rysuje tilesy
+        self.mapa.building_group.draw(self.mapa.mapSurf)  # rysuje budynki
 
     def draw_mini_map(self):
         self.mini_mapa.update()
@@ -80,7 +84,8 @@ class Gra:
         pygame.draw.rect(
             self.screen, (0, 0, 0), self.mini_mapa.mapRect, width=2
         )  # rysuje border
-##nigger
+
+    ##nigger
     def draw_resource(self):
         self.screen.blit(self.resource.surf, self.resource.rect)
         self.resource.fill()
