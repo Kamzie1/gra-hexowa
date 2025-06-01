@@ -48,15 +48,19 @@ class Gra:
                             if tile.hitbox.collidepoint(mouse_pos):
                                 if not tile.budynek is None:
                                     print("kliknąłem budynek")
-                                    Wojownik(
-                                        Yukimura_Sanada,
-                                        self.army_group,
-                                        (
-                                            randint(0, Mapa_width),
-                                            randint(0, Mapa_height),
-                                        ),
-                                    )
-                                    self.player.gold -= Yukimura_Sanada["cost"]
+                                    try:
+                                        self.player.gold -= Yukimura_Sanada["cost"]
+                                        Wojownik(
+                                            Yukimura_Sanada,
+                                            self.army_group,
+                                            (
+                                                randint(0, Mapa_width),
+                                                randint(0, Mapa_height),
+                                            ),
+                                        )
+                                    except ValueError:
+                                        print("no money")
+
                                 else:
                                     print(f"kliknąłem heksa{tile.id}")
             # aktualizacja położenia mapy
