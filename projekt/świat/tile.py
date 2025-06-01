@@ -11,3 +11,4 @@ class Tile(pygame.sprite.Sprite):
         self.jednostka = jednostka
         self.hitbox_surf = pygame.Surface((112, 54))
         self.hitbox = self.hitbox_surf.get_frect(center=pos)
+        self.pos = pos

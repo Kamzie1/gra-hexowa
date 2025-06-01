@@ -6,6 +6,7 @@ from świat import Mapa, Mini_map, Resource, SideMenu
 from player import Player
 from jednostki import Yukimura_Sanada, Wojownik
 from random import randint
+from math import sqrt
 
 
 # klasa reprezentująca grę
@@ -45,7 +46,7 @@ class Gra:
                     )
                     for tiles in self.mapa.Tile_array:
                         for tile in tiles:
-                            if tile.hitbox.collidepoint(mouse_pos):
+                            if self.Clicked(tile.pos, mouse_pos):
                                 if not tile.budynek is None:
                                     print("kliknąłem budynek")
                                     try:
@@ -58,8 +59,8 @@ class Gra:
                                                 randint(0, Mapa_height),
                                             ),
                                         )
-                                    except ValueError:
-                                        print("no money")
+                                    except (ValueError, TypeError) as e:
+                                        print(e)
 
                                 else:
                                     print(f"kliknąłem heksa{tile.id}")
@@ -127,6 +128,13 @@ class Gra:
     def draw_menu(self):
         self.menu.fill()
         self.screen.blit(self.menu.surf, self.menu.rect)
+
+    def Clicked(self, pos, mouse_pos) -> bool:
+        r = sqrt(3) * tile_height / 4
+        a, b = pos
+        if pow(mouse_pos[0] - a, 2) + pow(mouse_pos[1] - b, 2) <= pow(r, 2):
+            return True
+        return False
 
 
 # ważne!!! Odpala tylko, jeżeli został uruchomiony sam z siebie, a nie w formie zainportowanego modułu. Bez tego, gdybyśmy importwali ten program to przy imporcie uruchamiałby się gra.run()
