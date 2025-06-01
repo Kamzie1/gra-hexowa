@@ -17,6 +17,10 @@ map_tile_height = 30
 mapa_x_offset = srodek[0]
 mapa_y_offset = srodek[1]
 
+mouse_boundry_offset_x = 2
+mouse_boundry_offset_y = 2
+mouse_border_speed = 20
+
 plik_mapy = "mapa_test.tmx"
 
 map_original_pos = (0, 0)

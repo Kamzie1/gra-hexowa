@@ -8,6 +8,7 @@ from .tile import Tile
 class Mapa:
     def __init__(self):
         self.origin = map_original_pos
+        self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
         self.tmx = load_pygame(join(folder_grafiki, plik_mapy))
@@ -18,6 +19,22 @@ class Mapa:
         self.load_tiles()
 
     def update(self) -> None:
+        if pygame.mouse.get_pos()[0] <= 0 + mouse_boundry_offset_x:
+            self.origin1 = (self.origin[0] + mouse_border_speed, self.origin[1])
+        elif pygame.mouse.get_pos()[0] >= Width - mouse_boundry_offset_x:
+            self.origin1 = (self.origin[0] - mouse_border_speed, self.origin[1])
+        elif pygame.mouse.get_pos()[1] <= 0 + mouse_boundry_offset_y:
+            self.origin1 = (self.origin[0], self.origin[1] + mouse_border_speed)
+        elif pygame.mouse.get_pos()[1] >= Height - mouse_boundry_offset_y:
+            self.origin1 = (self.origin[0], self.origin[1] - mouse_border_speed)
+        else:
+            self.origin1 = None
+
+        if not self.origin1 is None:
+            if self.validateOffset((0, 0), self.origin1):
+                self.origin = self.origin1
+                self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
+
         if pygame.mouse.get_pressed()[1]:
             # aktualizacja pozycji mapy względem ekranu
             self.update_pos()
