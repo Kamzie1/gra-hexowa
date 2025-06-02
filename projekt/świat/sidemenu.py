@@ -1,6 +1,6 @@
 from ustawienia import *
 from jednostki import *
-from .buttton import Recruit
+from .button import Recruit
 import pygame
 
 

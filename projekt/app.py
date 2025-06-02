@@ -126,13 +126,14 @@ class Gra:
                                     print("clicked")
                                     self.move_flag = tile.jednostka
                                 else:
-                                    print("move")
-                                    self.move_flag.pos = tile.pos
-                                    self.move_flag.tile.jednostka = None
-                                    self.move_flag.tile = tile
-                                    tile.jednostka = self.move_flag
-                                    print(self.move_flag)
-                                    print(tile.id, tile.jednostka)
+                                    if tile.jednostka is None:
+                                        print("move")
+                                        self.move_flag.pos = tile.pos
+                                        self.move_flag.tile.jednostka = None
+                                        self.move_flag.tile = tile
+                                        tile.jednostka = self.move_flag
+                                        print(self.move_flag)
+                                        print(tile.id, tile.jednostka)
                                     self.move_flag = None
 
                 self.click_flag = False

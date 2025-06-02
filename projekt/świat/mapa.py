@@ -74,20 +74,29 @@ class Mapa:
         # loaduje z tmx tilesy i przypisuje je do grupy
         for layer in self.tmx.visible_layers:
             if hasattr(layer, "data"):
-                for x, y, surf in layer.tiles():
+                for x, y, gid in layer.iter_data():
                     pos = oblicz_pos(x, y)
+                    props = self.tmx.get_tile_properties_by_gid(gid)
+                    image = self.tmx.get_tile_image_by_gid(gid)
                     if x == pos_rec_x and y == pos_rec_y:
                         budynek = Budynek(pos, self.building_group, budynek_img)
                         tile = Tile(
-                            surf=surf,
+                            surf=image,
                             pos=pos,
                             group=self.tiles_group,
                             id=x + 30 * y,
                             budynek=budynek,
+                            koszt_ruchu=props["koszt_ruchu"],
+                            typ=props["id"],
                         )
                     else:
                         tile = Tile(
-                            surf=surf, pos=pos, group=self.tiles_group, id=x + 30 * y
+                            surf=image,
+                            pos=pos,
+                            group=self.tiles_group,
+                            id=x + 30 * y,
+                            koszt_ruchu=props["koszt_ruchu"],
+                            typ=props["id"],
                         )
                     self.Tile_array[x][y] = tile
 

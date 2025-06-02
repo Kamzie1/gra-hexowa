@@ -1,7 +1,7 @@
 from ustawienia import *
 from os.path import join
 import pygame
-from .buttton import Quit
+from .button import Quit
 
 
 class Resource:
