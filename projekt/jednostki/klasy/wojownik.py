@@ -5,7 +5,7 @@ from os.path import join
 # klasa wojownik, podstawowa klasa reprezentująca mechanikę każdej jednostki, czyli jej ruch i atak, dziedziczy od specjalnej klasy Sprite od pygame pozwalajacej na lepszą kontrolę w pygame
 class Wojownik(pygame.sprite.Sprite):
     # inicjalizacja
-    def __init__(self, jednostka, group, pos):
+    def __init__(self, jednostka, group, pos, tile):
         super().__init__(group)
         self.zdrowie = jednostka["zdrowie"]
         self.morale = jednostka["morale"]
@@ -14,7 +14,8 @@ class Wojownik(pygame.sprite.Sprite):
         self.pancerz = jednostka["pancerz"]
         self.atak = jednostka["atak"]
         self.koszt_ataku = jednostka["koszt_ataku"]
-        self.pos = pos
+        self._pos = pos
+        self.tile = tile
 
         self.image = pygame.image.load(
             join("grafika/jednostki-grafika", jednostka["image"])
@@ -28,3 +29,12 @@ class Wojownik(pygame.sprite.Sprite):
 
     def marsz(self):
         self.rect.x += self.ruch / 10  # type: ignore
+
+    @property
+    def pos(self):
+        return self._pos
+
+    @pos.setter
+    def pos(self, value):
+        self._pos = value
+        self.rect = self.image.get_frect(center=self._pos)

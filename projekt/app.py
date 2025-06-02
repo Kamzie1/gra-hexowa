@@ -24,6 +24,7 @@ class Gra:
         self.click_flag = False
         self.show = True
         self.menu = SideMenu(self.player, self.mapa)
+        self.move_flag = None
 
     # metoda uruchamiająca grę
     def run(self):
@@ -121,7 +122,19 @@ class Gra:
                     for tiles in self.mapa.Tile_array:
                         for tile in tiles:
                             if self.Clicked(tile.pos, mouse_pos):
-                                print(f"kliknąłem heksa{tile.id}")
+                                if self.move_flag is None:
+                                    print("clicked")
+                                    self.move_flag = tile.jednostka
+                                else:
+                                    print("move")
+                                    self.move_flag.pos = tile.pos
+                                    self.move_flag.tile.jednostka = None
+                                    self.move_flag.tile = tile
+                                    tile.jednostka = self.move_flag
+                                    print(self.move_flag)
+                                    print(tile.id, tile.jednostka)
+                                    self.move_flag = None
+
                 self.click_flag = False
 
 

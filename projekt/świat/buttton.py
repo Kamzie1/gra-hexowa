@@ -47,7 +47,12 @@ class Recruit(Button):
         try:
             if self.mapa.Tile_array[pos_rec_x][pos_rec_y].jednostka is None:
                 self.player.gold -= self.jednostka["cost"]
-                w = Wojownik(self.jednostka, self.group, self.recruit_pos)
+                w = Wojownik(
+                    self.jednostka,
+                    self.group,
+                    self.recruit_pos,
+                    self.mapa.Tile_array[pos_rec_x][pos_rec_y],
+                )
                 self.mapa.Tile_array[pos_rec_x][pos_rec_y].jednostka = w
         except (ValueError, TypeError) as e:
             print(e)

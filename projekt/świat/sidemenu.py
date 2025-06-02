@@ -31,5 +31,18 @@ class SideMenu:
             self.mapa,
         )
 
+        Recruit(
+            50,
+            50,
+            "green",
+            (0, 50),
+            Bodyguard,
+            self.group,
+            self.recruit_group,
+            recruit_pos,
+            self.player,
+            self.mapa,
+        )
+
     def fill(self):
         self.surf.fill(menu_color)
