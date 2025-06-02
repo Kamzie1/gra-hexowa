@@ -1,7 +1,11 @@
+import pygame
+
+
 class Player:
     def __init__(self):
         self.name = "anonim"
         self._gold = 1000
+        self.army_group = pygame.sprite.Group()
 
     @property
     def gold(self):

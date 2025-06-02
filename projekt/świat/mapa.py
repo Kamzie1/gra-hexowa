@@ -4,6 +4,7 @@ from pytmx.util_pygame import load_pygame
 from os.path import join
 from .tile import Tile
 from .budynek import Budynek
+from narzedzia import *
 
 
 class Mapa:
@@ -74,16 +75,7 @@ class Mapa:
         for layer in self.tmx.visible_layers:
             if hasattr(layer, "data"):
                 for x, y, surf in layer.tiles():
-                    if y % 2 == 0:
-                        pos = (
-                            x * tile_width + tile_width / 2,
-                            y * tile_height / 4 * 3 + tile_height / 2,
-                        )
-                    else:
-                        pos = (
-                            x * tile_width + tile_width,
-                            y * tile_height / 4 * 3 + tile_height / 2,
-                        )
+                    pos = oblicz_pos(x, y)
                     if x == pos_rec_x and y == pos_rec_y:
                         budynek = Budynek(pos, self.building_group, budynek_img)
                         tile = Tile(
@@ -123,3 +115,17 @@ class Mini_map:
 
     def update(self):
         self.surf = self.scaledSurf.copy()
+
+    def update_minimap(self, mapa):
+        if pygame.mouse.get_pressed()[0]:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.mapRect.collidepoint(mouse_pos):
+                # jeżeli zachodzi interakcja z mini mapą, to licz współrzędne (odpowiednio zeskalowane)
+                pos_y = mouse_pos[1] - mini_map_pos[1]
+                pos_x = mouse_pos[0] + mini_width - mini_map_pos[0]
+                mapa_pos_y = pos_y * skala
+                mapa_pos_x = pos_x * skala
+                mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])  # type: ignore , srodek wyrównuje widok, przenosi origin o połowę wektora przekątnej ekranu
+                mapa.mapRect = mapa.mapSurf.get_frect(
+                    topleft=mapa.origin  # zaktualizuj położenie mapy
+                )

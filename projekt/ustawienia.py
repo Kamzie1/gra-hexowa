@@ -8,12 +8,6 @@ Title = "Gra"
 
 FPS = 60
 
-# recruit
-pos_rec_x = 6
-pos_rec_y = 6
-recruit_pos = (728, 540)
-budynek_img = "recruit_test.png"
-
 # mapa
 Mapa_width = 3416
 Mapa_height = 2457
@@ -52,6 +46,27 @@ resource_color = (0, 0, 0, 100)
 font = "consolas.ttf"
 font_size = 32
 font_color = "yellow"
+
+
+def oblicz_pos(x, y):
+    if y % 2 == 0:
+        pos = (
+            x * tile_width + tile_width / 2,
+            y * tile_height / 4 * 3 + tile_height / 2,
+        )
+    else:
+        pos = (
+            x * tile_width + tile_width,
+            y * tile_height / 4 * 3 + tile_height / 2,
+        )
+    return pos
+
+
+# recruit
+pos_rec_x = 6
+pos_rec_y = 6
+recruit_pos = oblicz_pos(pos_rec_x, pos_rec_y)
+budynek_img = "recruit_test.png"
 
 # side-menu
 menu_width = 300

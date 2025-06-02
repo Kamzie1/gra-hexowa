@@ -1,6 +1,7 @@
 from ustawienia import *
 from os.path import join
 import pygame
+from .buttton import Quit
 
 
 class Resource:
@@ -9,6 +10,14 @@ class Resource:
         self.surf.fill(resource_color)
         self.rect = self.surf.get_frect(topleft=resource_pos)
         self.font = pygame.font.Font(join(folder_grafiki, font), font_size)
+        self.button_group = pygame.sprite.Group()
+        Quit(
+            50,
+            50,
+            "blue",
+            (0, 0),
+            self.button_group,
+        )
 
     def fill(self):
         self.surf.fill(resource_color)
