@@ -126,9 +126,10 @@ class Gra:
                                 if self.move_flag is None:
                                     print("clicked")
                                     self.move_flag = tile.jednostka
-                                    self.correct_moves = self.mapa.possible_moves(
-                                        tile.pos[0], tile.pos[1], tile.jednostka.ruch
-                                    )
+                                    if not tile.jednostka is None:
+                                        self.correct_moves = self.mapa.possible_moves(
+                                            tile.x, tile.y, tile.jednostka.ruch
+                                        )
                                 else:
                                     if (
                                         tile.jednostka is None
