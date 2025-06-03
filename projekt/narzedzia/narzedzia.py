@@ -1,4 +1,4 @@
-from ustawienia import *
+from ..ustawienia import tile_height, tile_width
 
 
 def oblicz_id(origin, mouse_pos):

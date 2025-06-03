@@ -1,6 +1,6 @@
 import pygame
 from os.path import join
-from ustawienia import folder_grafiki
+from ..ustawienia import folder_grafiki
 
 
 class Budynek(pygame.sprite.Sprite):

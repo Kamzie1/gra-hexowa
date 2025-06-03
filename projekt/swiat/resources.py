@@ -1,4 +1,4 @@
-from ustawienia import *
+from ..ustawienia import *
 from os.path import join
 import pygame
 from .button import Quit
