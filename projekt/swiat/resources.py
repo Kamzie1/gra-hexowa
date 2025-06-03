@@ -23,7 +23,10 @@ class Resource:
         self.surf.fill(resource_color)
 
     def display_gold(self, player, pos):
-        self.display = f"Gold: {player.gold} "
-        self.text = self.font.render(self.display, True, font_color)
-        self.text_rect = self.text.get_rect(topleft=pos)
-        self.surf.blit(self.text, self.text_rect)
+        image = pygame.image.load(join("grafika", "złoto.png"))
+        rect = image.get_frect(topleft=(150, (resource_height - font_size) / 2))
+        self.surf.blit(image, rect)
+        display = f"{player.gold} "
+        text = self.font.render(display, True, font_color)
+        text_rect = text.get_rect(topleft=pos)
+        self.surf.blit(text, text_rect)

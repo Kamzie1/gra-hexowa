@@ -21,10 +21,12 @@ class Tile(pygame.sprite.Sprite):
 
 
 class Najechanie:
-    def __init__(self, surf, pos):
+    def __init__(self, surf, pos, surf2):
         self._origin = pos
         self.image = surf
+        self.image2 = surf2
         self.rect = self.image.get_frect(center=self.origin)
+        self.flag = True
 
     @property
     def origin(self):

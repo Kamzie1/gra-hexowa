@@ -31,12 +31,18 @@ class Gra:
                 join("grafika/tile-grafika", "Hex_najechanie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
+            pygame.image.load(
+                join("grafika/tile-grafika", "Hex_wrogie_podswietlanie.png")
+            ).convert_alpha(),
         )
         self.klikniecie = Najechanie(
             pygame.image.load(
                 join("grafika/tile-grafika", "Hex-klikniecie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
+            pygame.image.load(
+                join("grafika/tile-grafika", "Hex_wrogie_podswietlanie.png")
+            ).convert_alpha(),
         )
         self.klikniecie_flag = False
         self.move_group = pygame.sprite.Group()
@@ -56,6 +62,10 @@ class Gra:
                 for tile in tiles:
                     if self.Clicked(tile.pos, mouse_pos):
                         self.najechanie.origin = tile.pos
+                        if tile.jednostka is None:
+                            self.najechanie.flag = True
+                        else:
+                            self.najechanie.flag = False
 
             pygame.display.update()  # odświeża display
 
@@ -74,7 +84,10 @@ class Gra:
         self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
         self.mapa.tiles_group.draw(self.mapa.mapSurf)  # rysuje tilesy
         self.mapa.building_group.draw(self.mapa.mapSurf)  # rysuje budynki
-        self.mapa.mapSurf.blit(self.najechanie.image, self.najechanie.rect)
+        if self.najechanie.flag:
+            self.mapa.mapSurf.blit(self.najechanie.image, self.najechanie.rect)
+        else:
+            self.mapa.mapSurf.blit(self.najechanie.image2, self.najechanie.rect)
         if self.klikniecie_flag:
             self.mapa.mapSurf.blit(self.klikniecie.image, self.klikniecie.rect)
         if not self.move_flag is None:
