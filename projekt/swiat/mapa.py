@@ -91,6 +91,8 @@ class Mapa:
                         tile = Tile(
                             surf=image,
                             pos=pos,
+                            x=x,
+                            y=y,
                             group=self.tiles_group,
                             id=x + 30 * y,
                             budynek=budynek,
@@ -100,6 +102,8 @@ class Mapa:
                     else:
                         tile = Tile(
                             surf=image,
+                            x=x,
+                            y=y,
                             pos=pos,
                             group=self.tiles_group,
                             id=x + 30 * y,

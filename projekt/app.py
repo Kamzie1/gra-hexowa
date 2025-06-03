@@ -1,11 +1,11 @@
 import pygame
 from sys import exit
 from os.path import join
-from ustawienia import *  # plik z ustawieniami
-from swiat import Mapa, Mini_map, Resource, SideMenu
-from player import Player
+from projekt.ustawienia import *  # plik z ustawieniami
+from projekt.swiat import Mapa, Mini_map, Resource, SideMenu
+from projekt.player import Player
 from math import sqrt
-from narzedzia import *
+from projekt.narzedzia import *
 
 
 # klasa reprezentująca grę
@@ -25,6 +25,7 @@ class Gra:
         self.show = True
         self.menu = SideMenu(self.player, self.mapa)
         self.move_flag = None
+        self.correct_moves = None
 
     # metoda uruchamiająca grę
     def run(self):
@@ -125,8 +126,14 @@ class Gra:
                                 if self.move_flag is None:
                                     print("clicked")
                                     self.move_flag = tile.jednostka
+                                    self.correct_moves = self.mapa.possible_moves(
+                                        tile.pos[0], tile.pos[1], tile.jednostka.ruch
+                                    )
                                 else:
-                                    if tile.jednostka is None:
+                                    if (
+                                        tile.jednostka is None
+                                        and self.correct_moves[tile.x][tile.y] == 1
+                                    ):
                                         print("move")
                                         self.move_flag.pos = tile.pos
                                         self.move_flag.tile.jednostka = None
