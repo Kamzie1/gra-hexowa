@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 from os.path import join
 from projekt.ustawienia import *  # plik z ustawieniami
-from projekt.swiat import Mapa, Mini_map, Resource, SideMenu
+from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Najechanie, Ruch
 from projekt.player import Player
 from math import sqrt
 from projekt.narzedzia import *
@@ -26,6 +26,20 @@ class Gra:
         self.menu = SideMenu(self.player, self.mapa)
         self.move_flag = None
         self.correct_moves = None
+        self.najechanie = Najechanie(
+            pygame.image.load(
+                join("grafika/tile-grafika", "Hex_najechanie.png")
+            ).convert_alpha(),
+            (tile_width / 2, tile_height / 2),
+        )
+        self.klikniecie = Najechanie(
+            pygame.image.load(
+                join("grafika/tile-grafika", "Hex-klikniecie.png")
+            ).convert_alpha(),
+            (tile_width / 2, tile_height / 2),
+        )
+        self.klikniecie_flag = False
+        self.move_group = pygame.sprite.Group()
 
     # metoda uruchamiająca grę
     def run(self):
@@ -35,6 +49,13 @@ class Gra:
             self.mapa.update()
             self.mini_mapa.update_minimap(self.mapa)  # obsługa minimapy
             self.draw()  # rysuje wszystkie elementy
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, self.mapa.origin)
+
+            for tiles in self.mapa.Tile_array:
+                for tile in tiles:
+                    if self.Clicked(tile.pos, mouse_pos):
+                        self.najechanie.origin = tile.pos
 
             pygame.display.update()  # odświeża display
 
@@ -53,16 +74,30 @@ class Gra:
         self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
         self.mapa.tiles_group.draw(self.mapa.mapSurf)  # rysuje tilesy
         self.mapa.building_group.draw(self.mapa.mapSurf)  # rysuje budynki
+        self.mapa.mapSurf.blit(self.najechanie.image, self.najechanie.rect)
+        if self.klikniecie_flag:
+            self.mapa.mapSurf.blit(self.klikniecie.image, self.klikniecie.rect)
+        if not self.move_flag is None:
+            if len(self.move_group) == 0:
+                for tiles in self.mapa.Tile_array:
+                    for tile in tiles:
+                        if self.correct_moves[tile.x][tile.y] == 1:
+                            Ruch(
+                                self.move_group,
+                                pygame.image.load(
+                                    join("grafika/tile-grafika", "Hex-klikniecie.png")
+                                ).convert_alpha(),
+                                (tile.pos),
+                            )
+            self.move_group.draw(self.mapa.mapSurf)
 
     def draw_mini_map(self):
         self.mini_mapa.update()
-        self.mini_mapa.origin = (  # type: ignore
+        self.mini_mapa.origin = (
             -self.mapa.origin[0] / skala,
             -self.mapa.origin[1] / skala,
         )
-        self.mini_mapa.rect = self.mini_mapa.rectsurf.get_frect(
-            topleft=self.mini_mapa.origin
-        )
+
         pygame.draw.rect(
             self.mini_mapa.surf, mini_map_rect_color, self.mini_mapa.rect, width=1
         )
@@ -106,12 +141,14 @@ class Gra:
             elif event.type == pygame.MOUSEBUTTONUP and self.click_flag == True:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.menu.rect.collidepoint(mouse_pos) and self.show:
+                    self.klikniecie_flag = False
                     mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
                     for button in self.menu.recruit_group:
                         if button.rect.collidepoint(mouse_pos):
                             print("button click")
                             button.click()
                 elif self.resource.rect.collidepoint(mouse_pos):
+                    self.klikniecie_flag = False
                     mouse_pos = pozycja_myszy_na_surface(mouse_pos, resource_pos)
                     for button in self.resource.button_group:
                         if button.rect.collidepoint(mouse_pos):
@@ -123,6 +160,8 @@ class Gra:
                     for tiles in self.mapa.Tile_array:
                         for tile in tiles:
                             if self.Clicked(tile.pos, mouse_pos):
+                                self.klikniecie_flag = True
+                                self.klikniecie.origin = tile.pos
                                 if self.move_flag is None:
                                     print("clicked")
                                     self.move_flag = tile.jednostka
@@ -130,6 +169,7 @@ class Gra:
                                         self.correct_moves = self.mapa.possible_moves(
                                             tile.x, tile.y, tile.jednostka.ruch
                                         )
+
                                 else:
                                     if (
                                         tile.jednostka is None
@@ -142,7 +182,11 @@ class Gra:
                                         tile.jednostka = self.move_flag
                                         print(self.move_flag)
                                         print(tile.id, tile.jednostka)
+                                        self.klikniecie_flag = False
+
                                     self.move_flag = None
+                                    for tile in self.move_group:
+                                        tile.kill()
 
                 self.click_flag = False
 

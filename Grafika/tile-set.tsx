@@ -8,7 +8,7 @@
  </tile>
  <tile id="2">
   <properties>
-   <property name="koszt_ruchu" type="int" value="1"/>
+   <property name="koszt_ruchu" type="int" value="3"/>
   </properties>
  </tile>
 </tileset>

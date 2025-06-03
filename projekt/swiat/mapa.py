@@ -17,7 +17,7 @@ class Mapa:
     sasiedzi2y = [0, 1, -1, 0, 1, -1]
 
     def __init__(self):
-        self.origin = map_original_pos
+        self._origin = map_original_pos
         self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
@@ -28,6 +28,15 @@ class Mapa:
             [None for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
         self.load_tiles()
+
+    @property
+    def origin(self):
+        return self._origin
+
+    @origin.setter
+    def origin(self, value):
+        self._origin = value
+        self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
 
     def update(self) -> None:
         if pygame.mouse.get_pos()[0] <= 0 + mouse_boundry_offset_x:
@@ -44,7 +53,6 @@ class Mapa:
         if not self.origin1 is None:
             if self.validateOffset((0, 0), self.origin1):
                 self.origin = self.origin1
-                self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
 
         if pygame.mouse.get_pressed()[1]:
             # aktualizacja pozycji mapy względem ekranu
@@ -64,7 +72,6 @@ class Mapa:
                 self.original_origin[0] + offset[0],  # type: ignore
                 self.original_origin[1] + offset[1],  # type: ignore
             )
-        self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
 
     def validateOffset(self, offset, original_origin) -> bool:
         # sprawdza, czy nie wychodzisz poza mapę
@@ -162,7 +169,6 @@ class Mapa:
 
 class Mini_map:
     def __init__(self):
-        self.origin = mini_map_pos
         self.image = pygame.image.load(join(folder_grafiki, minimapa_image)).convert()
         self.scaledSurf = pygame.transform.smoothscale(
             self.image, (mini_width, mini_height)
@@ -170,10 +176,19 @@ class Mini_map:
         self.surf = self.scaledSurf
         self.mapRect = self.surf.get_frect(topright=mini_map_pos)
 
-        self.origin = map_original_pos
+        self._origin = map_original_pos
         self.rectsurf = pygame.Surface(
             (mini_map_mouse_rect_width, mini_map_mouse_rect_height)
         )
+        self.rect = self.rectsurf.get_frect(topleft=self.origin)
+
+    @property
+    def origin(self):
+        return self._origin
+
+    @origin.setter
+    def origin(self, value):
+        self._origin = value
         self.rect = self.rectsurf.get_frect(topleft=self.origin)
 
     def update(self):
