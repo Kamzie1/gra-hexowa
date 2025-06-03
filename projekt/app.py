@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 from os.path import join
 from ustawienia import *  # plik z ustawieniami
-from świat import Mapa, Mini_map, Resource, SideMenu
+from swiat import Mapa, Mini_map, Resource, SideMenu
 from player import Player
 from math import sqrt
 from narzedzia import *

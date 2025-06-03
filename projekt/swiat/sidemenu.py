@@ -1,5 +1,5 @@
-from ustawienia import *
-from jednostki import *
+from ..ustawienia import *
+from ..jednostki import *
 from .button import Recruit
 import pygame
 

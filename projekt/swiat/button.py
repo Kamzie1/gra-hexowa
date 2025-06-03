@@ -1,5 +1,5 @@
-from ustawienia import *
-from jednostki import *
+from ..ustawienia import *
+from ..jednostki import *
 from os.path import join
 import pygame
 

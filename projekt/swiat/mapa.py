@@ -1,13 +1,21 @@
 import pygame
-from ustawienia import *
+from projekt.ustawienia import *
 from pytmx.util_pygame import load_pygame
 from os.path import join
 from .tile import Tile
 from .budynek import Budynek
-from narzedzia import *
+from projekt.narzedzia import *
 
 
 class Mapa:
+    sasiedzi1x = [-1, 0, 0, 1, 1, 1]
+
+    sasiedzi1y = [0, 1, -1, 0, 1, -1]
+
+    sasiedzi2x = [1, 0, 0, -1, -1, -1]
+
+    sasiedzi2y = [0, 1, -1, 0, 1, -1]
+
     def __init__(self):
         self.origin = map_original_pos
         self.origin1 = None
@@ -99,6 +107,48 @@ class Mapa:
                             typ=props["id"],
                         )
                     self.Tile_array[x][y] = tile
+
+    def possible_moves(self, x, y, ruch):
+        tablica_odwiedzonych = [
+            [0 for _ in range(map_tile_width)] for _ in range(map_tile_height)
+        ]
+        tablica_odwiedzonych[x][y] = 1
+        queue = priority_queue()
+        queue.append((x, y, ruch))
+        while not queue.empty():
+            x, y, ruch = queue.pop()
+            match (y % 2):
+                case 1:
+                    sasiedzix = Mapa.sasiedzi1x
+                    sasiedziy = Mapa.sasiedzi1y
+                case 0:
+                    sasiedzix = Mapa.sasiedzi2x
+                    sasiedziy = Mapa.sasiedzi2y
+            for i in range(6):
+                if x + sasiedzix[i] >= map_tile_width or x + sasiedzix[i] < 0:
+                    continue
+                if y + sasiedziy[i] >= map_tile_height or y + sasiedziy[i] < 0:
+                    continue
+                if tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] == 1:
+                    continue
+                if (
+                    ruch
+                    - self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].koszt_ruchu
+                    < 0
+                ):
+                    continue
+                tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] = 1
+                queue.append(
+                    (
+                        x + sasiedzix[i],
+                        y + sasiedziy[i],
+                        ruch
+                        - self.Tile_array[x + sasiedzix[i]][
+                            y + sasiedziy[i]
+                        ].koszt_ruchu,
+                    )
+                )
+        return tablica_odwiedzonych
 
     def __str__(self):
         for layer in self.tmx.layers:
