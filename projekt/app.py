@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 from os.path import join
 from projekt.ustawienia import *  # plik z ustawieniami
-from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Najechanie, Ruch
+from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Najechanie, Ruch, Turn
 from projekt.player import Player
 from math import sqrt
 from projekt.narzedzia import *
@@ -21,6 +21,7 @@ class Gra:
         self.mini_mapa = Mini_map()
         self.player = Player()
         self.resource = Resource()
+        self.turn = Turn()
         self.click_flag = False
         self.show = True
         self.menu = SideMenu(self.player, self.mapa)
@@ -79,6 +80,7 @@ class Gra:
         self.draw_resource()
         self.draw_mini_map()
         self.player.army_group.draw(self.mapa.mapSurf)
+        self.screen.blit(self.turn.image, self.turn.rect)
 
     def draw_map(self):
         self.screen.blit(self.mapa.mapSurf, self.mapa.mapRect)  # rysuje mapę
@@ -154,12 +156,16 @@ class Gra:
             elif event.type == pygame.MOUSEBUTTONUP and self.click_flag == True:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.menu.rect.collidepoint(mouse_pos) and self.show:
+                    print("menu")
                     self.klikniecie_flag = False
                     mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
+                    mouse_pos = pozycja_myszy_na_surface(mouse_pos, rec_panel_pos)
                     for button in self.menu.recruit_group:
                         if button.rect.collidepoint(mouse_pos):
                             print("button click")
                             button.click()
+                elif self.turn.rect.collidepoint(mouse_pos):
+                    print("koniec")
                 elif self.resource.rect.collidepoint(mouse_pos):
                     self.klikniecie_flag = False
                     mouse_pos = pozycja_myszy_na_surface(mouse_pos, resource_pos)

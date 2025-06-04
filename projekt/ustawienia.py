@@ -49,7 +49,7 @@ resource_height = 50
 resource_pos = (0, 0)
 resource_color = (0, 0, 0, 100)
 font = "consolas.ttf"
-font_size = 32
+font_size = 24
 font_color = "yellow"
 
 
@@ -72,6 +72,7 @@ pos_rec_x = 6
 pos_rec_y = 6
 recruit_pos = oblicz_pos(pos_rec_x, pos_rec_y)
 budynek_img = "recruit_test.png"
+rec_panel_pos = (10, 50)
 
 # side-menu
 menu_width = 300
