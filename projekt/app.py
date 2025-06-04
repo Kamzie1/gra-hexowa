@@ -13,7 +13,7 @@ class Gra:
     # inicjalizacja gry
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((Width, Height))  # okienko
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # okienko
         pygame.display.set_caption(Title)
         self.clock = pygame.time.Clock()
         self.track = False

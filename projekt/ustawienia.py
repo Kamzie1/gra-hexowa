@@ -1,9 +1,14 @@
+import pygame
+
+pygame.init()
 # Plik ze stałymi służącymi do ustawień, będzie ich duża zapewne, a takie rozmieszczenie ułatwi ich edycję
 folder_grafiki = "grafika"
 # ekran
-Width = 1200
-Height = 600
+info = pygame.display.Info()
+Width = info.current_w
+Height = info.current_h
 srodek = (Width / 2, Height / 2)
+pygame.quit()
 Title = "Gra"
 
 FPS = 60
