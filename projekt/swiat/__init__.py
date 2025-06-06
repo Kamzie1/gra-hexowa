@@ -5,3 +5,4 @@ from .sidemenu import SideMenu
 from .budynek import Budynek
 from .tile import Najechanie, Ruch
 from .turn import Turn
+from .button import Button

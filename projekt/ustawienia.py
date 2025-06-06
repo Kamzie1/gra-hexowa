@@ -28,8 +28,6 @@ mouse_border_speed = 20
 
 plik_mapy = "mapa_test.tmx"
 
-map_original_pos = (-728 + srodek[0], -540 + srodek[1])
-
 # mini_mapa
 skala = 10
 mini_width = Mapa_width / skala

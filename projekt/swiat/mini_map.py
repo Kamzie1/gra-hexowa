@@ -4,7 +4,7 @@ from os.path import join
 
 
 class Mini_map:
-    def __init__(self):
+    def __init__(self, miasto_pos):
         self.image = pygame.image.load(join(folder_grafiki, minimapa_image)).convert()
         self.scaledSurf = pygame.transform.smoothscale(
             self.image, (mini_width, mini_height)
@@ -12,7 +12,7 @@ class Mini_map:
         self.surf = self.scaledSurf
         self.mapRect = self.surf.get_frect(topright=mini_map_pos)
 
-        self._origin = map_original_pos
+        self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[0] + srodek[1])
         self.rectsurf = pygame.Surface(
             (mini_map_mouse_rect_width, mini_map_mouse_rect_height)
         )

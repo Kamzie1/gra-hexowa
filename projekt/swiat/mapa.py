@@ -17,7 +17,7 @@ class Mapa:
     sasiedzi2y = [0, 1, -1, 0, 1, -1]
 
     def __init__(self, miasto_pos, miasto_x, miasto_y):
-        self._origin = map_original_pos
+        self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[0] + srodek[1])
         self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)

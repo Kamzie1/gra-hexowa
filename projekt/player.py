@@ -2,7 +2,8 @@ import pygame
 
 
 class Player:
-    def __init__(self, Frakcja, pos, x, y):
+    def __init__(self, Frakcja, pos, x, y, id):
+        self.id = id
         self.name = "anonim"
         self._gold = 100000
         self.army_group = pygame.sprite.Group()

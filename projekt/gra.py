@@ -12,14 +12,15 @@ from projekt.jednostki import Japonia
 # klasa reprezentująca grę
 class Gra:
     # inicjalizacja gry
-    def __init__(self, Frakcja, pos, x, y):
+    def __init__(self, Frakcja1, Frakcja2, pos1, x1, y1, pos2, x2, y2, id1, id2):
         pygame.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # okienko
         pygame.display.set_caption(Title)
         self.clock = pygame.time.Clock()
-        self.mapa = Mapa(pos, x, y)
-        self.mini_mapa = Mini_map()
-        self.player = Player(Frakcja, pos, x, y)
+        self.mapa = Mapa(pos1, x1, y1)
+        self.mini_mapa = Mini_map(pos1)
+        self.player = Player(Frakcja1, pos1, x1, y1, id1)
+        self.oponent = Player(Frakcja2, pos2, x2, y2, id2)
         self.resource = Resource()
         self.turn = Turn()
         self.menu = SideMenu(self.player, self.mapa)
@@ -71,8 +72,11 @@ class Gra:
 
 # ważne!!! Odpala tylko, jeżeli został uruchomiony sam z siebie, a nie w formie zainportowanego modułu. Bez tego, gdybyśmy importwali ten program to przy imporcie uruchamiałby się gra.run()
 if __name__ == "__main__":
-    x = 6
-    y = 6
-    recruit_pos = oblicz_pos(x, y)
-    gra = Gra(Japonia, recruit_pos, x, y)
+    x1 = 6
+    y1 = 6
+    x2 = 6
+    y2 = 6
+    gra = Gra(
+        Japonia, Japonia, oblicz_pos(x1, y1), x1, y1, oblicz_pos(x2, y2), x2, y2, 1, 2
+    )
     gra.run()
