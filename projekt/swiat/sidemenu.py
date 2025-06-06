@@ -1,5 +1,6 @@
 from ..ustawienia import *
 from ..jednostki import *
+from ..narzedzia import pozycja_myszy_na_surface
 from .button import Recruit
 import pygame
 from os.path import join
@@ -30,14 +31,35 @@ class SideMenu:
         text_rect = text.get_rect(topleft=(5, 5))
         self.recruit_surface.blit(text, text_rect)
 
-        self.create_recruit_button(Yukimura_Sanada, 5, 40)
-
-        self.create_recruit_button(Bodyguard, 100, 40)
+        x, y = 5, 40
+        for jednostka in player.frakcja:
+            self.create_recruit_button(
+                jednostka, x, y, player.recruit_pos, player.x, player.y
+            )
+            x += 95
+            y += 0
 
     def fill(self):
         self.surf.fill(menu_color)
 
-    def create_recruit_button(self, jednostka, x, y):
+    def event(self, mouse_pos, flag):
+        if self.rect.collidepoint(mouse_pos) and flag.show:
+            print("menu")
+            flag.klikniecie_flag = False
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, rec_panel_pos)
+            for button in self.recruit_group:
+                if button.rect.collidepoint(mouse_pos):
+                    print("button click")
+                    button.click()
+
+    def draw(self, screen):
+        self.fill()
+        self.recruit_group.draw(self.recruit_surface)
+        self.surf.blit(self.recruit_surface, self.recruit_rec)
+        screen.blit(self.surf, self.rect)
+
+    def create_recruit_button(self, jednostka, x, y, recruit_pos, miasto_x, miasto_y):
         Recruit(
             40,
             40,
@@ -49,6 +71,8 @@ class SideMenu:
             recruit_pos,
             self.player,
             self.mapa,
+            miasto_x,
+            miasto_y,
         )
 
         self.gold_rect = self.scaled_gold_icon.get_frect(topleft=(x + 45, y + 5))

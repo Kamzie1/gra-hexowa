@@ -16,6 +16,7 @@ class Wojownik(pygame.sprite.Sprite):
         self.koszt_ataku = jednostka["koszt_ataku"]
         self._pos = pos
         self.tile = tile
+        self.original_ruch = self.ruch
 
         self.image = pygame.image.load(
             join("grafika/jednostki-grafika", jednostka["image"])

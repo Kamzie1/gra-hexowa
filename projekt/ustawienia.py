@@ -52,25 +52,7 @@ font = "consolas.ttf"
 font_size = 24
 font_color = "yellow"
 
-
-def oblicz_pos(x, y):
-    if y % 2 == 0:
-        pos = (
-            x * tile_width + tile_width / 2,
-            y * tile_height / 4 * 3 + tile_height / 2,
-        )
-    else:
-        pos = (
-            x * tile_width + tile_width,
-            y * tile_height / 4 * 3 + tile_height / 2,
-        )
-    return pos
-
-
 # recruit
-pos_rec_x = 6
-pos_rec_y = 6
-recruit_pos = oblicz_pos(pos_rec_x, pos_rec_y)
 budynek_img = "recruit_test.png"
 rec_panel_pos = (10, 50)
 

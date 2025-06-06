@@ -26,4 +26,9 @@
    <property name="koszt_ruchu" type="int" value="5"/>
   </properties>
  </tile>
+ <tile id="5">
+  <properties>
+   <property name="koszt_ruchu" type="int" value="7"/>
+  </properties>
+ </tile>
 </tileset>

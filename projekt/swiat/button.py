@@ -12,6 +12,9 @@ class Button(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = self.image.get_frect(topleft=self.pos)
 
+    def click(self, *args):
+        pass
+
 
 class Recruit(Button):
     def __init__(
@@ -26,6 +29,8 @@ class Recruit(Button):
         recruit_pos,
         player,
         mapa,
+        x,
+        y,
     ) -> None:
         super().__init__(width, height, color, pos, button_group)
         self.group = group
@@ -34,28 +39,29 @@ class Recruit(Button):
         self.jednostka = jednostka
         self.player = player
         self.mapa = mapa
+        self.x = x
+        self.y = y
         print("button gotowy")
 
     def click(self):
         print("click")
         try:
-            if self.mapa.Tile_array[pos_rec_x][pos_rec_y].jednostka is None:
+            if self.mapa.Tile_array[self.x][self.y].jednostka is None:
                 self.player.gold -= self.jednostka["cost"]
                 w = Wojownik(
                     self.jednostka,
                     self.group,
                     self.recruit_pos,
-                    self.mapa.Tile_array[pos_rec_x][pos_rec_y],
+                    self.mapa.Tile_array[self.x][self.y],
                 )
-                self.mapa.Tile_array[pos_rec_x][pos_rec_y].jednostka = w
+                self.mapa.Tile_array[self.x][self.y].jednostka = w
         except (ValueError, TypeError) as e:
             print(e)
 
 
-class Quit(Button):
+class Show(Button):
     def __init__(self, width, height, color, pos, button_group) -> None:
         super().__init__(width, height, color, pos, button_group)
-        self.text = "quit"
 
-    def click(self, show):
-        return not show
+    def click(self, flag):
+        flag.show = not flag.show

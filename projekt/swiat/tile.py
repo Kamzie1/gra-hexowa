@@ -1,4 +1,7 @@
 import pygame
+from ..narzedzia import pozycja_myszy_na_surface, clicked
+from os.path import join
+from ..ustawienia import folder_grafiki, tile_height, tile_width
 
 
 class Tile(pygame.sprite.Sprite):
@@ -35,13 +38,30 @@ class Najechanie:
         self._origin = value
         self.rect = self.image.get_frect(center=self.origin)
 
+    def update(self, mouse_pos, Tile_array, origin):
+        mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
+
+        for tiles in Tile_array:
+            for tile in tiles:
+                if clicked(tile.pos, mouse_pos):
+                    self.origin = tile.pos
+                    if tile.jednostka is None:
+                        self.flag = True
+                    else:
+                        self.flag = False
+
 
 class Ruch(pygame.sprite.Sprite):
-    def __init__(self, groups, surf, pos):
+    def __init__(self, groups, surf, pos, ruch):
         super().__init__(groups)
         self._origin = pos
         self.image = surf
         self.rect = self.image.get_frect(center=self.origin)
+        font = pygame.font.Font(join(folder_grafiki, "consolas.ttf"), 16)
+        display = f"{ruch}"
+        text = font.render(display, True, "black")
+        text_rect = text.get_rect(center=(tile_width / 2, tile_height / 2))
+        self.image.blit(text, text_rect)
 
     @property
     def origin(self):

@@ -27,3 +27,5 @@ Bodyguard = {
     "image": "Bodyguard.png",
     "cost": 100,
 }
+
+Japonia = [Bodyguard, Yukimura_Sanada]
