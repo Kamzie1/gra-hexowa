@@ -28,9 +28,6 @@ class Wojownik(pygame.sprite.Sprite):
     def __str__(self) -> str:
         return f"Statystyki klasy: \n ruch: {self.ruch}, \n atak: {self.atak}, \n pancerz: {self.pancerz}, \n przebicie: {self.przebicie}, \n koszt_ataku: {self.koszt_ataku} \nStatystyki jednostki: \n zdrowie: {self.zdrowie}, \n morale: {self.morale} \nPOS: {self.pos}"
 
-    def marsz(self):
-        self.rect.x += self.ruch / 10  # type: ignore
-
     @property
     def pos(self):
         return self._pos

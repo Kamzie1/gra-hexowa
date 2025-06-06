@@ -41,4 +41,8 @@ Kolumbryna = {
     "cost": 400,
 }
 
-Japonia = [Bodyguard, Yukimura_Sanada, Kolumbryna]
+Japonia = [
+    Bodyguard,
+    Yukimura_Sanada,
+    Kolumbryna,
+]

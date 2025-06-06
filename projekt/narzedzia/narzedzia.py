@@ -2,10 +2,6 @@ from ..ustawienia import tile_height, tile_width
 from math import sqrt
 
 
-def oblicz_id(origin, mouse_pos):
-    pass
-
-
 def oblicz_pos(x, y):
     if y % 2 == 0:
         pos = (
@@ -25,10 +21,6 @@ def pozycja_myszy_na_surface(mouse_pos, origin):
         mouse_pos[0] - origin[0],
         mouse_pos[1] - origin[1],
     )
-
-
-def oblicz_pos_screen(x, y, origin):
-    pass
 
 
 def clicked(pos, mouse_pos) -> bool:

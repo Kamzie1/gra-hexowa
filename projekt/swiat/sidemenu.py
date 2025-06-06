@@ -37,7 +37,9 @@ class SideMenu:
                 jednostka, x, y, player.recruit_pos, player.x, player.y
             )
             x += 95
-            y += 0
+            if x > menu_width - 25:
+                x = 5
+                y += 50
 
     def fill(self):
         self.surf.fill(menu_color)
