@@ -28,4 +28,17 @@ Bodyguard = {
     "cost": 100,
 }
 
-Japonia = [Bodyguard, Yukimura_Sanada]
+Kolumbryna = {
+    "nazwa": "Kolumbryna",
+    "zdrowie": 80,
+    "morale": 90,
+    "ruch": 5,
+    "przebicie": 12,
+    "pancerz": 2,
+    "atak": 20,
+    "koszt_ataku": 4,
+    "image": "kolubryna.png",
+    "cost": 400,
+}
+
+Japonia = [Bodyguard, Yukimura_Sanada, Kolumbryna]
