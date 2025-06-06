@@ -11,13 +11,6 @@ class Button(pygame.sprite.Sprite):
         self.image.fill(color)
         self.pos = pos
         self.rect = self.image.get_frect(topleft=self.pos)
-        self.font = pygame.font.Font(join(folder_grafiki, font), font_size)
-        self.text = "button"
-
-    def display(self):
-        self.display = self.font.render(self.text, True, "black")
-        self.text_rect = self.display.get_rect(topleft=self.pos)
-        self.image.blit(self.display, self.text_rect)
 
 
 class Recruit(Button):
@@ -36,7 +29,7 @@ class Recruit(Button):
     ) -> None:
         super().__init__(width, height, color, pos, button_group)
         self.group = group
-        self.text = f"{jednostka['nazwa']}"
+        print(f"{jednostka['nazwa']}")
         self.recruit_pos = recruit_pos
         self.jednostka = jednostka
         self.player = player
@@ -44,6 +37,7 @@ class Recruit(Button):
         print("button gotowy")
 
     def click(self):
+        print("click")
         try:
             if self.mapa.Tile_array[pos_rec_x][pos_rec_y].jednostka is None:
                 self.player.gold -= self.jednostka["cost"]

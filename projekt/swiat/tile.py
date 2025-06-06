@@ -13,18 +13,18 @@ class Tile(pygame.sprite.Sprite):
         self.id = id
         self.budynek = budynek
         self.jednostka = jednostka
-        self.hitbox_surf = pygame.Surface((112, 54))
-        self.hitbox = self.hitbox_surf.get_frect(center=pos)
         self.pos = pos
         self.koszt_ruchu = koszt_ruchu
         self.typ = typ
 
 
 class Najechanie:
-    def __init__(self, surf, pos):
+    def __init__(self, surf, pos, surf2):
         self._origin = pos
         self.image = surf
+        self.image2 = surf2
         self.rect = self.image.get_frect(center=self.origin)
+        self.flag = True
 
     @property
     def origin(self):
