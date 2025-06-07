@@ -273,6 +273,11 @@ class Mapa:
             jednostka.kill()
         for jednostka in self.opponent.army_group:
             jednostka.kill()
+
+        for tiles in self.Tile_array:
+            for tile in tiles:
+                tile.jednostka = None
+                tile.budynek = None
         for tiles in self.Tile_array:
             for tile in tiles:
                 for jednostka in state["jednostka"]:
@@ -296,8 +301,6 @@ class Mapa:
                         )
                         print(w)
                         tile.jednostka = w
-                    else:
-                        tile.jednostka = None
                 for budynek in state["budynek"]:
                     if tile.pos == tuple(jednostka["pos"]):
                         b = Budynek(
@@ -307,8 +310,6 @@ class Mapa:
                             budynek["owner"],
                         )
                         tile.budynek = b
-                    else:
-                        tile.budynek = None
 
     def __str__(self):
         for layer in self.tmx.layers:
