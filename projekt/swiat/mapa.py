@@ -240,6 +240,8 @@ class Mapa:
 
     def load_state(self):
         state = {}
+        state["jednostka"] = []
+        state["budynek"] = []
         for tiles in self.Tile_array:
             for tile in tiles:
                 if not tile.jednostka is None:

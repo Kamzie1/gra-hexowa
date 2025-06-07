@@ -55,3 +55,13 @@ Japonia2 = [
     Yukimura_Sanada,
     Kolumbryna,
 ]
+
+
+def get_fraction(frakcja):
+    match (frakcja):
+        case "japonia":
+            return Japonia
+        case "japonia2":
+            return Japonia2
+        case _:
+            raise ValueError

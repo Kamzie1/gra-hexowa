@@ -31,12 +31,7 @@ class Client:
         @self.sio.on("start_game")
         def start_game(data):
             print("start game")
-            package1 = {"x": 6, "y": 6, "frakcja": Japonia, "id": 1}
-            package2 = {"x": 24, "y": 24, "frakcja": Japonia2, "id": 0}
-            if random.randint(1, 2) == 1:
-                self.info = {data["users"][0]: package1, data["users"][1]: package2}
-            else:
-                self.info = {data["users"][0]: package2, data["users"][1]: package1}
+            self.info = data
             self.names = data["users"]
             self.start_game = True
 

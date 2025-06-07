@@ -79,11 +79,7 @@ class Main:
         if self.client.start_game:
             self.client.start_game = False
             pygame.quit
-            if self.name_input.display == self.client.names[0]:
-                opponent_name = self.client.names[1]
-            else:
-                opponent_name = self.client.names[0]
-            gra = Gra(self.client, self.name_input.display, opponent_name)
+            gra = Gra(self.client)
             gra.run()
 
     def error_event(self):
