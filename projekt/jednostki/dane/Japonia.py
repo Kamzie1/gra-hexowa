@@ -46,3 +46,12 @@ Japonia = [
     Yukimura_Sanada,
     Kolumbryna,
 ]
+
+Japonia2 = [
+    Bodyguard,
+    Yukimura_Sanada,
+    Kolumbryna,
+    Bodyguard,
+    Yukimura_Sanada,
+    Kolumbryna,
+]

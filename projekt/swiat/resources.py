@@ -41,7 +41,6 @@ class Resource:
             for button in self.button_group:
                 if button.rect.collidepoint(mouse_pos):
                     button.click(flag)
-                    print("button click")
 
     def draw(self, screen, player):
         self.fill()

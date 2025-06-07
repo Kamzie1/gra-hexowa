@@ -12,32 +12,33 @@ from projekt.jednostki import Japonia
 # klasa reprezentująca grę
 class Gra:
     # inicjalizacja gry
-    def __init__(
-        self,
-        x1,
-        y1,
-        x2,
-        y2,
-        id1,
-        id2,
-        name="anonim",
-        Frakcja1=Japonia,
-        Frakcja2=Japonia,
-    ):
-        pos1 = oblicz_pos(x1, y1)
-        pos2 = oblicz_pos(x1, y1)
+    def __init__(self, client, name, name2):
+        x = client.info[name]["x"]
+        y = client.info[name]["y"]
+        frakcja = client.info[name]["frakcja"]
+        num = client.info[name]["id"]
+        pos = oblicz_pos(x, y)
+        x2 = client.info[name2]["x"]
+        y2 = client.info[name2]["y"]
+        frakcja2 = client.info[name2]["frakcja"]
+        num2 = client.info[name2]["id"]
+        pos2 = oblicz_pos(x2, y2)
         pygame.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # okienko
         pygame.display.set_caption(Title)
         self.clock = pygame.time.Clock()
-        self.mapa = Mapa(pos1, x1, y1)
-        self.mini_mapa = Mini_map(pos1)
-        self.player = Player(Frakcja1, pos1, x1, y1, id1, name)
-        self.oponent = Player(Frakcja2, pos2, x2, y2, id2)
+        self.mini_mapa = Mini_map(pos)
+        self.player = Player(frakcja, pos, x, y, num, name)
+        self.opponent = Player(frakcja2, pos2, x2, y2, num2, name2)
+        self.mapa = Mapa(pos, x, y, self.player, self.opponent)
         self.resource = Resource()
         self.turn = Turn()
         self.menu = SideMenu(self.player, self.mapa)
         self.flag = Flag()
+        self.client = client
+        client.mapa = self.mapa
+        client.user = self.player.name
+        client.id = self.player.id
 
     # metoda uruchamiająca grę
     def run(self):
@@ -77,24 +78,7 @@ class Gra:
                 exit()
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
-                self.turn.event(mouse_pos, self.player.army_group)
-                self.menu.event(mouse_pos, self.flag)
+                self.turn.event(mouse_pos, self.mapa, self.client)
+                self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)
                 self.resource.event(mouse_pos, self.flag)
-                self.mapa.event(mouse_pos, self.flag)
-
-
-# ważne!!! Odpala tylko, jeżeli został uruchomiony sam z siebie, a nie w formie zainportowanego modułu. Bez tego, gdybyśmy importwali ten program to przy imporcie uruchamiałby się gra.run()
-if __name__ == "__main__":
-    x1 = 6
-    y1 = 6
-    x2 = 6
-    y2 = 6
-    gra = Gra(
-        x1,
-        y1,
-        x2,
-        y2,
-        1,
-        2,
-    )
-    gra.run()
+                self.mapa.event(mouse_pos, self.flag, self.client.turn, self.client.id)

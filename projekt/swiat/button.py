@@ -25,6 +25,7 @@ class Recruit(Button):
         color,
         pos,
         jednostka,
+        id,
         group,
         button_group,
         recruit_pos,
@@ -35,17 +36,15 @@ class Recruit(Button):
     ) -> None:
         super().__init__(width, height, color, pos, button_group)
         self.group = group
-        print(f"{jednostka['nazwa']}")
         self.recruit_pos = recruit_pos
         self.jednostka = jednostka
+        self.id = id
         self.player = player
         self.mapa = mapa
         self.x = x
         self.y = y
-        print("button gotowy")
 
     def click(self):
-        print(self.x, self.y)
         try:
             if self.mapa.Tile_array[self.x][self.y].jednostka is None:
                 self.player.gold -= self.jednostka["cost"]
@@ -55,6 +54,7 @@ class Recruit(Button):
                     self.recruit_pos,
                     self.mapa.Tile_array[self.x][self.y],
                     self.player.id,
+                    self.id,
                 )
                 self.mapa.Tile_array[self.x][self.y].jednostka = w
         except (ValueError, TypeError) as e:

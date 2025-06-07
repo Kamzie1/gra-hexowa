@@ -1,32 +1,50 @@
 import socketio
 import threading
-import pygame
 import socketio.exceptions
+import random
+from projekt.jednostki import Japonia, Japonia2
 
 
 class Client:
     def __init__(self):
         self.start_game = False
+        self.connected = False
         self.sio = socketio.Client()
         self._setup_events()
+        self.turn = 1
 
     def _setup_events(self):
         @self.sio.event
         def connect():
             print("[CLIENT] Connected to server")
+            self.connected = True
 
         @self.sio.event
         def disconnect():
             print("[CLIENT] Disconnected from server")
+            self.connected = False
 
         @self.sio.on("message")
         def on_message(data):
             print(f"[SERVER] Message: {data}")
 
         @self.sio.on("start_game")
-        def start_game():
+        def start_game(data):
             print("start game")
+            package1 = {"x": 6, "y": 6, "frakcja": Japonia, "id": 1}
+            package2 = {"x": 24, "y": 24, "frakcja": Japonia2, "id": 0}
+            if random.randint(1, 2) == 1:
+                self.info = {data["users"][0]: package1, data["users"][1]: package2}
+            else:
+                self.info = {data["users"][0]: package2, data["users"][1]: package1}
+            self.names = data["users"]
             self.start_game = True
+
+        @self.sio.on("new_state")
+        def import_state(data):
+            print("got new state")
+            self.mapa.import_state(data)
+            self.turn += 1
 
     def start(self, url="http://192.168.50.195:5000"):
         def run():
@@ -56,7 +74,12 @@ class Client:
             print(f"created room: {data.get('id')}")
 
     def join_room(self, id, name):
-        self.sio.emit("join", (id, name), callback=self.handle_join)
+        if self.connected:
+            self.sio.emit("join", (id, name), callback=self.handle_join)
 
     def create_room(self, name):
-        self.sio.emit("create", name, callback=self.handle_create)
+        if self.connected:
+            self.sio.emit("create", name, callback=self.handle_create)
+
+    def send_state(self, state):
+        self.sio.emit("new_state", {"state": state, "user": self.user})

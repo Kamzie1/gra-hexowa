@@ -32,11 +32,13 @@ class SideMenu:
         self.recruit_surface.blit(text, text_rect)
 
         x, y = 5, 40
+        id = 0
         for jednostka in player.frakcja:
             self.create_recruit_button(
-                jednostka, x, y, player.recruit_pos, player.x, player.y
+                jednostka, id, x, y, player.recruit_pos, player.x, player.y
             )
             x += 95
+            id += 1
             if x > menu_width - 25:
                 x = 5
                 y += 50
@@ -44,16 +46,15 @@ class SideMenu:
     def fill(self):
         self.surf.fill(menu_color)
 
-    def event(self, mouse_pos, flag):
+    def event(self, mouse_pos, flag, turn, id):
         if self.rect.collidepoint(mouse_pos) and flag.show:
-            print("menu")
             flag.klikniecie_flag = False
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, rec_panel_pos)
-            for button in self.recruit_group:
-                if button.rect.collidepoint(mouse_pos):
-                    print("button click")
-                    button.click()
+            if turn % 2 == id:
+                for button in self.recruit_group:
+                    if button.rect.collidepoint(mouse_pos):
+                        button.click()
 
     def draw(self, screen):
         self.fill()
@@ -61,13 +62,16 @@ class SideMenu:
         self.surf.blit(self.recruit_surface, self.recruit_rec)
         screen.blit(self.surf, self.rect)
 
-    def create_recruit_button(self, jednostka, x, y, recruit_pos, miasto_x, miasto_y):
+    def create_recruit_button(
+        self, jednostka, id, x, y, recruit_pos, miasto_x, miasto_y
+    ):
         Recruit(
             40,
             40,
             "red",
             (x, y),
             jednostka,
+            id,
             self.group,
             self.recruit_group,
             recruit_pos,

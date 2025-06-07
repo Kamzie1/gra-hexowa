@@ -5,6 +5,7 @@ from os.path import join
 from .tile import Tile, Ruch, Najechanie
 from .budynek import Budynek
 from projekt.narzedzia import *
+from projekt.jednostki import Wojownik
 
 
 class Mapa:
@@ -16,8 +17,8 @@ class Mapa:
 
     sasiedzi2y = [0, 1, -1, 0, 1, -1]
 
-    def __init__(self, miasto_pos, miasto_x, miasto_y):
-        self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[0] + srodek[1])
+    def __init__(self, miasto_pos, miasto_x, miasto_y, player, opponent):
+        self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[1] + srodek[1])
         self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
@@ -49,6 +50,8 @@ class Mapa:
                 join("grafika/tile-grafika", "Hex_wrogie_podswietlanie.png")
             ).convert_alpha(),
         )
+        self.player = player
+        self.opponent = opponent
 
     @property
     def origin(self):
@@ -130,9 +133,6 @@ class Mapa:
                         koszt_ruchu=props["koszt_ruchu"],
                         typ=props["id"],
                     )
-                    if x == miasto_x and y == miasto_y:
-                        budynek = Budynek(miasto_pos, self.building_group, budynek_img)
-                        tile.budynek = budynek
 
                     self.Tile_array[x][y] = tile
 
@@ -206,7 +206,7 @@ class Mapa:
                             )
             self.move_group.draw(self.mapSurf)
 
-    def event(self, mouse_pos, flag):
+    def event(self, mouse_pos, flag, turn, id):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, self.origin)
 
         for tiles in self.Tile_array:
@@ -215,7 +215,6 @@ class Mapa:
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
                     if self.move_flag is None:
-                        print("clicked")
                         self.move_flag = tile.jednostka
                         if not self.move_flag is None:
                             self.correct_moves = self.possible_moves(
@@ -226,9 +225,8 @@ class Mapa:
                         if (
                             tile.jednostka is None
                             and self.correct_moves[tile.x][tile.y] >= 0
+                            and turn % 2 == id
                         ):
-                            print(self.correct_moves[tile.x][tile.y])
-                            print("move")
                             self.move_flag.pos = tile.pos
                             self.move_flag.tile.jednostka = None
                             self.move_flag.tile = tile
@@ -239,6 +237,65 @@ class Mapa:
                         self.move_flag = None
                         for tile in self.move_group:
                             tile.kill()
+
+    def load_state(self):
+        state = {}
+        for tiles in self.Tile_array:
+            for tile in tiles:
+                if not tile.jednostka is None:
+                    stan_jednostki = {
+                        "zdrowie": tile.jednostka.zdrowie,
+                        "morale": tile.jednostka.morale,
+                        "id": tile.jednostka.id,
+                        "owner": tile.jednostka.owner,
+                        "pos": tile.jednostka.pos,
+                    }
+                    state["jednostka"].append(stan_jednostki)
+                if not tile.budynek is None:
+                    stan_budynku = {
+                        "owner": tile.budynek.owner,
+                        "pos": tile.budynek.pos,
+                    }
+                    state["budynek"].append(stan_budynku)
+        return state
+
+    def import_state(self, state):
+        for tiles in self.Tile_array:
+            for tile in tiles:
+                for jednostka in state["jednostka"]:
+                    if tile.pos == jednostka["pos"]:
+                        if jednostka["owner"] == self.player.id:
+                            w = Wojownik(
+                                self.player.frakcja[jednostka["id"]],
+                                self.player.army_group,
+                                jednostka["pos"],
+                                tile,
+                                jednostka["owner"],
+                                jednostka["id"],
+                                jednostka["zdrowie"],
+                                jednostka["morale"],
+                            )
+                        else:
+                            w = Wojownik(
+                                self.opponent.frakcja[jednostka["id"]],
+                                self.opponent.army_group,
+                                jednostka["pos"],
+                                tile,
+                                jednostka["owner"],
+                                jednostka["id"],
+                                jednostka["zdrowie"],
+                                jednostka["morale"],
+                            )
+                        tile.jednostka = w
+                for budynek in state["budynek"]:
+                    if tile.pos == budynek["pos"]:
+                        b = Budynek(
+                            budynek["pos"],
+                            self.building_group,
+                            budynek_img,
+                            budynek["owner"],
+                        )
+                        tile.budynek = b
 
     def __str__(self):
         for layer in self.tmx.layers:
