@@ -2,6 +2,7 @@ from projekt.jednostki import Japonia
 from projekt.narzedzia import oblicz_pos, Input, Przycisk
 from projekt.ustawienia import FPS
 from projekt.network import Client
+from projekt.gra import Gra
 import pygame
 
 
@@ -52,7 +53,18 @@ class Main:
                         ):
                             continue
                         self.client.create_room(self.name_input.display)
-
+            if self.client.start_game:
+                self.client.start_game = False
+                pygame.quit
+                gra = Gra(
+                    6,
+                    6,
+                    6,
+                    6,
+                    1,
+                    2,
+                )
+                gra.run()
             self.name_input.draw(self.screen)
             self.id_input.draw(self.screen)
             self.join.draw(self.screen)

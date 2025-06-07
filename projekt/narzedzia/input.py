@@ -32,17 +32,14 @@ class Input:
     def update(self, event):
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             if self.rect.collidepoint(pygame.mouse.get_pos()):
-                print(self.active)
                 self.active = True
             else:
                 self.active = False
         elif event.type == pygame.KEYDOWN and self.active:
             if event.key == pygame.K_BACKSPACE:
                 self.display = self.display[:-1]
-                print(self.display)
             else:
                 self.display += event.unicode
-                print(self.display)
 
     def draw(self, screen):
         self.surf.fill(self.color)

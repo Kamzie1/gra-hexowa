@@ -1,12 +1,12 @@
 import socketio
 import threading
-from projekt.gra import Gra
 import pygame
 import socketio.exceptions
 
 
 class Client:
     def __init__(self):
+        self.start_game = False
         self.sio = socketio.Client()
         self._setup_events()
 
@@ -25,18 +25,10 @@ class Client:
 
         @self.sio.on("start_game")
         def start_game():
-            pygame.quit()
-            gra = Gra(
-                6,
-                6,
-                6,
-                6,
-                1,
-                2,
-            )
-            gra.run()
+            print("start game")
+            self.start_game = True
 
-    def start(self, url="http://127.0.0.1:5000"):
+    def start(self, url="http://192.168.50.195:5000"):
         def run():
             try:
                 self.sio.connect(url)
