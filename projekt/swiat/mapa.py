@@ -274,42 +274,6 @@ class Mapa:
         for jednostka in self.army_group:
             jednostka.kill()
 
-<<<<<<< HEAD
-        for tiles in self.Tile_array:
-            for tile in tiles:
-                tile.jednostka = None
-                tile.budynek = None
-
-        for jednostka in state["jednostka"]:
-            tile = self.get_tile(jednostka["pos"])
-            if jednostka["owner"] == self.player.id:
-                frakcja = self.player.frakcja
-            else:
-                frakcja = self.opponent.frakcja
-            print(frakcja[jednostka["id"]])
-            w = Wojownik(
-                frakcja[jednostka["id"]],
-                self.army_group,
-                tuple(jednostka["pos"]),
-                tile,
-                jednostka["owner"],
-                jednostka["id"],
-                jednostka["zdrowie"],
-                jednostka["morale"],
-            )
-            print(w)
-            tile.jednostka = w
-
-        for budynek in state["budynek"]:
-            tile = self.get_tile(budynek["pos"])
-            b = Budynek(
-                tuple(budynek["pos"]),
-                self.building_group,
-                budynek_img,
-                budynek["owner"],
-            )
-            tile.budynek = b
-=======
         for tiles in self.Tile_array:
             for tile in tiles:
                 tile.jednostka = None
@@ -319,15 +283,13 @@ class Mapa:
                 for jednostka in state["jednostka"]:
                     if tile.pos == tuple(jednostka["pos"]):
                         if jednostka["owner"] == self.player.id:
-                            group = self.army_group
                             frakcja = self.player.frakcja
                         else:
-                            group = self.opponent.army_group
                             frakcja = self.opponent.frakcja
                         print(frakcja[jednostka["id"]])
                         w = Wojownik(
                             frakcja[jednostka["id"]],
-                            group,
+                            self.army_group,
                             tuple(jednostka["pos"]),
                             tile,
                             jednostka["owner"],
@@ -346,7 +308,6 @@ class Mapa:
                             budynek["owner"],
                         )
                         tile.budynek = b
-=========
         for tiles in self.Tile_array:
             for tile in tiles:
                 tile.jednostka = None
@@ -381,7 +342,6 @@ class Mapa:
                 budynek["owner"],
             )
             tile.budynek = b
->>>>>>>>> Temporary merge branch 2
 
     def __str__(self):
         for layer in self.tmx.layers:
