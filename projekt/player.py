@@ -6,7 +6,6 @@ class Player:
         self.id = id
         self.name = name
         self._gold = 100000
-        self.army_group = pygame.sprite.Group()
         self.frakcja = Frakcja
         self.recruit_pos = pos
         self.x = x

@@ -12,7 +12,7 @@ class SideMenu:
         self.surf.fill(menu_color)
         self.rect = self.surf.get_frect(topleft=menu_pos)
         self.player = player
-        self.group = player.army_group
+        self.group = mapa.army_group
         self.button_group = pygame.sprite.Group()
         self.recruit_group = pygame.sprite.Group()
         self.mapa = mapa

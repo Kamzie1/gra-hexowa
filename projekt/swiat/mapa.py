@@ -32,6 +32,8 @@ class Mapa:
         self.move_group = pygame.sprite.Group()
         self.move_flag = None
         self.correct_moves = None
+        self.army_group = pygame.sprite.Group()
+
         self.najechanie = Najechanie(
             pygame.image.load(
                 join("grafika/tile-grafika", "Hex_najechanie.png")
@@ -269,46 +271,43 @@ class Mapa:
         return None
 
     def import_state(self, state):
-        for jednostka in self.player.army_group:
+        for jednostka in self.army_group:
             jednostka.kill()
-        for jednostka in self.opponent.army_group:
-            jednostka.kill()
+
         for tiles in self.Tile_array:
             for tile in tiles:
-                for jednostka in state["jednostka"]:
-                    if tile.pos == tuple(jednostka["pos"]):
-                        if jednostka["owner"] == self.player.id:
-                            group = self.player.army_group
-                            frakcja = self.player.frakcja
-                        else:
-                            group = self.opponent.army_group
-                            frakcja = self.opponent.frakcja
-                        print(frakcja[jednostka["id"]])
-                        w = Wojownik(
-                            frakcja[jednostka["id"]],
-                            group,
-                            tuple(jednostka["pos"]),
-                            tile,
-                            jednostka["owner"],
-                            jednostka["id"],
-                            jednostka["zdrowie"],
-                            jednostka["morale"],
-                        )
-                        print(w)
-                        tile.jednostka = w
-                    else:
-                        tile.jednostka = None
-                for budynek in state["budynek"]:
-                    if tile.pos == tuple(jednostka["pos"]):
-                        b = Budynek(
-                            budynek["pos"],
-                            self.building_group,
-                            budynek_img,
-                            budynek["owner"],
-                        )
-                        tile.budynek = b
-                    else:
-                        tile.budynek = None
+                tile.jednostka = None
+                tile.budynek = None
+
+        for jednostka in state["jednostka"]:
+            tile = self.get_tile(jednostka["pos"])
+            if jednostka["owner"] == self.player.id:
+                frakcja = self.player.frakcja
+            else:
+                frakcja = self.opponent.frakcja
+            print(frakcja[jednostka["id"]])
+            w = Wojownik(
+                frakcja[jednostka["id"]],
+                self.army_group,
+                tuple(jednostka["pos"]),
+                tile,
+                jednostka["owner"],
+                jednostka["id"],
+                jednostka["zdrowie"],
+                jednostka["morale"],
+            )
+            print(w)
+            tile.jednostka = w
+
+        for budynek in state["budynek"]:
+            tile = self.get_tile(budynek["pos"])
+            b = Budynek(
+                tuple(budynek["pos"]),
+                self.building_group,
+                budynek_img,
+                budynek["owner"],
+            )
+            tile.budynek = b
 
     def __str__(self):
         for layer in self.tmx.layers:
