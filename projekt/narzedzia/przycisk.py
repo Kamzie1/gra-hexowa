@@ -14,15 +14,6 @@ class Przycisk:
         self.font = pygame.font.Font(join(folder_grafiki, font), 24)
         self.font_color = font_color
 
-    def update(self, event):
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            if self.rect.collidepoint(pygame.mouse.get_pos()):
-                print("click")
-                self.click
-
-    def click(self, *args):
-        pass
-
     def draw(self, screen):
         self.surf.fill(self.color)
         text = self.font.render(self.display, True, self.font_color)

@@ -12,14 +12,27 @@ from projekt.jednostki import Japonia
 # klasa reprezentująca grę
 class Gra:
     # inicjalizacja gry
-    def __init__(self, Frakcja1, Frakcja2, pos1, x1, y1, pos2, x2, y2, id1, id2):
+    def __init__(
+        self,
+        x1,
+        y1,
+        x2,
+        y2,
+        id1,
+        id2,
+        name="anonim",
+        Frakcja1=Japonia,
+        Frakcja2=Japonia,
+    ):
+        pos1 = oblicz_pos(x1, y1)
+        pos2 = oblicz_pos(x1, y1)
         pygame.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # okienko
         pygame.display.set_caption(Title)
         self.clock = pygame.time.Clock()
         self.mapa = Mapa(pos1, x1, y1)
         self.mini_mapa = Mini_map(pos1)
-        self.player = Player(Frakcja1, pos1, x1, y1, id1)
+        self.player = Player(Frakcja1, pos1, x1, y1, id1, name)
         self.oponent = Player(Frakcja2, pos2, x2, y2, id2)
         self.resource = Resource()
         self.turn = Turn()
@@ -77,6 +90,11 @@ if __name__ == "__main__":
     x2 = 6
     y2 = 6
     gra = Gra(
-        Japonia, Japonia, oblicz_pos(x1, y1), x1, y1, oblicz_pos(x2, y2), x2, y2, 1, 2
+        x1,
+        y1,
+        x2,
+        y2,
+        1,
+        2,
     )
     gra.run()

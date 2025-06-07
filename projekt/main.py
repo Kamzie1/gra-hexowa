@@ -1,7 +1,7 @@
-from projekt.gra import Gra
 from projekt.jednostki import Japonia
 from projekt.narzedzia import oblicz_pos, Input, Przycisk
 from projekt.ustawienia import FPS
+from projekt.network import Client
 import pygame
 
 
@@ -18,18 +18,40 @@ class Main:
         self.id_input = Input(300, 34, (100, 150), "grey", "black", "wpisz id pokoju:")
         self.join = Przycisk(70, 34, "blue", (450, 150), "Join", "grey")
         self.create = Przycisk(200, 34, "green", (100, 200), "stwórz pokój", "black")
+        self.client = Client()
+        self.client.start()
 
     def run(self):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # wyjdź z programu
                     pygame.quit()
+                    self.client.stop()
                     exit()
-                else:
-                    self.name_input.update(event)
-                    self.id_input.update(event)
-                    self.join.update(event)
-                    self.create.update(event)
+
+                self.name_input.update(event)
+                self.id_input.update(event)
+
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    if self.join.rect.collidepoint(pygame.mouse.get_pos()):
+                        if (
+                            len(self.name_input.display) == 0
+                            or len(self.id_input.display) == 0
+                            or self.name_input.display == self.name_input.message
+                            or self.id_input.display == self.id_input.message
+                        ):
+                            continue
+                        self.client.join_room(
+                            self.id_input.display, self.name_input.display
+                        )
+
+                    elif self.create.rect.collidepoint(pygame.mouse.get_pos()):
+                        if (
+                            len(self.name_input.display) == 0
+                            or self.name_input.display == self.name_input.message
+                        ):
+                            continue
+                        self.client.create_room(self.name_input.display)
 
             self.name_input.draw(self.screen)
             self.id_input.draw(self.screen)
