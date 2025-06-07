@@ -69,6 +69,8 @@ class Gra:
         self.resource.draw(self.screen, self.player)
         self.mini_mapa.draw(self.screen, self.mapa.origin)
         self.player.army_group.draw(self.mapa.mapSurf)
+        self.opponent.army_group.draw(self.mapa.mapSurf)
+
         self.turn.draw(self.screen)
 
     ##nigger

@@ -77,4 +77,4 @@ class Client:
             self.sio.emit("create", name, callback=self.handle_create)
 
     def send_state(self, state):
-        self.sio.emit("new_state", {"state": state, "user": self.user})
+        self.sio.emit("new_state", state)

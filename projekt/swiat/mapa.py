@@ -261,43 +261,43 @@ class Mapa:
                     state["budynek"].append(stan_budynku)
         return state
 
-    def import_state(self, state):
+    def get_tile(self, pos):
         for tiles in self.Tile_array:
             for tile in tiles:
-                for jednostka in state["jednostka"]:
-                    if tile.pos == jednostka["pos"]:
-                        if jednostka["owner"] == self.player.id:
-                            w = Wojownik(
-                                self.player.frakcja[jednostka["id"]],
-                                self.player.army_group,
-                                jednostka["pos"],
-                                tile,
-                                jednostka["owner"],
-                                jednostka["id"],
-                                jednostka["zdrowie"],
-                                jednostka["morale"],
-                            )
-                        else:
-                            w = Wojownik(
-                                self.opponent.frakcja[jednostka["id"]],
-                                self.opponent.army_group,
-                                jednostka["pos"],
-                                tile,
-                                jednostka["owner"],
-                                jednostka["id"],
-                                jednostka["zdrowie"],
-                                jednostka["morale"],
-                            )
-                        tile.jednostka = w
-                for budynek in state["budynek"]:
-                    if tile.pos == budynek["pos"]:
-                        b = Budynek(
-                            budynek["pos"],
-                            self.building_group,
-                            budynek_img,
-                            budynek["owner"],
-                        )
-                        tile.budynek = b
+                if tile.pos == tuple(pos):
+                    return tile
+        return None
+
+    def import_state(self, state):
+        for jednostka in state["jednostka"]:
+            tile = self.get_tile(jednostka["pos"])
+            if jednostka["owner"] == self.player.id:
+                group = self.player.army_group
+                frakcja = self.player.frakcja
+            else:
+                group = self.opponent.army_group
+                frakcja = self.opponent.frakcja
+            w = Wojownik(
+                frakcja[jednostka["id"]],
+                group,
+                tuple(jednostka["pos"]),
+                tile,
+                jednostka["owner"],
+                jednostka["id"],
+                jednostka["zdrowie"],
+                jednostka["morale"],
+            )
+            print(w)
+            tile.jednostka = w
+        for budynek in state["budynek"]:
+            tile = self.get_tile(budynek["pos"])
+            b = Budynek(
+                budynek["pos"],
+                self.building_group,
+                budynek_img,
+                budynek["owner"],
+            )
+            tile.budynek = b
 
     def __str__(self):
         for layer in self.tmx.layers:
