@@ -269,35 +269,46 @@ class Mapa:
         return None
 
     def import_state(self, state):
-        for jednostka in state["jednostka"]:
-            tile = self.get_tile(jednostka["pos"])
-            if jednostka["owner"] == self.player.id:
-                group = self.player.army_group
-                frakcja = self.player.frakcja
-            else:
-                group = self.opponent.army_group
-                frakcja = self.opponent.frakcja
-            w = Wojownik(
-                frakcja[jednostka["id"]],
-                group,
-                tuple(jednostka["pos"]),
-                tile,
-                jednostka["owner"],
-                jednostka["id"],
-                jednostka["zdrowie"],
-                jednostka["morale"],
-            )
-            print(w)
-            tile.jednostka = w
-        for budynek in state["budynek"]:
-            tile = self.get_tile(budynek["pos"])
-            b = Budynek(
-                budynek["pos"],
-                self.building_group,
-                budynek_img,
-                budynek["owner"],
-            )
-            tile.budynek = b
+        for jednostka in self.player.army_group:
+            jednostka.kill()
+        for jednostka in self.opponent.army_group:
+            jednostka.kill()
+        for tiles in self.Tile_array:
+            for tile in tiles:
+                for jednostka in state["jednostka"]:
+                    if tile.pos == tuple(jednostka["pos"]):
+                        if jednostka["owner"] == self.player.id:
+                            group = self.player.army_group
+                            frakcja = self.player.frakcja
+                        else:
+                            group = self.opponent.army_group
+                            frakcja = self.opponent.frakcja
+                        print(frakcja[jednostka["id"]])
+                        w = Wojownik(
+                            frakcja[jednostka["id"]],
+                            group,
+                            tuple(jednostka["pos"]),
+                            tile,
+                            jednostka["owner"],
+                            jednostka["id"],
+                            jednostka["zdrowie"],
+                            jednostka["morale"],
+                        )
+                        print(w)
+                        tile.jednostka = w
+                    else:
+                        tile.jednostka = None
+                for budynek in state["budynek"]:
+                    if tile.pos == tuple(jednostka["pos"]):
+                        b = Budynek(
+                            budynek["pos"],
+                            self.building_group,
+                            budynek_img,
+                            budynek["owner"],
+                        )
+                        tile.budynek = b
+                    else:
+                        tile.budynek = None
 
     def __str__(self):
         for layer in self.tmx.layers:

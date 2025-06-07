@@ -68,7 +68,11 @@ class Gra:
             self.menu.draw(self.screen)
         self.resource.draw(self.screen, self.player)
         self.mini_mapa.draw(self.screen, self.mapa.origin)
+        for jednostka in self.player.army_group:
+            print(jednostka.image)
         self.player.army_group.draw(self.mapa.mapSurf)
+        for jednostka in self.opponent.army_group:
+            print(jednostka.image)
         self.opponent.army_group.draw(self.mapa.mapSurf)
 
         self.turn.draw(self.screen)
