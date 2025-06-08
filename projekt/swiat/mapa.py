@@ -274,6 +274,12 @@ class Mapa:
         for jednostka in self.army_group:
             jednostka.kill()
 
+        for jednostka in self.building_group:
+            jednostka.kill()
+
+        self.army_group.empty()
+        self.building_group.empty()
+
         for tiles in self.Tile_array:
             for tile in tiles:
                 tile.jednostka = None
