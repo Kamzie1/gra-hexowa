@@ -45,6 +45,10 @@ class Gra:
     # metoda uruchamiająca grę
     def run(self):
         while True:
+            if not self.client.state_loaded:
+                self.clock.tick(FPS)  # maks 60 FPS
+                continue
+
             self.event_handler()
 
             self.update()

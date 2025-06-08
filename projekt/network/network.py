@@ -11,6 +11,7 @@ class Client:
         self.connected = False
         self.sio = socketio.Client()
         self._setup_events()
+        self.state_loaded = True
         self.turn = 1
 
     def _setup_events(self):
@@ -38,7 +39,9 @@ class Client:
         @self.sio.on("new_state")
         def import_state(data):
             print("got new state")
+            self.state_loaded = False
             self.mapa.import_state(data)
+            self.state_loaded = True
             self.turn += 1
 
     def start(self, url="http://192.168.50.195:5000"):
