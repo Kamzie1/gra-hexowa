@@ -274,40 +274,12 @@ class Mapa:
         for jednostka in self.army_group:
             jednostka.kill()
 
-        for tiles in self.Tile_array:
-            for tile in tiles:
-                tile.jednostka = None
-                tile.budynek = None
-        for tiles in self.Tile_array:
-            for tile in tiles:
-                for jednostka in state["jednostka"]:
-                    if tile.pos == tuple(jednostka["pos"]):
-                        if jednostka["owner"] == self.player.id:
-                            frakcja = self.player.frakcja
-                        else:
-                            frakcja = self.opponent.frakcja
-                        print(frakcja[jednostka["id"]])
-                        w = Wojownik(
-                            frakcja[jednostka["id"]],
-                            self.army_group,
-                            tuple(jednostka["pos"]),
-                            tile,
-                            jednostka["owner"],
-                            jednostka["id"],
-                            jednostka["zdrowie"],
-                            jednostka["morale"],
-                        )
-                        print(w)
-                        tile.jednostka = w
-                for budynek in state["budynek"]:
-                    if tile.pos == tuple(jednostka["pos"]):
-                        b = Budynek(
-                            budynek["pos"],
-                            self.building_group,
-                            budynek_img,
-                            budynek["owner"],
-                        )
-                        tile.budynek = b
+        for jednostka in self.building_group:
+            jednostka.kill()
+
+        self.army_group.empty()
+        self.building_group.empty()
+
         for tiles in self.Tile_array:
             for tile in tiles:
                 tile.jednostka = None
@@ -330,13 +302,13 @@ class Mapa:
                 jednostka["zdrowie"],
                 jednostka["morale"],
             )
+            assert isinstance(w.image, pygame.Surface)
             print(w)
             tile.jednostka = w
-
         for budynek in state["budynek"]:
             tile = self.get_tile(budynek["pos"])
             b = Budynek(
-                tuple(budynek["pos"]),
+                budynek["pos"],
                 self.building_group,
                 budynek_img,
                 budynek["owner"],
