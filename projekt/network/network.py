@@ -12,7 +12,7 @@ class Client:
         self.sio = socketio.Client()
         self._setup_events()
         self.state_loaded = True
-        self.turn = 1
+        self.turn = 0
 
     def _setup_events(self):
         @self.sio.event
