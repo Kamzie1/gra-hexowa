@@ -72,12 +72,11 @@ class Gra:
             self.menu.draw(self.screen)
         self.resource.draw(self.screen, self.player)
         self.mini_mapa.draw(self.screen, self.mapa.origin)
-        if not isinstance(self.mapa.mapSurf, pygame.Surface):
-            raise KeyError("map surf not working")
         for jednostka in self.mapa.army_group:
-            if not isinstance(jednostka.image, pygame.Surface):
-                raise KeyError("jednostka surf not working")
-        self.mapa.army_group.draw(self.mapa.mapSurf)
+            if isinstance(jednostka.image, pygame.Surface):
+                self.mapa.army_group.draw(self.mapa.mapSurf)
+            else:
+                print(f"błąd py surf: {jednostka.image}, jednostka: {jednostka}")
 
         self.turn.draw(self.screen)
 

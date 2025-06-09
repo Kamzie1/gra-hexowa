@@ -291,7 +291,6 @@ class Mapa:
                 frakcja = self.player.frakcja
             else:
                 frakcja = self.opponent.frakcja
-            print(frakcja[jednostka["id"]])
             w = Wojownik(
                 frakcja[jednostka["id"]],
                 self.army_group,
@@ -303,7 +302,6 @@ class Mapa:
                 jednostka["morale"],
             )
             assert isinstance(w.image, pygame.Surface)
-            print(w)
             tile.jednostka = w
         for budynek in state["budynek"]:
             tile = self.get_tile(budynek["pos"])
