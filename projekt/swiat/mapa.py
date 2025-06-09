@@ -216,9 +216,11 @@ class Mapa:
                 if clicked(tile.pos, mouse_pos):
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
+                    if not turn % 2 == id:
+                        return
                     if self.move_flag is None:
                         self.move_flag = tile.jednostka
-                        if not self.move_flag is None:
+                        if not self.move_flag is None and tile.jednostka.owner == id:
                             self.correct_moves = self.possible_moves(
                                 tile.x, tile.y, self.move_flag
                             )
@@ -227,7 +229,6 @@ class Mapa:
                         if (
                             tile.jednostka is None
                             and self.correct_moves[tile.x][tile.y] >= 0
-                            and turn % 2 == id
                         ):
                             self.move_flag.pos = tile.pos
                             self.move_flag.tile.jednostka = None

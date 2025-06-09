@@ -41,8 +41,9 @@ class Gra:
         client.mapa = self.mapa
         client.user = self.player.name
         client.id = self.player.id
-        self.turn_display = Display(50, 34, (srodek[0] - 25, 0), "consolas.ttf", 20)
-        self.czyja_tura = Display(100, 34, (srodek[0] + 50, 0), "consolas.ttf", 20)
+        self.turn_display = TurnDisplay(
+            300, 34, (srodek[0] - 25, 0), "consolas.ttf", 20
+        )
 
     # metoda uruchamiająca grę
     def run(self):
@@ -73,7 +74,9 @@ class Gra:
         if self.flag.show:
             self.menu.draw(self.screen)
         self.resource.draw(self.screen, self.player)
-        self.draw_turn()
+        self.turn_display.display(
+            "grey", self.screen, self.client.turn, self.player, self.opponent
+        )
         self.mini_mapa.draw(self.screen, self.mapa.origin)
         for jednostka in self.mapa.army_group:
             if isinstance(jednostka.image, pygame.Surface):
@@ -82,22 +85,6 @@ class Gra:
                 print(f"błąd py surf: {jednostka.image}, jednostka: {jednostka}")
 
         self.turn.draw(self.screen)
-
-    def draw_turn(self):
-        self.turn_display.display(f"{self.client.turn // 2 + 1}", "grey")
-        self.screen.blit(self.turn_display.surf, self.turn_display.rect)
-        if self.client.turn % 2 == 0:
-            if self.player.id == 0:
-                text = f"{self.player.name}"
-            else:
-                text = f"{self.opponent.name}"
-        else:
-            if self.player.id == 1:
-                text = f"{self.player.name}"
-            else:
-                text = f"{self.opponent.name}"
-        self.czyja_tura.display(text, "grey")
-        self.screen.blit(self.czyja_tura.surf, self.czyja_tura.rect)
 
     ##nigger
 
