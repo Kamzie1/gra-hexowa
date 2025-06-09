@@ -22,12 +22,12 @@ class Tile(pygame.sprite.Sprite):
 
 
 class Najechanie:
-    def __init__(self, surf, pos, surf2):
+    def __init__(self, base, pos, red, blue):
         self._origin = pos
-        self.image = surf
-        self.image2 = surf2
-        self.rect = self.image.get_frect(center=self.origin)
-        self.flag = True
+        self.surf = [base, red, blue]
+        self.rect = self.surf[0].get_frect(center=self.origin)
+
+        self.flag = -1
 
     @property
     def origin(self):
@@ -36,7 +36,7 @@ class Najechanie:
     @origin.setter
     def origin(self, value):
         self._origin = value
-        self.rect = self.image.get_frect(center=self.origin)
+        self.rect = self.surf[0].get_frect(center=self.origin)
 
     def update(self, mouse_pos, Tile_array, origin):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
@@ -46,9 +46,27 @@ class Najechanie:
                 if clicked(tile.pos, mouse_pos):
                     self.origin = tile.pos
                     if tile.jednostka is None:
-                        self.flag = True
+                        self.flag = 0
                     else:
-                        self.flag = False
+                        self.flag = tile.jednostka.owner + 1
+
+
+class Klikniecie:
+    def __init__(self, image, pos):
+        self._origin = pos
+        self.image = image
+        self.rect = self.image.get_frect(center=self.origin)
+
+        self.flag = -1
+
+    @property
+    def origin(self):
+        return self._origin
+
+    @origin.setter
+    def origin(self, value):
+        self._origin = value
+        self.rect = self.image.get_frect(center=self.origin)
 
 
 class Ruch(pygame.sprite.Sprite):

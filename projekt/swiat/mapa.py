@@ -2,7 +2,7 @@ import pygame
 from projekt.ustawienia import *
 from pytmx.util_pygame import load_pygame
 from os.path import join
-from .tile import Tile, Ruch, Najechanie
+from .tile import Tile, Ruch, Najechanie, Klikniecie
 from .budynek import Budynek
 from projekt.narzedzia import *
 from projekt.jednostki import Wojownik
@@ -40,17 +40,17 @@ class Mapa:
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
             pygame.image.load(
-                join("grafika/tile-grafika", "Hex_wrogie_podswietlanie.png")
+                join("grafika/tile-grafika", "niebieskie_podswietlenie.png")
+            ).convert_alpha(),
+            pygame.image.load(
+                join("grafika/tile-grafika", "czerwone_podswietlenie.png")
             ).convert_alpha(),
         )
-        self.klikniecie = Najechanie(
+        self.klikniecie = Klikniecie(
             pygame.image.load(
-                join("grafika/tile-grafika", "Hex-klikniecie.png")
+                join("grafika/tile-grafika", "hex-klikniecie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
-            pygame.image.load(
-                join("grafika/tile-grafika", "Hex_wrogie_podswietlanie.png")
-            ).convert_alpha(),
         )
         self.player = player
         self.opponent = opponent
@@ -187,10 +187,9 @@ class Mapa:
         screen.blit(self.mapSurf, self.mapRect)  # rysuje mapę
         self.tiles_group.draw(self.mapSurf)  # rysuje tilesy
         self.building_group.draw(self.mapSurf)  # rysuje budynki
-        if self.najechanie.flag:
-            self.mapSurf.blit(self.najechanie.image, self.najechanie.rect)
-        else:
-            self.mapSurf.blit(self.najechanie.image2, self.najechanie.rect)
+        self.mapSurf.blit(
+            self.najechanie.surf[self.najechanie.flag], self.najechanie.rect
+        )
         if flag.klikniecie_flag:
             self.mapSurf.blit(self.klikniecie.image, self.klikniecie.rect)
         if not self.move_flag is None:
@@ -224,6 +223,8 @@ class Mapa:
                             self.correct_moves = self.possible_moves(
                                 tile.x, tile.y, self.move_flag
                             )
+                        else:
+                            self.move_flag = None
 
                     else:
                         if (

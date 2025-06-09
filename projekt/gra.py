@@ -30,8 +30,10 @@ class Gra:
         pygame.display.set_caption(Title)
         self.clock = pygame.time.Clock()
         self.mini_mapa = Mini_map(pos)
-        self.player = Player(frakcja, pos, x, y, num, name)
-        self.opponent = Player(frakcja2, pos2, x2, y2, num2, name2)
+        self.player = Player(frakcja, pos, x, y, num, name, client.info[name]["color"])
+        self.opponent = Player(
+            frakcja2, pos2, x2, y2, num2, name2, client.info[name2]["color"]
+        )
         self.mapa = Mapa(pos, x, y, self.player, self.opponent)
         self.resource = Resource()
         self.turn = Turn()

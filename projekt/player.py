@@ -2,7 +2,7 @@ import pygame
 
 
 class Player:
-    def __init__(self, Frakcja, pos, x, y, id, name="anonim"):
+    def __init__(self, Frakcja, pos, x, y, id, name, color):
         self.id = id
         self.name = name
         self._gold = 100000
@@ -10,6 +10,7 @@ class Player:
         self.recruit_pos = pos
         self.x = x
         self.y = y
+        self.color = color
 
     @property
     def gold(self):
