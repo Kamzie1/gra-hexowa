@@ -54,6 +54,7 @@ class Recruit(Button):
                     self.recruit_pos,
                     self.mapa.Tile_array[self.x][self.y],
                     self.player.id,
+                    self.player.color,
                     self.id,
                 )
                 self.mapa.Tile_array[self.x][self.y].jednostka = w

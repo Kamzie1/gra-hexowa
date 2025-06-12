@@ -6,7 +6,7 @@ from os.path import join
 class Wojownik(pygame.sprite.Sprite):
     # inicjalizacja
     def __init__(
-        self, jednostka, group, pos, tile, owner, id, zdrowie=None, morale=None
+        self, jednostka, group, pos, tile, owner, color, id, zdrowie=None, morale=None
     ):
         super().__init__(group)
         if zdrowie is None:
@@ -28,6 +28,7 @@ class Wojownik(pygame.sprite.Sprite):
         self.original_zdrowie = self.zdrowie
         self.id = id
         self.owner = owner
+        self.color = color
 
         self.image = pygame.image.load(
             join("grafika/jednostki-grafika", jednostka["image"])

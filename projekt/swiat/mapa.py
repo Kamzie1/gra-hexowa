@@ -255,12 +255,14 @@ class Mapa:
                         "id": tile.jednostka.id,
                         "owner": tile.jednostka.owner,
                         "pos": tile.jednostka.pos,
+                        "color": tile.jednostka.color,
                     }
                     state["jednostka"].append(stan_jednostki)
                 if not tile.budynek is None:
                     stan_budynku = {
                         "owner": tile.budynek.owner,
                         "pos": tile.budynek.pos,
+                        "color": tile.budynek.color,
                     }
                     state["budynek"].append(stan_budynku)
         return state
@@ -299,6 +301,7 @@ class Mapa:
                 tuple(jednostka["pos"]),
                 tile,
                 jednostka["owner"],
+                jednostka["color"],
                 jednostka["id"],
                 jednostka["zdrowie"],
                 jednostka["morale"],
@@ -312,6 +315,7 @@ class Mapa:
                 self.building_group,
                 budynek_img,
                 budynek["owner"],
+                budynek["color"],
             )
             tile.budynek = b
 
