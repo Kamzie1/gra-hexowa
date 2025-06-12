@@ -61,12 +61,14 @@ class Mini_map:
         screen.blit(self.surf, self.mapRect)  # rysuje mini mapę
 
     def draw_jednostka(self, color, pos):
-        surf = pygame.Surface((10, 20))
+        pos = (pos[0] / skala, pos[1] / skala)
+        surf = pygame.Surface((5, 5))
         rect = surf.get_frect(center=pos)
         pygame.draw.rect(self.surf, color, rect)
 
     def draw_budynek(self, color, pos):
-        surf = pygame.Surface((20, 20))
+        pos = (pos[0] / skala, pos[1] / skala)
+        surf = pygame.Surface((10, 10))
         rect = surf.get_frect(center=pos)
         pygame.draw.rect(self.surf, "grey", rect)
         pygame.draw.rect(self.surf, color, rect, width=1)
