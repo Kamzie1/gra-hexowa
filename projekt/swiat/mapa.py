@@ -40,10 +40,10 @@ class Mapa:
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
             pygame.image.load(
-                join("grafika/tile-grafika", "niebieskie_podswietlenie.png")
+                join("grafika/tile-grafika", "blue_podswietlenie.png")
             ).convert_alpha(),
             pygame.image.load(
-                join("grafika/tile-grafika", "czerwone_podswietlenie.png")
+                join("grafika/tile-grafika", "red_podswietlenie.png")
             ).convert_alpha(),
         )
         self.klikniecie = Klikniecie(
@@ -200,7 +200,7 @@ class Mapa:
                             Ruch(
                                 self.move_group,
                                 pygame.image.load(
-                                    join("grafika/tile-grafika", "Hex-klikniecie.png")
+                                    join("grafika/tile-grafika", "hex-klikniecie.png")
                                 ).convert_alpha(),
                                 (tile.pos),
                                 self.correct_moves[tile.x][tile.y],
@@ -255,12 +255,14 @@ class Mapa:
                         "id": tile.jednostka.id,
                         "owner": tile.jednostka.owner,
                         "pos": tile.jednostka.pos,
+                        "color": tile.jednostka.color,
                     }
                     state["jednostka"].append(stan_jednostki)
                 if not tile.budynek is None:
                     stan_budynku = {
                         "owner": tile.budynek.owner,
                         "pos": tile.budynek.pos,
+                        "color": tile.budynek.color,
                     }
                     state["budynek"].append(stan_budynku)
         return state
@@ -299,6 +301,7 @@ class Mapa:
                 tuple(jednostka["pos"]),
                 tile,
                 jednostka["owner"],
+                jednostka["color"],
                 jednostka["id"],
                 jednostka["zdrowie"],
                 jednostka["morale"],
@@ -312,6 +315,7 @@ class Mapa:
                 self.building_group,
                 budynek_img,
                 budynek["owner"],
+                budynek["color"],
             )
             tile.budynek = b
 

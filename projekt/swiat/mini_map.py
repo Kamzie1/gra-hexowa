@@ -44,13 +44,29 @@ class Mini_map:
                     topleft=mapa.origin  # zaktualizuj położenie mapy
                 )
 
-    def draw(self, screen, origin):
+    def draw(self, screen, origin, Tile_array):
         self.refresh()
         self.origin = (
             -origin[0] / skala,
             -origin[1] / skala,
         )
-
+        for tiles in Tile_array:
+            for tile in tiles:
+                if not tile.budynek is None:
+                    self.draw_budynek(tile.budynek.color, tile.pos)
+                if not tile.jednostka is None:
+                    self.draw_jednostka(tile.jednostka.color, tile.pos)
         pygame.draw.rect(self.surf, mini_map_rect_color, self.rect, width=1)
         pygame.draw.rect(screen, (0, 0, 0), self.mapRect, width=2)  # rysuje border
         screen.blit(self.surf, self.mapRect)  # rysuje mini mapę
+
+    def draw_jednostka(self, color, pos):
+        surf = pygame.Surface((10, 20))
+        rect = surf.get_frect(center=pos)
+        pygame.draw.rect(self.surf, color, rect)
+
+    def draw_budynek(self, color, pos):
+        surf = pygame.Surface((20, 20))
+        rect = surf.get_frect(center=pos)
+        pygame.draw.rect(self.surf, "grey", rect)
+        pygame.draw.rect(self.surf, color, rect, width=1)
