@@ -28,32 +28,33 @@ class Mapa:
         self.Tile_array = [
             [None for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
-        self.load_tiles(miasto_pos, miasto_x, miasto_y)
+        self.load_tiles()
         self.move_group = pygame.sprite.Group()
         self.move_flag = None
         self.correct_moves = None
         self.army_group = pygame.sprite.Group()
 
+        self.player = player
+        self.opponent = opponent
+
         self.najechanie = Najechanie(
             pygame.image.load(
-                join("grafika/tile-grafika", "Hex_najechanie.png")
+                join("Grafika/tile-grafika", "Hex_najechanie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
             pygame.image.load(
-                join("grafika/tile-grafika", "blue_podswietlenie.png")
+                join("Grafika/tile-grafika", f"{player.color}_podswietlenie.png")
             ).convert_alpha(),
             pygame.image.load(
-                join("grafika/tile-grafika", "red_podswietlenie.png")
+                join("Grafika/tile-grafika", f"{opponent.color}_podswietlenie.png")
             ).convert_alpha(),
         )
         self.klikniecie = Klikniecie(
             pygame.image.load(
-                join("grafika/tile-grafika", "hex-klikniecie.png")
+                join("Grafika/tile-grafika", "hex-klikniecie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
         )
-        self.player = player
-        self.opponent = opponent
         self.import_state(state)
 
     @property
@@ -70,7 +71,9 @@ class Mapa:
 
         self.update_based_border(mouse_pos)
         self.update_based_mouse(mouse_pos)
-        self.najechanie.update(mouse_pos, self.Tile_array, self.origin)
+        self.najechanie.update(
+            mouse_pos, self.Tile_array, self.origin, self.player.id, self.opponent.id
+        )
 
     def update_based_mouse(self, mouse_pos):
         if pygame.mouse.get_pressed()[1]:
@@ -118,7 +121,7 @@ class Mapa:
             return False
         return True
 
-    def load_tiles(self, miasto_pos, miasto_x, miasto_y):
+    def load_tiles(self):
         # loaduje z tmx tilesy i przypisuje je do grupy
         for layer in self.tmx.visible_layers:
             if hasattr(layer, "data"):
@@ -268,6 +271,8 @@ class Mapa:
                         "pos": tile.budynek.pos,
                         "color": tile.budynek.color,
                         "id": tile.budynek.id,
+                        "zdrowie": tile.budynek.zdrowie,
+                        "morale": tile.budynek.morale,
                     }
                     state["budynek"].append(stan_budynku)
         return state
@@ -330,6 +335,19 @@ class Mapa:
                 budynek["morale"],
             )
             tile.budynek = b
+
+    def zarabiaj(self):
+        for budynek in self.building_group:
+            if isinstance(budynek, Budynek):
+                budynek.zarabiaj(self.player)
+            else:
+                print("to nie budynek")
+
+    def heal(self):
+        for budynek in self.building_group:
+            tile = self.get_tile(budynek.pos)
+            if not tile.jednostka is None:
+                tile.jednostka.heal(budynek.heal)
 
     def __str__(self):
         for layer in self.tmx.layers:

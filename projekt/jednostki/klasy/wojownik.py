@@ -49,3 +49,8 @@ class Wojownik(pygame.sprite.Sprite):
     def pos(self, value):
         self._pos = value
         self.rect = self.image.get_frect(center=self._pos)
+
+    def heal(self, value):
+        self.zdrowie += value
+        if self.zdrowie > self.original_zdrowie:
+            self.zdrowie = self.original_zdrowie

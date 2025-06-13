@@ -38,7 +38,7 @@ class Najechanie:
         self._origin = value
         self.rect = self.surf[0].get_frect(center=self.origin)
 
-    def update(self, mouse_pos, Tile_array, origin):
+    def update(self, mouse_pos, Tile_array, origin, player_id, opponent_id):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
 
         for tiles in Tile_array:
@@ -47,8 +47,10 @@ class Najechanie:
                     self.origin = tile.pos
                     if tile.jednostka is None:
                         self.flag = 0
-                    else:
-                        self.flag = tile.jednostka.owner + 1
+                    elif tile.jednostka.owner == player_id:
+                        self.flag = 1
+                    elif tile.jednostka.owner == opponent_id:
+                        self.flag = 2
 
 
 class Klikniecie:

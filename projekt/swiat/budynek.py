@@ -31,3 +31,7 @@ class Budynek(pygame.sprite.Sprite):
         self.atak = budynek["atak"]
         self.koszt_ataku = budynek["koszt_ataku"]
         self.id = id
+
+    def zarabiaj(self, player):
+        if self.owner == player.id:
+            player.gold += self.earn["gold"]
