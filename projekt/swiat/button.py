@@ -1,5 +1,6 @@
 from ..ustawienia import *
 from ..jednostki import *
+from .budynek import Budynek
 from os.path import join
 import pygame
 
@@ -15,6 +16,11 @@ class Button(pygame.sprite.Sprite):
 
     def click(self, *args):
         pass
+
+
+class Recruit_sample:
+    def __init__(self, ruch):
+        self.ruch = ruch
 
 
 class Recruit(Button):
@@ -46,18 +52,17 @@ class Recruit(Button):
 
     def click(self):
         try:
-            if self.mapa.Tile_array[self.x][self.y].jednostka is None:
-                self.player.gold -= self.jednostka["cost"]
-                w = Wojownik(
-                    self.jednostka,
-                    self.group,
-                    self.recruit_pos,
-                    self.mapa.Tile_array[self.x][self.y],
-                    self.player.id,
-                    self.player.color,
-                    self.id,
-                )
-                self.mapa.Tile_array[self.x][self.y].jednostka = w
+            self.mapa.move_flag = Wojownik(
+                self.jednostka,
+                self.group,
+                (4000, 4000),
+                None,
+                self.player.id,
+                self.player.color,
+                self.id,
+            )
+            r = Recruit_sample(4)
+            self.mapa.correct_moves = self.mapa.possible_moves(self.x, self.y, r)
         except (ValueError, TypeError) as e:
             print(e)
 

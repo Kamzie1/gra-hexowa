@@ -8,6 +8,7 @@ class Budynek(pygame.sprite.Sprite):
         self, budynek, id, pos, group, owner, color, zdrowie=None, morale=None
     ):
         super().__init__(group)
+        self.ruch = 0
         self.pos = pos
         self.image = pygame.image.load(
             join(folder_grafiki, budynek[color])

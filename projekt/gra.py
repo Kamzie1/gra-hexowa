@@ -97,7 +97,7 @@ class Gra:
                 exit()
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
-                self.turn.event(mouse_pos, self.mapa, self.client)
-                self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)
-                self.resource.event(mouse_pos, self.flag)
                 self.mapa.event(mouse_pos, self.flag, self.client.turn, self.client.id)
+                self.turn.event(mouse_pos, self.mapa, self.client)
+                self.resource.event(mouse_pos, self.flag)
+                self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)

@@ -68,7 +68,7 @@ class Mini_map:
 
     def draw_budynek(self, color, pos):
         pos = (pos[0] / skala, pos[1] / skala)
-        surf = pygame.Surface((10, 10))
+        surf = pygame.Surface((20, 20))
         rect = surf.get_frect(center=pos)
-        pygame.draw.rect(self.surf, "grey", rect)
-        pygame.draw.rect(self.surf, color, rect, width=1)
+        pygame.draw.ellipse(self.surf, "grey", rect)
+        pygame.draw.ellipse(self.surf, color, rect, width=2)

@@ -18,7 +18,7 @@ class SideMenu:
         self.mapa = mapa
 
         self.recruit_surface = pygame.Surface((menu_width - 20, 300), pygame.SRCALPHA)
-        self.recruit_surface.fill((50, 50, 50, 50))
+        self.recruit_surface.fill((50, 50, 50, 70))
         self.recruit_rec = self.recruit_surface.get_frect(topleft=rec_panel_pos)
         self.font = pygame.font.Font(join(folder_grafiki, font), font_size)
         self.res_font = pygame.font.Font(join(folder_grafiki, font), 10)

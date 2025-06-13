@@ -238,12 +238,28 @@ class Mapa:
                             tile.jednostka is None
                             and self.correct_moves[tile.x][tile.y] >= 0
                         ):
-                            self.move_flag.pos = tile.pos
-                            self.move_flag.tile.jednostka = None
-                            self.move_flag.tile = tile
-                            self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
-                            tile.jednostka = self.move_flag
-                            flag.klikniecie_flag = False
+                            if not self.move_flag.tile is None:
+                                self.move_flag.tile.jednostka = None
+                                self.move_flag.pos = tile.pos
+                                self.move_flag.tile = tile
+                                self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
+                                tile.jednostka = self.move_flag
+                                flag.klikniecie_flag = False
+                            else:
+                                try:
+                                    self.player.gold -= self.player.frakcja[
+                                        "jednostka"
+                                    ][self.move_flag.id]["cost"]
+                                except:
+                                    print("not enopugh money")
+                                else:
+                                    self.move_flag.pos = tile.pos
+                                    self.move_flag.tile = tile
+                                    self.move_flag.ruch = self.correct_moves[tile.x][
+                                        tile.y
+                                    ]
+                                    tile.jednostka = self.move_flag
+                                    flag.klikniecie_flag = False
 
                         self.move_flag = None
                         for tile in self.move_group:
