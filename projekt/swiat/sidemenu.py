@@ -33,7 +33,7 @@ class SideMenu:
 
         x, y = 5, 40
         id = 0
-        for jednostka in player.frakcja:
+        for jednostka in player.frakcja["jednostka"]:
             self.create_recruit_button(
                 jednostka, id, x, y, player.recruit_pos, player.x, player.y
             )

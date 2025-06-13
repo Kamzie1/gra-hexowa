@@ -35,6 +35,7 @@ class Client:
             self.info = data
             self.names = data["users"]
             self.start_game = True
+            self.state = data["state"]
 
         @self.sio.on("new_state")
         def import_state(data):

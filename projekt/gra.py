@@ -34,7 +34,7 @@ class Gra:
         self.opponent = Player(
             frakcja2, pos2, x2, y2, num2, name2, client.info[name2]["color"]
         )
-        self.mapa = Mapa(pos, x, y, self.player, self.opponent)
+        self.mapa = Mapa(pos, x, y, self.player, self.opponent, client.state)
         self.resource = Resource()
         self.turn = Turn()
         self.menu = SideMenu(self.player, self.mapa)

@@ -1,5 +1,6 @@
 import pygame
 from os.path import join
+from projekt.ustawienia import folder_grafiki
 
 
 # klasa wojownik, podstawowa klasa reprezentująca mechanikę każdej jednostki, czyli jej ruch i atak, dziedziczy od specjalnej klasy Sprite od pygame pozwalajacej na lepszą kontrolę w pygame
@@ -31,7 +32,7 @@ class Wojownik(pygame.sprite.Sprite):
         self.color = color
 
         self.image = pygame.image.load(
-            join("grafika/jednostki-grafika", jednostka["image"])
+            join(f"{folder_grafiki}/jednostki-grafika", jednostka[color])
         ).convert_alpha()
 
         self.rect = self.image.get_frect(center=pos)

@@ -11,7 +11,8 @@ Yukimura_Sanada = {
     "pancerz": 8,
     "atak": 20,
     "koszt_ataku": 3,
-    "image": "Yukimura_Sanada.png",
+    "red": "Yukimura_Sanada.png",
+    "blue": "Yukimura_Sanada.png",
     "cost": 500,
 }
 
@@ -24,7 +25,8 @@ Bodyguard = {
     "pancerz": 4,
     "atak": 10,
     "koszt_ataku": 3,
-    "image": "Bodyguard.png",
+    "red": "Bodyguard.png",
+    "blue": "Bodyguard.png",
     "cost": 100,
 }
 
@@ -37,15 +39,35 @@ Kolumbryna = {
     "pancerz": 2,
     "atak": 20,
     "koszt_ataku": 4,
-    "image": "kolubryna.png",
+    "red": "kolubryna.png",
+    "blue": "kolubryna.png",
     "cost": 400,
 }
 
-Japonia = [
-    Bodyguard,
-    Yukimura_Sanada,
-    Kolumbryna,
-]
+Miasto = {
+    "nazwa": "Miasto",
+    "zdrowie": 1000,
+    "morale": 90,
+    "przebicie": 15,
+    "pancerz": 20,
+    "atak": 30,
+    "koszt_ataku": 2,
+    "red": "recruit_test.png",
+    "blue": "recruit_test.png",
+    "earn": {
+        "gold": 400,
+    },
+    "heal": 40,
+}
+
+Japonia = {
+    "jednostka": [
+        Bodyguard,
+        Yukimura_Sanada,
+        Kolumbryna,
+    ],
+    "miasto": Miasto,
+}
 
 Japonia2 = [
     Bodyguard,

@@ -2,7 +2,7 @@ import pygame
 
 pygame.init()
 # Plik ze stałymi służącymi do ustawień, będzie ich duża zapewne, a takie rozmieszczenie ułatwi ich edycję
-folder_grafiki = "grafika"
+folder_grafiki = "Grafika"
 # ekran
 info = pygame.display.Info()
 Width = info.current_w

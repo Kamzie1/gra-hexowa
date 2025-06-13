@@ -17,7 +17,7 @@ class Mapa:
 
     sasiedzi2y = [0, 1, -1, 0, 1, -1]
 
-    def __init__(self, miasto_pos, miasto_x, miasto_y, player, opponent):
+    def __init__(self, miasto_pos, miasto_x, miasto_y, player, opponent, state):
         self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[1] + srodek[1])
         self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
@@ -54,6 +54,7 @@ class Mapa:
         )
         self.player = player
         self.opponent = opponent
+        self.import_state(state)
 
     @property
     def origin(self):
@@ -200,7 +201,10 @@ class Mapa:
                             Ruch(
                                 self.move_group,
                                 pygame.image.load(
-                                    join("grafika/tile-grafika", "hex-klikniecie.png")
+                                    join(
+                                        f"{folder_grafiki}/tile-grafika",
+                                        "hex-klikniecie.png",
+                                    )
                                 ).convert_alpha(),
                                 (tile.pos),
                                 self.correct_moves[tile.x][tile.y],
@@ -263,6 +267,7 @@ class Mapa:
                         "owner": tile.budynek.owner,
                         "pos": tile.budynek.pos,
                         "color": tile.budynek.color,
+                        "id": tile.budynek.id,
                     }
                     state["budynek"].append(stan_budynku)
         return state
@@ -296,7 +301,7 @@ class Mapa:
             else:
                 frakcja = self.opponent.frakcja
             w = Wojownik(
-                frakcja[jednostka["id"]],
+                frakcja["jednostka"][jednostka["id"]],
                 self.army_group,
                 tuple(jednostka["pos"]),
                 tile,
@@ -310,12 +315,19 @@ class Mapa:
             tile.jednostka = w
         for budynek in state["budynek"]:
             tile = self.get_tile(budynek["pos"])
+            if budynek["owner"] == self.player.id:
+                frakcja = self.player.frakcja
+            else:
+                frakcja = self.opponent.frakcja
             b = Budynek(
+                frakcja[budynek["id"]],
+                budynek["id"],
                 budynek["pos"],
                 self.building_group,
-                budynek_img,
                 budynek["owner"],
                 budynek["color"],
+                budynek["zdrowie"],
+                budynek["morale"],
             )
             tile.budynek = b
 

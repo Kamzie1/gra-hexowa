@@ -4,11 +4,30 @@ from projekt.ustawienia import folder_grafiki
 
 
 class Budynek(pygame.sprite.Sprite):
-    def __init__(self, pos, group, surface, owner, color, name="Budynek"):
+    def __init__(
+        self, budynek, id, pos, group, owner, color, zdrowie=None, morale=None
+    ):
         super().__init__(group)
         self.pos = pos
-        self.image = pygame.image.load(join(folder_grafiki, surface)).convert_alpha()
+        self.image = pygame.image.load(
+            join(folder_grafiki, budynek[color])
+        ).convert_alpha()
         self.rect = self.image.get_frect(center=pos)
+        self.nazwa = budynek["nazwa"]
         self.owner = owner
-        self.name = name
         self.color = color
+        if zdrowie is None:
+            self.zdrowie = budynek["zdrowie"]
+        else:
+            self.zdrowie = zdrowie
+        if morale is None:
+            self.morale = budynek["morale"]
+        else:
+            self.morale = morale
+        self.heal = budynek["heal"]
+        self.earn = budynek["earn"]
+        self.przebicie = budynek["przebicie"]
+        self.pancerz = budynek["pancerz"]
+        self.atak = budynek["atak"]
+        self.koszt_ataku = budynek["koszt_ataku"]
+        self.id = id
