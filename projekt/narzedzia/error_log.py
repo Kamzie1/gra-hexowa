@@ -7,7 +7,7 @@ class Error_log:
         self.surf.fill(color)
         self.color = color
         self.rect = self.surf.get_frect(topleft=pos)
-        self.font = pygame.font.Font("grafika/consolas.ttf", 24)
+        self.font = pygame.font.Font("Grafika/consolas.ttf", 24)
         self.error = ""
         self.font_color = "red"
 
