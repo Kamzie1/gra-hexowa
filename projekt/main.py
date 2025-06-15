@@ -33,6 +33,8 @@ class Main:
             self.clock.tick(FPS)  # maks 60 FPS
 
     def event_handler(self):
+        self.game_event()
+        self.error_event()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # wyjdź z programu
                 pygame.quit()
@@ -43,8 +45,6 @@ class Main:
             self.id_input.update(event)
             self.join_event(event)
             self.create_event(event)
-            self.game_event()
-            self.error_event()
 
     def draw(self):
         self.name_input.draw(self.screen)

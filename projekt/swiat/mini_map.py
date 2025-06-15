@@ -71,4 +71,4 @@ class Mini_map:
         surf = pygame.Surface((20, 20))
         rect = surf.get_frect(center=pos)
         pygame.draw.ellipse(self.surf, "grey", rect)
-        pygame.draw.ellipse(self.surf, color, rect, width=2)
+        pygame.draw.ellipse(self.surf, color, rect, width=1)

@@ -2,7 +2,7 @@ import pygame
 from projekt.ustawienia import *
 from pytmx.util_pygame import load_pygame
 from os.path import join
-from .tile import Tile, Ruch, Najechanie, Klikniecie
+from .tile import Tile, Ruch, Najechanie, Klikniecie, Podswietlenie
 from .budynek import Budynek
 from projekt.narzedzia import *
 from projekt.jednostki import Wojownik
@@ -338,8 +338,11 @@ class Mapa:
             tile = self.get_tile(budynek["pos"])
             if budynek["owner"] == self.player.id:
                 frakcja = self.player.frakcja
+                color = self.player.color
+
             else:
                 frakcja = self.opponent.frakcja
+                color = self.opponent.color
             b = Budynek(
                 frakcja[budynek["id"]],
                 budynek["id"],
@@ -350,6 +353,7 @@ class Mapa:
                 budynek["zdrowie"],
                 budynek["morale"],
             )
+            Podswietlenie(f"{color}_podswietlenie.png", tile.pos, self.building_group)
             tile.budynek = b
 
     def zarabiaj(self):

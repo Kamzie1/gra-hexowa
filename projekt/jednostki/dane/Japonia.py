@@ -11,8 +11,8 @@ Yukimura_Sanada = {
     "pancerz": 8,
     "atak": 20,
     "koszt_ataku": 3,
-    "red": "Yukimura_Sanada.png",
-    "blue": "Yukimura_Sanada.png",
+    "red": "Yukimura_Sanada_red.png",
+    "blue": "Yukimura_Sanada_blue.png",
     "cost": 500,
 }
 
@@ -25,8 +25,8 @@ Bodyguard = {
     "pancerz": 4,
     "atak": 10,
     "koszt_ataku": 3,
-    "red": "Bodyguard.png",
-    "blue": "Bodyguard.png",
+    "red": "Bodyguard_red.png",
+    "blue": "Bodyguard_blue.png",
     "cost": 100,
 }
 

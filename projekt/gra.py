@@ -84,7 +84,7 @@ class Gra:
             if isinstance(jednostka.image, pygame.Surface):
                 self.mapa.army_group.draw(self.mapa.mapSurf)
             else:
-                print(f"błąd py surf: {jednostka.image}, jednostka: {jednostka}")
+                print(f"błąd py surf: {jednostka.image}")
 
         self.turn.draw(self.screen)
 
