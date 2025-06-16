@@ -7,11 +7,11 @@ from os.path import join
 
 
 class SideMenu:
-    def __init__(self, player, mapa):
+    def __init__(self, mapa):
         self.surf = pygame.Surface((menu_width, menu_height), pygame.SRCALPHA)
         self.surf.fill(menu_color)
         self.rect = self.surf.get_frect(topleft=menu_pos)
-        self.player = player
+        self.player = mapa.player
         self.group = mapa.army_group
         self.button_group = pygame.sprite.Group()
         self.recruit_group = pygame.sprite.Group()
@@ -33,9 +33,15 @@ class SideMenu:
 
         x, y = 5, 40
         id = 0
-        for jednostka in player.frakcja["jednostka"]:
+        for jednostka in self.player.frakcja["jednostka"]:
             self.create_recruit_button(
-                jednostka, id, x, y, player.recruit_pos, player.x, player.y
+                jednostka,
+                id,
+                x,
+                y,
+                self.player.recruit_pos,
+                self.player.x,
+                self.player.y,
             )
             x += 95
             id += 1
@@ -87,3 +93,31 @@ class SideMenu:
         text = self.res_font.render(display, True, "white")
         text_rect = text.get_rect(topleft=(x + 60, y + 10))
         self.recruit_surface.blit(text, text_rect)
+
+    def swap(self, player):
+        for button in self.recruit_group:
+            button.kill()
+        self.recruit_group.empty()
+
+        for button in self.button_group:
+            button.kill()
+        self.button_group.empty()
+
+        self.player = player
+        x, y = 5, 40
+        id = 0
+        for jednostka in self.player.frakcja["jednostka"]:
+            self.create_recruit_button(
+                jednostka,
+                id,
+                x,
+                y,
+                self.player.recruit_pos,
+                self.player.x,
+                self.player.y,
+            )
+            x += 95
+            id += 1
+            if x > menu_width - 25:
+                x = 5
+                y += 50

@@ -7,6 +7,7 @@ from projekt.player import Player
 from projekt.narzedzia import *
 from projekt.flag import Flag
 from projekt.jednostki import get_fraction
+from projekt.network import Client
 
 
 # klasa reprezentująca grę
@@ -30,14 +31,14 @@ class Gra:
         pygame.display.set_caption(Title)
         self.clock = pygame.time.Clock()
         self.mini_mapa = Mini_map(pos)
-        self.player = Player(frakcja, pos, x, y, num, name, client.info[name]["color"])
+        self.player = Player(frakcja, pos, x, y, 0, name, client.info[name]["color"])
         self.opponent = Player(
-            frakcja2, pos2, x2, y2, num2, name2, client.info[name2]["color"]
+            frakcja2, pos2, x2, y2, 1, name2, client.info[name2]["color"]
         )
         self.mapa = Mapa(pos, x, y, self.player, self.opponent, client.state)
         self.resource = Resource()
         self.turn = Turn()
-        self.menu = SideMenu(self.player, self.mapa)
+        self.menu = SideMenu(self.mapa)
         self.flag = Flag()
         self.client = client
         client.mapa = self.mapa
@@ -75,7 +76,7 @@ class Gra:
         )
         if self.flag.show:
             self.menu.draw(self.screen)
-        self.resource.draw(self.screen, self.player)
+        self.resource.draw(self.screen, self.mapa.player)
         self.turn_display.display(
             "grey", self.screen, self.client.turn, self.player, self.opponent
         )
@@ -99,5 +100,14 @@ class Gra:
                 mouse_pos = pygame.mouse.get_pos()
                 self.mapa.event(mouse_pos, self.flag, self.client.turn, self.client.id)
                 self.turn.event(mouse_pos, self.mapa, self.client)
+                self.menu.swap(self.mapa.player)
                 self.resource.event(mouse_pos, self.flag)
                 self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)
+
+
+if __name__ == "__main__":
+
+    client = Client()
+    client.start_game(client.uruchom_gre())
+    gra = Gra(client)
+    gra.run()

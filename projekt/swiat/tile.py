@@ -47,9 +47,9 @@ class Najechanie:
                     self.origin = tile.pos
                     if tile.jednostka is None:
                         self.flag = 0
-                    elif tile.jednostka.owner == player_id:
+                    elif tile.jednostka.owner == 0:
                         self.flag = 1
-                    elif tile.jednostka.owner == opponent_id:
+                    elif tile.jednostka.owner == 1:
                         self.flag = 2
 
 
