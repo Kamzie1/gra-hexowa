@@ -12,13 +12,46 @@ class Squad(pygame.sprite.Sprite):
         self.wojownicy = []
         self.load_data(info, frakcja)
 
-    def draw(self, screen):
-        for wojownik in self.wojownicy:
-            screen.blit(wojownik.image, wojownik.image.get_frect(center=self.pos))
+    @property
+    def pos(self):
+        return self._pos
 
-    def heal(self):
+    @pos.setter
+    def pos(self, value):
+        self.positions = [0 for _ in range(5)]
+        self._pos = value
+        self.positions[0] = self._pos
+        self.positions[1] = (self._pos[0] + 30, self._pos[1])
+        self.positions[2] = (self._pos[0] - 30, self._pos[1])
+        self.positions[3] = (self._pos[0], self._pos[1] + 30)
+        self.positions[4] = (self._pos[0], self._pos[1] - 30)
+
+    @property
+    def ruch(self):
+        min_ruch = 100
         for wojownik in self.wojownicy:
-            wojownik.heal()
+            if wojownik.ruch < min_ruch:
+                min_ruch = wojownik.ruch
+
+        return min_ruch
+
+    @ruch.setter
+    def ruch(self, value):
+        diff = self.ruch - value
+        for wojownik in self.wojownicy:
+            wojownik.ruch -= diff
+
+    def draw(self, screen):
+        i = 0
+        for wojownik in self.wojownicy:
+            screen.blit(
+                wojownik.image, wojownik.image.get_frect(center=self.positions[i])
+            )
+            i += 1
+
+    def heal(self, value):
+        for wojownik in self.wojownicy:
+            wojownik.heal(value)
 
     def get_data(self):
         info = {}
@@ -40,3 +73,6 @@ class Squad(pygame.sprite.Sprite):
                 jednostka["morale"],
             )
             self.wojownicy.append(w)
+
+    def __add__(self, other):
+        self.wojownicy = self.wojownicy + other.wojownicy

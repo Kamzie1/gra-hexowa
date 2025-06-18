@@ -72,7 +72,7 @@ class Gra:
         self.mapa.draw(self.screen, self.flag)
         if self.flag.show:
             self.menu.draw(self.screen)
-        self.resource.draw(self.screen, self.player)
+        self.resource.draw(self.screen, self.mapa.player)
         self.turn_display.display(
             "grey", self.screen, self.client.turn, self.player, self.opponent
         )

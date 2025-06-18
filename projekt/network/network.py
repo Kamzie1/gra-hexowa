@@ -23,11 +23,8 @@ class Client:
         self.mapa.player = self.mapa.opponent
         self.mapa.opponent = bufor
 
-        print(self.mapa.player)
-        print(self.mapa.opponent)
         self.user = self.mapa.player.name
         self.id = self.mapa.player.id
-        print(self.id, self.user)
         if self.turn % 2 == self.mapa.player.id and self.turn != 1:
             self.mapa.zarabiaj()
             self.mapa.heal()
