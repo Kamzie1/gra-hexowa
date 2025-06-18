@@ -1,7 +1,7 @@
 from ..ustawienia import *
 from ..jednostki import *
 from ..narzedzia import pozycja_myszy_na_surface
-from .button import Recruit
+from .buttons import Recruit
 import pygame
 from os.path import join
 

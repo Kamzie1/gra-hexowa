@@ -14,6 +14,7 @@ Yukimura_Sanada = {
     "red": "Yukimura_Sanada_red.png",
     "blue": "Yukimura_Sanada_blue.png",
     "cost": 500,
+    "id": 1,
 }
 
 Bodyguard = {
@@ -28,6 +29,7 @@ Bodyguard = {
     "red": "Bodyguard_red.png",
     "blue": "Bodyguard_blue.png",
     "cost": 100,
+    "id": 0,
 }
 
 Kolumbryna = {
@@ -41,6 +43,7 @@ Kolumbryna = {
     "koszt_ataku": 4,
     "red": "kolubryna.png",
     "blue": "kolubryna.png",
+    "id": 2,
     "cost": 400,
 }
 

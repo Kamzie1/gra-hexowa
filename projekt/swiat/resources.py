@@ -1,8 +1,8 @@
-from ..ustawienia import *
-from ..narzedzia import pozycja_myszy_na_surface
+from projekt.ustawienia import *
+from projekt.narzedzia import pozycja_myszy_na_surface
 from os.path import join
 import pygame
-from .button import Show
+from .buttons import Show
 
 
 class Resource:
