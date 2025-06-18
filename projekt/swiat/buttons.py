@@ -51,20 +51,20 @@ class Recruit(Button):
         self.y = y
 
     def click(self):
-        try:
-            self.mapa.move_flag = Wojownik(
-                self.jednostka,
-                self.group,
-                (4000, 4000),
-                None,
-                self.player.id,
-                self.player.color,
-                self.id,
-            )
-            r = Recruit_sample(4)
-            self.mapa.correct_moves = self.mapa.possible_moves(self.x, self.y, r)
-        except (ValueError, TypeError) as e:
-            print(e)
+        info = {}
+        info["color"] = self.player.color
+        info["owner"] = self.player.id
+        info["pos"] = (5000, 5000)
+        info["jednostki"] = []
+        jednostka = {}
+        jednostka["id"] = self.id
+        jednostka["zdrowie"] = self.jednostka["zdrowie"]
+        jednostka["morale"] = self.jednostka["morale"]
+        info["jednostki"].append(jednostka)
+
+        self.mapa.move_flag = Squad(self.group, info, None, self.player.frakcja)
+        r = Recruit_sample(4)
+        self.mapa.correct_moves = self.mapa.possible_moves(self.x, self.y, r)
 
 
 class Show(Button):

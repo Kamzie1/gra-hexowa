@@ -5,7 +5,7 @@ from os.path import join
 from .tile import Tile, Ruch, Najechanie, Klikniecie, Podswietlenie
 from .budynek import Budynek
 from projekt.narzedzia import *
-from projekt.jednostki import Wojownik
+from projekt.jednostki import Wojownik, Squad
 
 
 class Mapa:
@@ -239,31 +239,34 @@ class Mapa:
                             and self.correct_moves[tile.x][tile.y] >= 0
                         ):
                             if not self.move_flag.tile is None:
-                                self.move_flag.tile.jednostka = None
-                                self.move_flag.pos = tile.pos
-                                self.move_flag.tile = tile
-                                self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
-                                tile.jednostka = self.move_flag
-                                flag.klikniecie_flag = False
+                                self.move(tile, flag)
                             else:
-                                try:
-                                    self.player.gold -= self.player.frakcja[
-                                        "jednostka"
-                                    ][self.move_flag.id]["cost"]
-                                except:
-                                    print("not enopugh money")
-                                else:
-                                    self.move_flag.pos = tile.pos
-                                    self.move_flag.tile = tile
-                                    self.move_flag.ruch = self.correct_moves[tile.x][
-                                        tile.y
-                                    ]
-                                    tile.jednostka = self.move_flag
-                                    flag.klikniecie_flag = False
-
+                                self.recruit(tile, flag)
                         self.move_flag = None
                         for tile in self.move_group:
                             tile.kill()
+
+    def move(self, tile, flag):
+        self.move_flag.tile.jednostka = None
+        self.move_flag.pos = tile.pos
+        self.move_flag.tile = tile
+        self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
+        tile.jednostka = self.move_flag
+        flag.klikniecie_flag = False
+
+    def recruit(self, tile, flag):
+        try:
+            self.player.gold -= self.player.frakcja["jednostka"][
+                self.move_flag.wojownicy[0].id
+            ]["cost"]
+        except:
+            print("not enough money")
+        else:
+            self.move_flag.pos = tile.pos
+            self.move_flag.tile = tile
+            self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
+            tile.jednostka = self.move_flag
+            flag.klikniecie_flag = False
 
     def load_state(self):
         state = {}
@@ -272,15 +275,7 @@ class Mapa:
         for tiles in self.Tile_array:
             for tile in tiles:
                 if not tile.jednostka is None:
-                    stan_jednostki = {
-                        "zdrowie": tile.jednostka.zdrowie,
-                        "morale": tile.jednostka.morale,
-                        "id": tile.jednostka.id,
-                        "owner": tile.jednostka.owner,
-                        "pos": tile.jednostka.pos,
-                        "color": tile.jednostka.color,
-                    }
-                    state["jednostka"].append(stan_jednostki)
+                    state["jednostka"].append(tile.jednostka.get_data())
                 if not tile.budynek is None:
                     stan_budynku = {
                         "owner": tile.budynek.owner,
@@ -321,19 +316,9 @@ class Mapa:
                 frakcja = self.player.frakcja
             else:
                 frakcja = self.opponent.frakcja
-            w = Wojownik(
-                frakcja["jednostka"][jednostka["id"]],
-                self.army_group,
-                tuple(jednostka["pos"]),
-                tile,
-                jednostka["owner"],
-                jednostka["color"],
-                jednostka["id"],
-                jednostka["zdrowie"],
-                jednostka["morale"],
-            )
-            assert isinstance(w.image, pygame.Surface)
-            tile.jednostka = w
+            s = Squad(self.army_group, jednostka, tile, frakcja)
+            tile.jednostka = s
+
         for budynek in state["budynek"]:
             tile = self.get_tile(budynek["pos"])
             if budynek["owner"] == self.player.id:
