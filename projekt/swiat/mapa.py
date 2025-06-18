@@ -40,19 +40,19 @@ class Mapa:
 
         self.najechanie = Najechanie(
             pygame.image.load(
-                join("Grafika/tile-grafika", "Hex_najechanie.png")
+                join("Grafika/tile-grafika/efekty hexów", "white_podswietlenie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
             pygame.image.load(
-                join("Grafika/tile-grafika", f"{player.color}_podswietlenie.png")
+                join("Grafika/tile-grafika/efekty hexów", f"{player.color}_podswietlenie.png")
             ).convert_alpha(),
             pygame.image.load(
-                join("Grafika/tile-grafika", f"{opponent.color}_podswietlenie.png")
+                join("Grafika/tile-grafika/efekty hexów", f"{opponent.color}_podswietlenie.png")
             ).convert_alpha(),
         )
         self.klikniecie = Klikniecie(
             pygame.image.load(
-                join("Grafika/tile-grafika", "hex-klikniecie.png")
+                join("Grafika/tile-grafika/efekty hexów", "hex-klikniecie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
         )
@@ -207,7 +207,7 @@ class Mapa:
                                 self.move_group,
                                 pygame.image.load(
                                     join(
-                                        f"{folder_grafiki}/tile-grafika",
+                                        f"{folder_grafiki}/tile-grafika/efekty hexów",
                                         "hex-klikniecie.png",
                                     )
                                 ).convert_alpha(),
