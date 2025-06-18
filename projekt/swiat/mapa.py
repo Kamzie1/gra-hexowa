@@ -33,6 +33,7 @@ class Mapa:
         self.move_flag = None
         self.correct_moves = None
         self.army_group = pygame.sprite.Group()
+        self.podswietlenie_group = pygame.sprite.Group()
 
         self.player = player
         self.opponent = opponent
@@ -191,6 +192,7 @@ class Mapa:
         screen.blit(self.mapSurf, self.mapRect)  # rysuje mapę
         self.tiles_group.draw(self.mapSurf)  # rysuje tilesy
         self.building_group.draw(self.mapSurf)  # rysuje budynki
+        self.podswietlenie_group.draw(self.mapSurf)
         self.mapSurf.blit(
             self.najechanie.surf[self.najechanie.flag], self.najechanie.rect
         )
@@ -296,14 +298,15 @@ class Mapa:
         return None
 
     def import_state(self, state):
-        for jednostka in self.army_group:
+        for jednostka in self.building_group:
             jednostka.kill()
 
-        for jednostka in self.building_group:
+        for jednostka in self.podswietlenie_group:
             jednostka.kill()
 
         self.army_group.empty()
         self.building_group.empty()
+        self.podswietlenie_group.empty()
 
         for tiles in self.Tile_array:
             for tile in tiles:
@@ -338,7 +341,9 @@ class Mapa:
                 budynek["zdrowie"],
                 budynek["morale"],
             )
-            Podswietlenie(f"{color}_podswietlenie.png", tile.pos, self.building_group)
+            Podswietlenie(
+                f"{color}_podswietlenie.png", tile.pos, self.podswietlenie_group
+            )
             tile.budynek = b
 
     def zarabiaj(self):
