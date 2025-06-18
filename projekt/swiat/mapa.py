@@ -236,27 +236,34 @@ class Mapa:
                             self.move_flag = None
 
                     else:
-                        if (
-                            tile.jednostka is None
-                            and self.correct_moves[tile.x][tile.y] >= 0
-                        ):
-                            if not self.move_flag.tile is None:
-                                self.move(tile, flag)
+                        if self.correct_moves[tile.x][tile.y] >= 0:
+                            if self.move_flag.tile is None:
+                                if tile.jednostka is None:
+                                    self.recruit(tile)
+                                elif tile.jednostka.owner == self.player.id:
+                                    self.recruit_join(tile)
+                                elif tile.jednostka.owner == self.opponent.id:
+                                    pass
+                            elif tile.jednostka is None:
+                                self.move(tile)
                             else:
-                                self.recruit(tile, flag)
+                                if tile.jednostka.owner == self.player.id:
+                                    self.join(tile.jednostka, self.move_flag, tile)
+                                elif tile.jednostka.owner == self.opponent.id:
+                                    pass
+                        flag.klikniecie_flag = False
                         self.move_flag = None
                         for tile in self.move_group:
                             tile.kill()
 
-    def move(self, tile, flag):
+    def move(self, tile):
         self.move_flag.tile.jednostka = None
         self.move_flag.pos = tile.pos
         self.move_flag.tile = tile
         self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
         tile.jednostka = self.move_flag
-        flag.klikniecie_flag = False
 
-    def recruit(self, tile, flag):
+    def recruit(self, tile):
         try:
             self.player.gold -= self.player.frakcja["jednostka"][
                 self.move_flag.wojownicy[0].id
@@ -268,7 +275,33 @@ class Mapa:
             self.move_flag.tile = tile
             self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
             tile.jednostka = self.move_flag
-            flag.klikniecie_flag = False
+
+    def recruit_join(self, tile):
+        try:
+            self.player.gold -= self.player.frakcja["jednostka"][
+                self.move_flag.wojownicy[0].id
+            ]["cost"]
+        except:
+            print("not enough money")
+        else:
+            self.join(tile.jednostka, self.move_flag, tile)
+
+    def join(self, squad1, squad2, tile):
+        if not self.validate_join(squad1, squad2):
+            return
+
+        squad2.ruch = self.correct_moves[tile.x][tile.y]
+
+        squad1 = squad1 + squad2
+
+        if not squad2.tile is None:
+            squad2.tile.jednostka = None
+        squad2.kill()
+
+    def validate_join(self, squad1, squad2):
+        if len(squad1.wojownicy) + len(squad2.wojownicy) > 5:
+            return False
+        return True
 
     def load_state(self):
         state = {}

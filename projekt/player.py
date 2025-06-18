@@ -24,3 +24,6 @@ class Player:
             raise TypeError("wrong type")
         else:
             self._gold = value
+
+    def __str__(self):
+        return self.name
