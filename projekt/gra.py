@@ -6,6 +6,7 @@ from projekt.player import Player
 from projekt.narzedzia import oblicz_pos, TurnDisplay
 from projekt.flag import Flag
 from projekt.jednostki import get_fraction
+from projekt.network import Client
 
 
 class Gra:
@@ -36,7 +37,7 @@ class Gra:
         self.mapa = Mapa(pos, x, y, self.player, self.opponent, client.state)
         self.resource = Resource()
         self.turn = Turn()
-        self.menu = SideMenu(self.player, self.mapa)
+        self.menu = SideMenu(self.mapa)
         self.flag = Flag()
         self.client = client
         client.mapa = self.mapa
@@ -90,6 +91,7 @@ class Gra:
                 mouse_pos = pygame.mouse.get_pos()
                 self.mapa.event(mouse_pos, self.flag, self.client.turn, self.client.id)
                 self.turn.event(mouse_pos, self.mapa, self.client)
+                self.menu.swap(self.mapa.player)
                 self.resource.event(mouse_pos, self.flag)
                 self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)
 

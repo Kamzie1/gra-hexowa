@@ -103,6 +103,12 @@ class SideMenu:
             button.kill()
         self.button_group.empty()
 
+        self.recruit_surface.fill((50, 50, 50, 70))
+        display = "Rekrutuj"
+        text = self.font.render(display, True, "white")
+        text_rect = text.get_rect(topleft=(5, 5))
+        self.recruit_surface.blit(text, text_rect)
+
         self.player = player
         x, y = 5, 40
         id = 0
