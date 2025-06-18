@@ -52,7 +52,6 @@ class Gra:
             if not self.client.state_loaded:
                 self.clock.tick(FPS)
                 continue
-
             self.event_handler()
 
             self.update()

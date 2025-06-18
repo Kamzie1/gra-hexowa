@@ -7,6 +7,7 @@ from projekt.jednostki import Japonia, Japonia2
 
 class Client:
     def __init__(self):
+        self.ekran = 0
         self.start_game = False
         self.connected = False
         self.sio = socketio.Client()
