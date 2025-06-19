@@ -5,6 +5,7 @@ from .wojownik import Wojownik
 class Squad(pygame.sprite.Sprite):
     def __init__(self, group, info, tile, frakcja):
         super().__init__(group)
+        self.owner_id = info["owner_id"]
         self.owner = info["owner"]
         self.color = info["color"]
         self.pos = tuple(info["pos"])
@@ -57,6 +58,7 @@ class Squad(pygame.sprite.Sprite):
         info = {}
         info["color"] = self.color
         info["owner"] = self.owner
+        info["owner_id"] = self.owner_id
         info["pos"] = self.pos
         info["jednostki"] = []
         for wojownik in self.wojownicy:
@@ -65,6 +67,7 @@ class Squad(pygame.sprite.Sprite):
 
     def load_data(self, info, frakcja):
         for jednostka in info["jednostki"]:
+            print(jednostka)
             w = Wojownik(
                 frakcja["jednostka"][jednostka["id"]],
                 jednostka["id"],
@@ -76,3 +79,20 @@ class Squad(pygame.sprite.Sprite):
 
     def __add__(self, other):
         self.wojownicy = self.wojownicy + other.wojownicy
+
+    def display(self, id):
+        representation = f"Oddział ({id}): {self.owner} | {self.ruch}"
+        return representation
+
+    def zdrowie(self, id, value):
+        try:
+            self.wojownicy[id].zdrowie = value
+        except ValueError:
+            self.wojownicy.remove(self.wojownicy[id])
+            if len(self.wojownicy) == 0:
+                self.kill()
+                self.tile.jednostka = None
+
+    def heal(self, value):
+        for wojownik in self.wojownicy:
+            wojownik.zdrowie += value

@@ -20,8 +20,8 @@ class SideMenu:
         self.recruit_surface = pygame.Surface((menu_width - 20, 300), pygame.SRCALPHA)
         self.recruit_surface.fill((50, 50, 50, 70))
         self.recruit_rec = self.recruit_surface.get_frect(topleft=rec_panel_pos)
-        self.font = pygame.font.Font(join(folder_grafiki, font), font_size)
-        self.res_font = pygame.font.Font(join(folder_grafiki, font), 10)
+        self.font = pygame.font.Font(join("Grafika/mapa", font), font_size)
+        self.res_font = pygame.font.Font(join("Grafika/mapa", font), 10)
 
         self.gold_icon = pygame.image.load(join("grafika", "złoto.png"))
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
@@ -53,9 +53,9 @@ class SideMenu:
         self.surf.fill(menu_color)
 
     def event(self, mouse_pos, flag, turn, id):
+        mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
         if self.rect.collidepoint(mouse_pos) and flag.show:
             flag.klikniecie_flag = False
-            mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, rec_panel_pos)
             if turn % 2 == id:
                 for button in self.recruit_group:

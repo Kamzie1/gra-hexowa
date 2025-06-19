@@ -29,3 +29,11 @@ def clicked(pos, mouse_pos) -> bool:
     if pow(mouse_pos[0] - a, 2) + pow(mouse_pos[1] - b, 2) <= pow(r, 2):
         return True
     return False
+
+
+def oslab_kolor(color, value):
+    r = color.r
+    g = color.g
+    b = color.b
+
+    return (r, g, b, value)

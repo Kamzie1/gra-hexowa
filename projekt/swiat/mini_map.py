@@ -5,7 +5,7 @@ from os.path import join
 
 class Mini_map:
     def __init__(self, miasto_pos):
-        self.image = pygame.image.load(join(folder_grafiki, minimapa_image)).convert()
+        self.image = pygame.image.load(join("Grafika/mapa", minimapa_image)).convert()
         self.scaledSurf = pygame.transform.smoothscale(
             self.image, (mini_width, mini_height)
         )
