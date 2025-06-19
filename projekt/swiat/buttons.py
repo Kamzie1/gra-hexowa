@@ -6,13 +6,15 @@ import pygame
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, width, height, color, pos, button_group, tekst=None) -> None:
+    def __init__(self, width, height, color, pos, button_group, image=None) -> None:
         super().__init__(button_group)
-        self.image = pygame.Surface((width, height))
-        self.image.fill(color)
+        if image is None:
+            self.image = pygame.Surface((width, height))
+            self.image.fill(color)
+        else:
+            self.image=pygame.image.load(f"Grafika/{image}")
         self.pos = pos
         self.rect = self.image.get_frect(topleft=self.pos)
-        self.tekst = tekst
 
     def click(self, *args):
         pass
@@ -66,15 +68,15 @@ class Recruit(Button):
         self.mapa.move_group.empty()
 
 
-class Show(Button):
+class Menu(Button):
     def __init__(self, width, height, color, pos, button_group) -> None:
-        super().__init__(width, height, color, pos, button_group)
+        super().__init__(width, height, color, pos, button_group,"menu.png")
 
     def click(self, flag):
         flag.show = not flag.show
 
 
-class Leave(Button):
+class Surrender(Button):
     def __init__(self, width, height, color, pos, button_group, tekst=None):
         super().__init__(width, height, color, pos, button_group, tekst)
 

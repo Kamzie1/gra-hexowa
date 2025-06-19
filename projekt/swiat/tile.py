@@ -77,7 +77,7 @@ class Ruch(pygame.sprite.Sprite):
         self._origin = pos
         self.image = surf
         self.rect = self.image.get_frect(center=self.origin)
-        font = pygame.font.Font(join("Grafika/mapa", "consolas.ttf"), 16)
+        font = pygame.font.Font(join("Grafika/fonts", "consolas.ttf"), 16)
         display = f"{ruch}"
         text = font.render(display, True, "black")
         text_rect = text.get_rect(center=(tile_width / 2, tile_height / 2))

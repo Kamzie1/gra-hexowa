@@ -20,8 +20,8 @@ class SideMenu:
         self.recruit_surface = pygame.Surface((menu_width - 20, 300), pygame.SRCALPHA)
         self.recruit_surface.fill((50, 50, 50, 70))
         self.recruit_rec = self.recruit_surface.get_frect(topleft=rec_panel_pos)
-        self.font = pygame.font.Font(join("Grafika/mapa", font), font_size)
-        self.res_font = pygame.font.Font(join("Grafika/mapa", font), 10)
+        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
+        self.res_font = pygame.font.Font(join("Grafika/fonts", font), 10)
 
         self.gold_icon = pygame.image.load(join("grafika", "złoto.png"))
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))

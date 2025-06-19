@@ -2,7 +2,7 @@ from projekt.ustawienia import *
 from projekt.narzedzia import pozycja_myszy_na_surface
 from os.path import join
 import pygame
-from .buttons import Show, Leave
+from .buttons import Menu, Surrender
 
 
 class Resource:
@@ -10,16 +10,16 @@ class Resource:
         self.surf = pygame.Surface((resource_width, resource_height), pygame.SRCALPHA)
         self.fill()
         self.rect = self.surf.get_frect(topleft=resource_pos)
-        self.font = pygame.font.Font(join("Grafika/mapa", font), font_size)
+        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
         self.button_group = pygame.sprite.Group()
-        Show(
+        Menu(
             50,
             50,
             "blue",
-            (0, 0),
+            (10,0),
             self.button_group,
         )
-        Leave(50, 50, "yellow", (60, 0), self.button_group)
+        Surrender(50, 50, "yellow", (70, 0), self.button_group)
 
     def fill(self):
         self.surf.fill(resource_color)
@@ -41,7 +41,7 @@ class Resource:
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, resource_pos)
             for button in self.button_group:
                 if button.rect.collidepoint(mouse_pos):
-                    if isinstance(button, Show):
+                    if isinstance(button, Menu):
                         button.click(flag)
                     else:
                         button.click(client, koniecGry)
