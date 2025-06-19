@@ -3,7 +3,7 @@ from sys import exit
 from projekt.ustawienia import *  # plik z ustawieniami
 from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Turn, SquadButtonDisplay
 from projekt.player import Player
-from projekt.narzedzia import oblicz_pos, TurnDisplay, SquadDisplay
+from projekt.narzedzia import oblicz_pos, TurnDisplay, SquadDisplay, KoniecGry
 from projekt.flag import Flag
 from projekt.jednostki import get_fraction
 from projekt.network import Client
@@ -39,6 +39,7 @@ class Gra:
         self.turn = Turn()
         self.menu = SideMenu(self.mapa)
         self.flag = Flag()
+        self.koniecGry = KoniecGry(Width, Height)
         self.client = client
         client.mapa = self.mapa
         client.user = self.player.name
@@ -93,18 +94,23 @@ class Gra:
 
         if self.squadDisplay.show and not self.mapa.move_flag is None:
             self.squadDisplay.display(self.mapa.move_flag, self.screen)
+        if self.koniecGry.show:
+            self.koniecGry.draw(self.screen)
 
     def event_handler(self):
         if self.mapa.Tile_array[self.player.x][self.player.y].budynek is None:
-            self.client.end_game(-1)
+            self.client.end_game(-1, self.koniecGry)
         if self.mapa.Tile_array[self.opponent.x][self.opponent.y].budynek is None:
-            self.client.end_game(1)
+            self.client.end_game(1, self.koniecGry)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
+                if self.koniecGry.show:
+                    pygame.quit()
+                    exit()
 
                 self.mapa.event(
                     mouse_pos,
@@ -117,7 +123,7 @@ class Gra:
 
                 self.turn.event(mouse_pos, self.mapa, self.client)
                 self.menu.swap(self.mapa.player)
-                self.resource.event(mouse_pos, self.flag)
+                self.resource.event(mouse_pos, self.flag, self.client, self.koniecGry)
                 self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)
                 self.DisplaySquadButton.event(
                     mouse_pos, self.squadDisplay, self.mapa.move_flag

@@ -49,7 +49,7 @@ Kolumbryna = {
 
 Miasto = {
     "nazwa": "Miasto",
-    "zdrowie": 1000,
+    "zdrowie": 20,
     "morale": 90,
     "przebicie": 15,
     "pancerz": 20,

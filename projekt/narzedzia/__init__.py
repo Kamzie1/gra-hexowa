@@ -6,3 +6,4 @@ from .error_log import Error_log
 from .display import TurnDisplay
 from .squadDisplay import SquadDisplay
 from .attackDisplay import AttackDisplay
+from .koniecgry import KoniecGry

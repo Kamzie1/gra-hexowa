@@ -51,12 +51,12 @@ class Client:
         self.import_state()
 
     def uruchom_gre(self):
-        package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "blue", "id": 1}
+        package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 1}
         package2 = {
             "x": 6,
             "y": 9,
             "frakcja": "japonia",
-            "color": "red",
+            "color": "blue",
             "id": 0,
         }
         starting_state["budynek"][0]["pos"] = id_to_pos(package1["x"], package1["y"])
@@ -72,11 +72,9 @@ class Client:
             "state": starting_state,
         }
 
-    def end_game(self, result):
+    def end_game(self, result, koniecGry):
         match (result):
-            case 1:
-                print(f"{self.mapa.player.name} wygral")
             case -1:
-                print(f"{self.mapa.player.name} przegral")
-            case _:
-                print("the game ended suddenly")
+                koniecGry.display("Przegrałeś", self.mapa.player.color)
+            case 1:
+                koniecGry.display("Wygrałeś", self.mapa.player.color)

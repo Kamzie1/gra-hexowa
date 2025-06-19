@@ -62,10 +62,11 @@ class Recruit(Button):
         jednostka["zdrowie"] = self.jednostka["zdrowie"]
         jednostka["morale"] = self.jednostka["morale"]
         info["jednostki"].append(jednostka)
-
+        print("Recruit")
         self.mapa.move_flag = Squad(self.group, info, None, self.player.frakcja)
         r = Recruit_sample(4)
         self.mapa.correct_moves = self.mapa.possible_moves(self.x, self.y, r)
+        self.mapa.move_group.empty()
 
 
 class Show(Button):
@@ -74,6 +75,14 @@ class Show(Button):
 
     def click(self, flag):
         flag.show = not flag.show
+
+
+class Leave(Button):
+    def __init__(self, width, height, color, pos, button_group, tekst=None):
+        super().__init__(width, height, color, pos, button_group, tekst)
+
+    def click(self, client, koniecGry):
+        client.end_game(-1, koniecGry)
 
 
 class SquadButtonDisplay:
