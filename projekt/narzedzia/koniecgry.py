@@ -9,7 +9,7 @@ class KoniecGry:
         self.rect = self.surf.get_rect(topleft=(0, 0))
         self.show = False
         self.result = ""
-        self.font = pygame.font.Font("Grafika/mapa/consolas.ttf", 100)
+        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", 100)
 
     def display(self, result, color):
         self.show = True

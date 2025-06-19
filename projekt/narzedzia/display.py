@@ -7,7 +7,7 @@ class Display:
         self.surf = pygame.Surface((width, height), pygame.SRCALPHA)
         self.surf.fill((0, 0, 0, 0))
         self.rect = self.surf.get_rect(topleft=pos)
-        self.font = pygame.font.Font(join("Grafika/mapa", font), font_size)
+        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
 
     def display(self, content, color, screen):
 

@@ -8,7 +8,7 @@ class AttackDisplay:
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))
         self.rect = self.surf.get_frect(center=pos)
-        self.font = pygame.font.Font("Grafika/mapa/consolas.ttf", int(self.width / 30))
+        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 30))
         self.font_color = color
         self.show = False
 
@@ -60,7 +60,7 @@ class SurfOddzialu:
         self.squad = squad
         self.surfs = []
         self.create_surf()
-        self.font = pygame.font.Font("Grafika/mapa/consolas.ttf", int(self.width / 15))
+        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 15))
         self.font_color = "black"
 
     def create_surf(self):
@@ -218,7 +218,7 @@ class WojownikSurf:
         )
         self.rect = self.surf.get_frect(topleft=pos)
         self.jednostka = jednostka
-        self.font = pygame.font.Font("Grafika/mapa/consolas.ttf", int(self.width / 35))
+        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 35))
         self.font_color = "black"
         self.color = color
 
@@ -292,7 +292,7 @@ class BudynekSurfDefend(WojownikSurf):
         )
         self.rect = self.surf.get_frect(topright=pos)
         self.budynek = budynek
-        self.font = pygame.font.Font("Grafika/mapa/consolas.ttf", int(self.width / 35))
+        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 35))
         self.font_color = "black"
 
     def display(self, screen, pos, origin):

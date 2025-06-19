@@ -9,9 +9,9 @@ class SquadDisplay:
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))
         self.rect = self.surf.get_frect(center=pos)
-        self.font = pygame.font.Font("Grafika/mapa/consolas.ttf", int(self.width / 20))
+        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 20))
         self.wojownik_font = pygame.font.Font(
-            "Grafika/mapa/consolas.ttf", int(self.width / 40)
+            "Grafika/fonts/consolas.ttf", int(self.width / 40)
         )
         self.font_color = color
         self.show = False
