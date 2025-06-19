@@ -6,16 +6,10 @@ from projekt.ustawienia import folder_grafiki
 # klasa wojownik, podstawowa klasa reprezentująca mechanikę każdej jednostki, czyli jej ruch i atak, dziedziczy od specjalnej klasy Sprite od pygame pozwalajacej na lepszą kontrolę w pygame
 class Wojownik:
     # inicjalizacja
-    def __init__(self, jednostka, id, color, zdrowie=None, morale=None):
+    def __init__(self, jednostka, id, color, zdrowie, morale):
         self.name = jednostka["nazwa"]
-        if zdrowie is None:
-            self.zdrowie = jednostka["zdrowie"]
-        else:
-            self.zdrowie = zdrowie
-        if morale is None:
-            self.morale = jednostka["morale"]
-        else:
-            self.morale = morale
+        self._zdrowie = zdrowie
+        self.morale = morale
         self.ruch = jednostka["ruch"]
         self.przebicie = jednostka["przebicie"]
         self.pancerz = jednostka["pancerz"]
@@ -24,6 +18,7 @@ class Wojownik:
         self.atak_points = jednostka["atak_points"]
         self.original_ruch = self.ruch
         self.original_zdrowie = self.zdrowie
+        self.jednostka = jednostka
         self.id = id
 
         self.image = pygame.image.load(
@@ -36,14 +31,12 @@ class Wojownik:
 
     @zdrowie.setter
     def zdrowie(self, value):
+        print(self.jednostka)
         self._zdrowie = value
         if self.zdrowie <= 0:
             raise ValueError("zdrowie poniżej zera")
-
-    def heal(self, value):
-        self.zdrowie += value
-        if self.zdrowie > self.original_zdrowie:
-            self.zdrowie = self.original_zdrowie
+        if self.zdrowie > self.jednostka["zdrowie"]:
+            self.zdrowie = self.jednostka["zdrowie"]
 
     def get_data(self):
         stan_jednostki = {

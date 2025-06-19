@@ -57,10 +57,7 @@ class Recruit(Button):
         info["owner_id"] = self.player.id
         info["pos"] = (5000, 5000)
         info["jednostki"] = []
-        jednostka = {}
-        jednostka["id"] = self.id
-        jednostka["zdrowie"] = self.jednostka["zdrowie"]
-        jednostka["morale"] = self.jednostka["morale"]
+        jednostka = self.jednostka
         info["jednostki"].append(jednostka)
         print("Recruit")
         self.mapa.move_flag = Squad(self.group, info, None, self.player.frakcja)

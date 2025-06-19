@@ -426,9 +426,14 @@ class Mapa:
 
     def heal(self):
         for budynek in self.building_group:
-            tile = self.get_tile(budynek.pos)
-            if not tile.jednostka is None:
-                tile.jednostka.heal(budynek.heal)
+            if isinstance(budynek, Budynek):
+                if budynek.owner_id == self.player.id:
+                    budynek.uzdrow()
+                    tile = self.get_tile(budynek.pos)
+                    if not tile.jednostka is None:
+                        tile.jednostka.heal(budynek.heal)
+            else:
+                print("to nie budynek")
 
     def __str__(self):
         for layer in self.tmx.layers:

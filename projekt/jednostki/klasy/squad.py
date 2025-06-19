@@ -67,6 +67,7 @@ class Squad(pygame.sprite.Sprite):
 
     def load_data(self, info, frakcja):
         for jednostka in info["jednostki"]:
+            print(jednostka)
             w = Wojownik(
                 frakcja["jednostka"][jednostka["id"]],
                 jednostka["id"],
@@ -91,3 +92,7 @@ class Squad(pygame.sprite.Sprite):
             if len(self.wojownicy) == 0:
                 self.kill()
                 self.tile.jednostka = None
+
+    def heal(self, value):
+        for wojownik in self.wojownicy:
+            wojownik.zdrowie += value

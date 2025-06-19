@@ -4,7 +4,7 @@
 # dane jednostki Yukimura Sanda w schemacie słownika, dostęp do danych: Yukimura_Sanda['nazwa_informacji'] np. Yukimura_Sanda['zdrowie'] da nam 500
 Yukimura_Sanada = {
     "nazwa": "Yukimura Sanada",
-    "zdrowie": 500,
+    "zdrowie": 100,
     "morale": 100,
     "ruch": 15,
     "przebicie": 10,
@@ -20,7 +20,7 @@ Yukimura_Sanada = {
 
 Bodyguard = {
     "nazwa": "Bodyguard",
-    "zdrowie": 100,
+    "zdrowie": 60,
     "morale": 70,
     "ruch": 10,
     "przebicie": 6,
@@ -36,7 +36,7 @@ Bodyguard = {
 
 Kolumbryna = {
     "nazwa": "Kolumbryna",
-    "zdrowie": 80,
+    "zdrowie": 55,
     "morale": 90,
     "ruch": 5,
     "przebicie": 12,
@@ -52,7 +52,7 @@ Kolumbryna = {
 
 Miasto = {
     "nazwa": "Miasto",
-    "zdrowie": 1000,
+    "zdrowie": 500,
     "morale": 90,
     "przebicie": 15,
     "pancerz": 20,
@@ -63,7 +63,7 @@ Miasto = {
     "earn": {
         "gold": 400,
     },
-    "heal": 40,
+    "heal": 10,
 }
 
 Japonia = {

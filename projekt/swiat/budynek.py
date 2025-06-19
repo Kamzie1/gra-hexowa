@@ -60,8 +60,13 @@ class Budynek(pygame.sprite.Sprite):
         self.id = id"""
 
     def zarabiaj(self, player):
-        if self.owner == player.id:
+        if self.owner_id == player.id:
             player.gold += self.earn["gold"]
+
+    def uzdrow(self):
+        self.zdrowie += self.heal
+        if self.zdrowie > self.budynek["zdrowie"]:
+            self.zdrowie = self.budynek["zdrowie"]
 
     @property
     def zdrowie(self):
