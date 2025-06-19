@@ -3,7 +3,13 @@ from sys import exit
 from projekt.ustawienia import *  # plik z ustawieniami
 from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Turn, SquadButtonDisplay
 from projekt.player import Player
-from projekt.narzedzia import oblicz_pos, TurnDisplay, SquadDisplay, KoniecGry
+from projekt.narzedzia import (
+    oblicz_pos,
+    TurnDisplay,
+    SquadDisplay,
+    KoniecGry,
+    AttackDisplay,
+)
 from projekt.flag import Flag
 from projekt.jednostki import get_fraction
 from projekt.network import Client
@@ -34,6 +40,7 @@ class Gra:
         self.opponent = Player(
             frakcja2, pos2, x2, y2, num2, name2, client.info[name2]["color"]
         )
+        self.attackDisplay = AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
         self.mapa = Mapa(pos, x, y, self.player, self.opponent, client.state)
         self.resource = Resource()
         self.turn = Turn()
@@ -89,6 +96,8 @@ class Gra:
             self.screen.blit(
                 self.DisplaySquadButton.image, self.DisplaySquadButton.rect
             )
+        if self.attackDisplay.show:
+            self.attackDisplay.display(self.screen)
 
         self.turn.draw(self.screen)
 
@@ -119,6 +128,7 @@ class Gra:
                     self.client.id,
                     self.squadDisplay,
                     self.DisplaySquadButton,
+                    self.attackDisplay,
                 )
 
                 self.turn.event(mouse_pos, self.mapa, self.client)

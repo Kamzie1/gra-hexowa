@@ -22,7 +22,7 @@ Miasto1 = {
     "owner": "client2",
     "owner_id": 1,
     "color": "red",
-    "zdrowie": 20,
+    "zdrowie": 1000,
     "morale": 90,
 }
 
@@ -32,7 +32,7 @@ Miasto2 = {
     "owner": "client1",
     "owner_id": 0,
     "color": "blue",
-    "zdrowie": 20,
+    "zdrowie": 1000,
     "morale": 90,
 }
 

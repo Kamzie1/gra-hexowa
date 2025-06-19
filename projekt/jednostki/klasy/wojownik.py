@@ -21,6 +21,7 @@ class Wojownik:
         self.pancerz = jednostka["pancerz"]
         self.atak = jednostka["atak"]
         self.koszt_ataku = jednostka["koszt_ataku"]
+        self.atak_points = jednostka["atak_points"]
         self.original_ruch = self.ruch
         self.original_zdrowie = self.zdrowie
         self.id = id
@@ -53,5 +54,5 @@ class Wojownik:
         return stan_jednostki
 
     def display(self, id):
-        representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.atak} | {self.przebicie} | {self.pancerz}"
+        representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.atak} | {self.przebicie} | {self.pancerz} | {self.atak_points}"
         return representation

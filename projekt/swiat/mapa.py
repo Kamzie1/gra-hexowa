@@ -64,8 +64,6 @@ class Mapa:
         )
         self.import_state(state)
 
-        self.attackDisplay = AttackDisplay(Width / 1.8, Height / 1.8, srodek, "black")
-
     @property
     def origin(self):
         return self._origin
@@ -226,13 +224,13 @@ class Mapa:
                                 self.correct_moves[tile.x][tile.y],
                             )
             self.move_group.draw(self.mapSurf)
-        if self.attackDisplay.show:
-            self.attackDisplay.display(screen)
 
-    def event(self, mouse_pos, flag, turn, id, squadDisplay, squadButtonDisplay):
-        if self.attackDisplay.show:
-            if self.attackDisplay.rect.collidepoint(mouse_pos):
-                self.attackDisplay.event(mouse_pos)
+    def event(
+        self, mouse_pos, flag, turn, id, squadDisplay, squadButtonDisplay, attackDisplay
+    ):
+        if attackDisplay.show:
+            if attackDisplay.rect.collidepoint(mouse_pos):
+                attackDisplay.event(mouse_pos)
                 return
 
         if squadDisplay.show:
@@ -248,7 +246,7 @@ class Mapa:
         for tiles in self.Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
-                    self.attackDisplay.show = False
+                    attackDisplay.show = False
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
                     if not turn % 2 == id:
@@ -278,7 +276,7 @@ class Mapa:
                                 elif tile.budynek.owner_id == self.player.id:
                                     self.move(tile)
                                 else:
-                                    self.attackDisplay.update(
+                                    attackDisplay.update(
                                         self.move_flag, tile.jednostka, tile.budynek
                                     )
                             else:
@@ -289,7 +287,7 @@ class Mapa:
                                     tile.jednostka.owner_id == self.opponent.id
                                     or tile.budynek.owner_id == self.opponent.id
                                 ):
-                                    self.attackDisplay.update(
+                                    attackDisplay.update(
                                         self.move_flag, tile.jednostka, tile.budynek
                                     )
                         flag.klikniecie_flag = False

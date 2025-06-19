@@ -53,8 +53,8 @@ class Client:
     def uruchom_gre(self):
         package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 1}
         package2 = {
-            "x": 6,
-            "y": 9,
+            "x": 24,
+            "y": 24,
             "frakcja": "japonia",
             "color": "blue",
             "id": 0,

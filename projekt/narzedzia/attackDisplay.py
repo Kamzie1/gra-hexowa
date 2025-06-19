@@ -8,7 +8,7 @@ class AttackDisplay:
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))
         self.rect = self.surf.get_frect(center=pos)
-        self.font = pygame.font.Font("Grafika/consolas.ttf", 24)
+        self.font = pygame.font.Font("Grafika/consolas.ttf", int(self.width / 30))
         self.font_color = color
         self.show = False
 
@@ -60,7 +60,7 @@ class SurfOddzialu:
         self.squad = squad
         self.surfs = []
         self.create_surf()
-        self.font = pygame.font.Font("Grafika/consolas.ttf", 24)
+        self.font = pygame.font.Font("Grafika/consolas.ttf", int(self.width / 15))
         self.font_color = "black"
 
     def create_surf(self):
@@ -113,7 +113,7 @@ class SurfAttack(SurfOddzialu):
                     self.squad,
                     i - 1,
                     wojownik,
-                    (5, 50 + i * 26),
+                    (5, 50 + i * int(self.width / 15)),
                     i,
                     self.squad.color,
                 )
@@ -157,7 +157,7 @@ class SurfDefend(SurfOddzialu):
                         self.squad,
                         i - 1,
                         wojownik,
-                        (self.width - 5, 50 + i * 26),
+                        (self.width - 5, 50 + i * int(self.width / 15)),
                         i,
                         self.squad.color,
                     )
@@ -169,7 +169,7 @@ class SurfDefend(SurfOddzialu):
                 BudynekSurfDefend(
                     self.width,
                     self.budynek,
-                    (self.width - 5, 50 + i * 26),
+                    (self.width - 5, 50 + i * int(self.width / 15)),
                 )
             )
 
@@ -213,10 +213,12 @@ class WojownikSurf:
         self.id = id
         self.squad = squad
         self.poz = poz
-        self.surf = pygame.Surface((self.width - 30, 26), pygame.SRCALPHA)
+        self.surf = pygame.Surface(
+            (self.width - 30, int(self.width / 20)), pygame.SRCALPHA
+        )
         self.rect = self.surf.get_frect(topleft=pos)
         self.jednostka = jednostka
-        self.font = pygame.font.Font("Grafika/consolas.ttf", 16)
+        self.font = pygame.font.Font("Grafika/consolas.ttf", int(self.width / 35))
         self.font_color = "black"
         self.color = color
 
@@ -277,16 +279,20 @@ class WojownikSurfDefend(WojownikSurf):
 
     def event(self, selected, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
-            self.squad.zdrowie(self.poz, self.jednostka.zdrowie - selected.atak)
+            if selected.atak_points > 0:
+                selected.atak_points -= selected.koszt_ataku
+                self.squad.zdrowie(self.poz, self.jednostka.zdrowie - selected.atak)
 
 
 class BudynekSurfDefend(WojownikSurf):
     def __init__(self, width, budynek, pos):
         self.width = width
-        self.surf = pygame.Surface((self.width - 30, 26), pygame.SRCALPHA)
+        self.surf = pygame.Surface(
+            (self.width - 30, int(self.width / 20)), pygame.SRCALPHA
+        )
         self.rect = self.surf.get_frect(topright=pos)
         self.budynek = budynek
-        self.font = pygame.font.Font("Grafika/consolas.ttf", 16)
+        self.font = pygame.font.Font("Grafika/consolas.ttf", int(self.width / 35))
         self.font_color = "black"
 
     def display(self, screen, pos, origin):
@@ -307,7 +313,9 @@ class BudynekSurfDefend(WojownikSurf):
 
     def event(self, selected, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
-            self.budynek.zdrowie -= selected.atak
-            if self.budynek.zdrowie <= 0:
-                print("None")
-                self.budynek = None
+            if selected.atak_points > 0:
+                self.budynek.zdrowie -= selected.atak
+                selected.atak_points -= selected.koszt_ataku
+                if self.budynek.zdrowie <= 0:
+                    print("None")
+                    self.budynek = None

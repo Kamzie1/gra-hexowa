@@ -11,6 +11,7 @@ Yukimura_Sanada = {
     "pancerz": 8,
     "atak": 20,
     "koszt_ataku": 3,
+    "atak_points": 12,
     "red": "Yukimura_Sanada_red.png",
     "blue": "Yukimura_Sanada_blue.png",
     "cost": 500,
@@ -26,6 +27,7 @@ Bodyguard = {
     "pancerz": 4,
     "atak": 10,
     "koszt_ataku": 3,
+    "atak_points": 9,
     "red": "Bodyguard_red.png",
     "blue": "Bodyguard_blue.png",
     "cost": 100,
@@ -41,6 +43,7 @@ Kolumbryna = {
     "pancerz": 2,
     "atak": 20,
     "koszt_ataku": 4,
+    "atak_points": 8,
     "red": "kolubryna.png",
     "blue": "kolubryna.png",
     "id": 2,
@@ -49,7 +52,7 @@ Kolumbryna = {
 
 Miasto = {
     "nazwa": "Miasto",
-    "zdrowie": 20,
+    "zdrowie": 1000,
     "morale": 90,
     "przebicie": 15,
     "pancerz": 20,
