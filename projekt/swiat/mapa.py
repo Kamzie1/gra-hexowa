@@ -273,14 +273,24 @@ class Mapa:
                                 elif tile.jednostka.owner_id == self.opponent.id:
                                     pass
                             elif tile.jednostka is None:
-                                self.move(tile)
+                                if tile.budynek is None:
+                                    self.move(tile)
+                                elif tile.budynek.owner_id == self.player.id:
+                                    self.move(tile)
+                                else:
+                                    self.attackDisplay.update(
+                                        self.move_flag, tile.jednostka, tile.budynek
+                                    )
                             else:
                                 if tile.jednostka.owner_id == self.player.id:
                                     if not self.move_flag.tile == tile:
                                         self.join(tile.jednostka, self.move_flag, tile)
-                                elif tile.jednostka.owner_id == self.opponent.id:
+                                elif (
+                                    tile.jednostka.owner_id == self.opponent.id
+                                    or tile.budynek.owner_id == self.opponent.id
+                                ):
                                     self.attackDisplay.update(
-                                        self.move_flag, tile.jednostka
+                                        self.move_flag, tile.jednostka, tile.budynek
                                     )
                         flag.klikniecie_flag = False
                         self.move_flag = None
@@ -393,24 +403,19 @@ class Mapa:
             tile = self.get_tile(budynek["pos"])
             if budynek["owner_id"] == self.player.id:
                 frakcja = self.player.frakcja
-                color = self.player.color
-
             else:
                 frakcja = self.opponent.frakcja
-                color = self.opponent.color
+
             b = Budynek(
-                frakcja[budynek["id"]],
-                budynek["id"],
-                budynek["pos"],
                 self.building_group,
-                budynek["owner"],
-                budynek["owner_id"],
-                budynek["color"],
-                budynek["zdrowie"],
-                budynek["morale"],
+                budynek,
+                tile,
+                frakcja,
             )
             Podswietlenie(
-                f"{color}_podswietlenie.png", tile.pos, self.podswietlenie_group
+                f"{budynek["color"]}_podswietlenie.png",
+                tile.pos,
+                self.podswietlenie_group,
             )
             tile.budynek = b
 

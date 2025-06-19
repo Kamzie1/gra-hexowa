@@ -12,16 +12,21 @@ class AttackDisplay:
         self.font_color = color
         self.show = False
 
-    def update(self, attacker, defender):
+    def update(self, attacker, defender, defenderBudynek):
         self.show = True
         self.attacker = attacker
         self.defender = defender
+        self.defenderBudynek = defenderBudynek
 
         self.attackers_surfs = SurfAttack(
             self.width / 2 - 1, self.height, (0, 0), self.attacker
         )
         self.defenders_surfs = SurfDefend(
-            self.width / 2 - 1, self.height, (self.width, 0), self.defender
+            self.width / 2 - 1,
+            self.height,
+            (self.width, 0),
+            self.defender,
+            self.defenderBudynek,
         )
 
     def display(self, screen):
@@ -46,6 +51,7 @@ class AttackDisplay:
 
 class SurfOddzialu:
     def __init__(self, width, height, pos, squad):
+        print("surf oddziału")
         self.width = width
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))
@@ -58,11 +64,11 @@ class SurfOddzialu:
         self.font_color = "black"
 
     def create_surf(self):
-        self.surfs = []
+        surfaces = []
         i = 1
         for wojownik in self.squad.wojownicy:
-            self.surfs.append(
-                WojownikSurf(
+            surfaces.append(
+                WojownikSurfAttack(
                     self.width,
                     self.squad,
                     i - 1,
@@ -72,7 +78,11 @@ class SurfOddzialu:
                     self.squad.color,
                 )
             )
+            if self.surfs[i - 1].selected:
+                surfaces[i - 1].selected = True
             i += 1
+
+        self.surfs = surfaces
 
     def display(self, screen, origin):
         self.surf.fill("white")
@@ -94,10 +104,10 @@ class SurfAttack(SurfOddzialu):
         self.selected = None
 
     def create_surf(self):
-        self.surfs = []
+        surfaces = []
         i = 1
         for wojownik in self.squad.wojownicy:
-            self.surfs.append(
+            surfaces.append(
                 WojownikSurfAttack(
                     self.width,
                     self.squad,
@@ -108,44 +118,70 @@ class SurfAttack(SurfOddzialu):
                     self.squad.color,
                 )
             )
+            if len(self.surfs) > 0:
+                if self.surfs[i - 1].selected:
+                    surfaces[i - 1].selected = True
             i += 1
+
+        self.surfs = surfaces
 
     def event(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
+            self.selected = None
+            for surf in self.surfs:
+                surf.selected = False
             for surf in self.surfs:
                 if surf.rect.collidepoint(mouse_pos):
                     self.selected = surf.jednostka
-                    print("wybrany")
+                    surf.selected = True
                     return
 
 
 class SurfDefend(SurfOddzialu):
-    def __init__(self, width, height, pos, squad):
+    def __init__(self, width, height, pos, squad, budynek):
+        self.budynek = budynek
         super().__init__(width, height, pos, squad)
         self.rect = self.surf.get_frect(topright=pos)
+        print(self.budynek)
 
     def create_surf(self):
         self.surfs = []
+
         i = 1
-        for wojownik in self.squad.wojownicy:
+        if not self.squad is None:
+            for wojownik in self.squad.wojownicy:
+                self.surfs.append(
+                    WojownikSurfDefend(
+                        self.width,
+                        self.squad,
+                        i - 1,
+                        wojownik,
+                        (self.width - 5, 50 + i * 26),
+                        i,
+                        self.squad.color,
+                    )
+                )
+                i += 1
+
+        if not self.budynek is None:
             self.surfs.append(
-                WojownikSurfDefend(
+                BudynekSurfDefend(
                     self.width,
-                    self.squad,
-                    i - 1,
-                    wojownik,
+                    self.budynek,
                     (self.width - 5, 50 + i * 26),
-                    i,
-                    self.squad.color,
                 )
             )
-            i += 1
 
     def display(self, screen, origin):
         self.surf.fill("white")
         self.create_surf()
-        display = self.squad.display(0)
+        if not self.squad is None:
+            display = self.squad.display(0)
+        elif not self.budynek is None:
+            display = self.budynek.owner_display()
+        else:
+            display = "Zniszczone miasto"
         text = self.font.render(display, True, self.font_color)
         text_rect = text.get_rect(topright=(self.width - 20, 20))
         self.surf.blit(text, text_rect)
@@ -155,14 +191,20 @@ class SurfDefend(SurfOddzialu):
         screen.blit(self.surf, self.rect)
 
     def event(self, mouse_pos, selected):
+        flag = True
         if selected is None:
             return
         if self.rect.collidepoint(mouse_pos):
+            flag = False
             for surf in self.surfs:
                 surf.event(
                     selected,
                     pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y)),
                 )
+                if not surf.budynek is None:
+                    flag = True
+        if not flag:
+            self.budynek = None
 
 
 class WojownikSurf:
@@ -199,6 +241,21 @@ class WojownikSurfAttack(WojownikSurf):
     def __init__(self, width, squad, poz, jednostka, pos, id, color):
         super().__init__(width, squad, poz, jednostka, pos, id, color)
         self.rect = self.surf.get_frect(topleft=pos)
+        self.selected = False
+
+    def display(self, screen, pos, origin):
+        self.surf.fill("white")
+        self.hover(pos, origin, pygame.mouse.get_pos())
+        display = self.jednostka.display(self.id)
+        text = self.font.render(display, True, self.font_color)
+        text_rect = text.get_rect(topleft=(15, 5))
+        self.surf.blit(text, text_rect)
+        screen.blit(self.surf, self.rect)
+        width = 1
+        if self.selected:
+            width = 4
+
+        pygame.draw.rect(screen, self.color, self.rect, width)
 
 
 class WojownikSurfDefend(WojownikSurf):
@@ -206,6 +263,7 @@ class WojownikSurfDefend(WojownikSurf):
         super().__init__(width, squad, poz, jednostka, pos, id, color)
         self.rect = self.surf.get_frect(topright=pos)
         self.pos = pos
+        self.budynek = None
 
     def display(self, screen, pos, origin):
         self.surf.fill("white")
@@ -219,5 +277,37 @@ class WojownikSurfDefend(WojownikSurf):
 
     def event(self, selected, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
-            print("attack")
             self.squad.zdrowie(self.poz, self.jednostka.zdrowie - selected.atak)
+
+
+class BudynekSurfDefend(WojownikSurf):
+    def __init__(self, width, budynek, pos):
+        self.width = width
+        self.surf = pygame.Surface((self.width - 30, 26), pygame.SRCALPHA)
+        self.rect = self.surf.get_frect(topright=pos)
+        self.budynek = budynek
+        self.font = pygame.font.Font("Grafika/consolas.ttf", 16)
+        self.font_color = "black"
+
+    def display(self, screen, pos, origin):
+        self.surf.fill("white")
+        self.hover(pos, origin, pygame.mouse.get_pos())
+        display = self.budynek.display()
+        text = self.font.render(display, True, self.font_color)
+        text_rect = text.get_rect(topright=(self.width - 45, 5))
+        self.surf.blit(text, text_rect)
+        screen.blit(self.surf, self.rect)
+        pygame.draw.rect(screen, self.budynek.color, self.rect, 1)
+
+    def hover(self, pos, origin, mouse_pos):
+        mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
+        mouse_pos = pozycja_myszy_na_surface(mouse_pos, pos)
+        if self.rect.collidepoint(mouse_pos):
+            self.surf.fill(oslab_kolor(pygame.Color(self.budynek.color), 20))
+
+    def event(self, selected, mouse_pos):
+        if self.rect.collidepoint(mouse_pos):
+            self.budynek.zdrowie -= selected.atak
+            if self.budynek.zdrowie <= 0:
+                print("None")
+                self.budynek = None

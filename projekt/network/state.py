@@ -19,7 +19,7 @@ def id_to_pos(x, y):
 Miasto1 = {
     "id": "miasto",
     "pos": id_to_pos(6, 6),
-    "owner": "client1",
+    "owner": "client2",
     "owner_id": 1,
     "color": "red",
     "zdrowie": 1000,
@@ -29,7 +29,7 @@ Miasto1 = {
 Miasto2 = {
     "id": "miasto",
     "pos": id_to_pos(24, 24),
-    "owner": "client2",
+    "owner": "client1",
     "owner_id": 0,
     "color": "blue",
     "zdrowie": 1000,

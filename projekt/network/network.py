@@ -71,3 +71,12 @@ class Client:
             "users": ["client1", "client2"],
             "state": starting_state,
         }
+
+    def end_game(self, result):
+        match (result):
+            case 1:
+                print(f"{self.mapa.player.name} wygral")
+            case -1:
+                print(f"{self.mapa.player.name} przegral")
+            case _:
+                print("the game ended suddenly")

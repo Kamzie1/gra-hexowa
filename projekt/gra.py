@@ -95,6 +95,10 @@ class Gra:
             self.squadDisplay.display(self.mapa.move_flag, self.screen)
 
     def event_handler(self):
+        if self.mapa.Tile_array[self.player.x][self.player.y].budynek is None:
+            self.client.end_game(-1)
+        if self.mapa.Tile_array[self.opponent.x][self.opponent.y].budynek is None:
+            self.client.end_game(1)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
