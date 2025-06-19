@@ -82,3 +82,12 @@ class Squad(pygame.sprite.Sprite):
     def display(self, id):
         representation = f"Oddział ({id}): {self.owner} | {self.ruch}"
         return representation
+
+    def zdrowie(self, id, value):
+        try:
+            self.wojownicy[id].zdrowie = value
+        except ValueError:
+            self.wojownicy.remove(self.wojownicy[id])
+            if len(self.wojownicy) == 0:
+                self.kill()
+                self.tile.jednostka = None

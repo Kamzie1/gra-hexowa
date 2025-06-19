@@ -29,6 +29,16 @@ class Wojownik:
             join(f"{folder_grafiki}/jednostki-grafika", jednostka[color])
         ).convert_alpha()
 
+    @property
+    def zdrowie(self):
+        return self._zdrowie
+
+    @zdrowie.setter
+    def zdrowie(self, value):
+        self._zdrowie = value
+        if self.zdrowie <= 0:
+            raise ValueError("zdrowie poniżej zera")
+
     def heal(self, value):
         self.zdrowie += value
         if self.zdrowie > self.original_zdrowie:

@@ -5,7 +5,7 @@ from os.path import join
 from .tile import Tile, Ruch, Najechanie, Klikniecie, Podswietlenie
 from .budynek import Budynek
 from projekt.narzedzia import *
-from projekt.jednostki import Wojownik, Squad
+from projekt.jednostki import Squad
 
 
 class Mapa:
@@ -63,6 +63,8 @@ class Mapa:
             (tile_width / 2, tile_height / 2),
         )
         self.import_state(state)
+
+        self.attackDisplay = AttackDisplay(Width / 1.8, Height / 1.8, srodek, "black")
 
     @property
     def origin(self):
@@ -224,8 +226,15 @@ class Mapa:
                                 self.correct_moves[tile.x][tile.y],
                             )
             self.move_group.draw(self.mapSurf)
+        if self.attackDisplay.show:
+            self.attackDisplay.display(screen)
 
     def event(self, mouse_pos, flag, turn, id, squadDisplay, squadButtonDisplay):
+        if self.attackDisplay.show:
+            if self.attackDisplay.rect.collidepoint(mouse_pos):
+                self.attackDisplay.event(mouse_pos)
+                return
+
         if squadDisplay.show:
             if squadDisplay.rect.collidepoint(mouse_pos):
                 return
@@ -239,6 +248,7 @@ class Mapa:
         for tiles in self.Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
+                    self.attackDisplay.show = False
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
                     if not turn % 2 == id:
@@ -269,7 +279,9 @@ class Mapa:
                                     if not self.move_flag.tile == tile:
                                         self.join(tile.jednostka, self.move_flag, tile)
                                 elif tile.jednostka.owner_id == self.opponent.id:
-                                    self.attack.show = True
+                                    self.attackDisplay.update(
+                                        self.move_flag, tile.jednostka
+                                    )
                         flag.klikniecie_flag = False
                         self.move_flag = None
                         squadDisplay.show = False
