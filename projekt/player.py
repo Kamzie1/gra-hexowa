@@ -5,7 +5,7 @@ class Player:
     def __init__(self, Frakcja, pos, x, y, id, name, color):
         self.id = id
         self.name = name
-        self._gold = 100000
+        self._gold = 1000
         self.frakcja = Frakcja
         self.recruit_pos = pos
         self.x = x

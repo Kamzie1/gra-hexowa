@@ -53,9 +53,9 @@ class SideMenu:
         self.surf.fill(menu_color)
 
     def event(self, mouse_pos, flag, turn, id):
+        mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
         if self.rect.collidepoint(mouse_pos) and flag.show:
             flag.klikniecie_flag = False
-            mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, rec_panel_pos)
             if turn % 2 == id:
                 for button in self.recruit_group:

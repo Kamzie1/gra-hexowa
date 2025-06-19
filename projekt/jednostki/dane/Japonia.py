@@ -4,13 +4,14 @@
 # dane jednostki Yukimura Sanda w schemacie słownika, dostęp do danych: Yukimura_Sanda['nazwa_informacji'] np. Yukimura_Sanda['zdrowie'] da nam 500
 Yukimura_Sanada = {
     "nazwa": "Yukimura Sanada",
-    "zdrowie": 500,
+    "zdrowie": 100,
     "morale": 100,
     "ruch": 15,
     "przebicie": 10,
     "pancerz": 8,
     "atak": 20,
     "koszt_ataku": 3,
+    "atak_points": 12,
     "red": "Yukimura_Sanada_red.png",
     "blue": "Yukimura_Sanada_blue.png",
     "cost": 500,
@@ -19,13 +20,14 @@ Yukimura_Sanada = {
 
 Bodyguard = {
     "nazwa": "Bodyguard",
-    "zdrowie": 100,
+    "zdrowie": 60,
     "morale": 70,
     "ruch": 10,
     "przebicie": 6,
     "pancerz": 4,
     "atak": 10,
     "koszt_ataku": 3,
+    "atak_points": 9,
     "red": "Bodyguard_red.png",
     "blue": "Bodyguard_blue.png",
     "cost": 100,
@@ -34,13 +36,14 @@ Bodyguard = {
 
 Kolumbryna = {
     "nazwa": "Kolumbryna",
-    "zdrowie": 80,
+    "zdrowie": 55,
     "morale": 90,
     "ruch": 5,
     "przebicie": 12,
     "pancerz": 2,
     "atak": 20,
     "koszt_ataku": 4,
+    "atak_points": 8,
     "red": "kolubryna.png",
     "blue": "kolubryna.png",
     "id": 2,
@@ -49,7 +52,7 @@ Kolumbryna = {
 
 Miasto = {
     "nazwa": "Miasto",
-    "zdrowie": 1000,
+    "zdrowie": 500,
     "morale": 90,
     "przebicie": 15,
     "pancerz": 20,
@@ -60,7 +63,7 @@ Miasto = {
     "earn": {
         "gold": 400,
     },
-    "heal": 40,
+    "heal": 10,
 }
 
 Japonia = {

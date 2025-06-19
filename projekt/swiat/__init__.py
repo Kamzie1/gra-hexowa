@@ -5,4 +5,4 @@ from .sidemenu import SideMenu
 from .budynek import Budynek
 from .tile import Najechanie, Ruch, Klikniecie
 from .turn import Turn
-from .buttons import Button
+from .buttons import Button, SquadButtonDisplay
