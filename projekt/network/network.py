@@ -60,9 +60,9 @@ class Client:
             "id": 0,
         }
         starting_state["budynek"][0]["pos"] = id_to_pos(package1["x"], package1["y"])
-        starting_state["budynek"][0]["owner"] = package1["id"]
+        starting_state["budynek"][0]["owner_id"] = package1["id"]
         starting_state["budynek"][0]["color"] = package1["color"]
-        starting_state["budynek"][1]["owner"] = package2["id"]
+        starting_state["budynek"][1]["owner_id"] = package2["id"]
         starting_state["budynek"][1]["color"] = package2["color"]
         starting_state["budynek"][1]["pos"] = id_to_pos(package2["x"], package2["y"])
         return {

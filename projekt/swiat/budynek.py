@@ -5,7 +5,7 @@ from projekt.ustawienia import folder_grafiki
 
 class Budynek(pygame.sprite.Sprite):
     def __init__(
-        self, budynek, id, pos, group, owner, color, zdrowie=None, morale=None
+        self, budynek, id, pos, group, owner, owner_id, color, zdrowie=None, morale=None
     ):
         super().__init__(group)
         self.ruch = 0
@@ -16,6 +16,7 @@ class Budynek(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center=pos)
         self.nazwa = budynek["nazwa"]
         self.owner = owner
+        self.owner_id = owner_id
         self.color = color
         if zdrowie is None:
             self.zdrowie = budynek["zdrowie"]

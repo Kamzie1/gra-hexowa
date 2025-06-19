@@ -7,6 +7,7 @@ from projekt.ustawienia import folder_grafiki
 class Wojownik:
     # inicjalizacja
     def __init__(self, jednostka, id, color, zdrowie=None, morale=None):
+        self.name = jednostka["nazwa"]
         if zdrowie is None:
             self.zdrowie = jednostka["zdrowie"]
         else:
@@ -40,3 +41,7 @@ class Wojownik:
             "id": self.id,
         }
         return stan_jednostki
+
+    def display(self, id):
+        representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.atak} | {self.przebicie} | {self.pancerz}"
+        return representation

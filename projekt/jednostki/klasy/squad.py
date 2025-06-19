@@ -5,6 +5,7 @@ from .wojownik import Wojownik
 class Squad(pygame.sprite.Sprite):
     def __init__(self, group, info, tile, frakcja):
         super().__init__(group)
+        self.owner_id = info["owner_id"]
         self.owner = info["owner"]
         self.color = info["color"]
         self.pos = tuple(info["pos"])
@@ -57,6 +58,7 @@ class Squad(pygame.sprite.Sprite):
         info = {}
         info["color"] = self.color
         info["owner"] = self.owner
+        info["owner_id"] = self.owner_id
         info["pos"] = self.pos
         info["jednostki"] = []
         for wojownik in self.wojownicy:
@@ -76,3 +78,7 @@ class Squad(pygame.sprite.Sprite):
 
     def __add__(self, other):
         self.wojownicy = self.wojownicy + other.wojownicy
+
+    def display(self, id):
+        representation = f"Oddział ({id}): {self.owner} | {self.ruch}"
+        return representation

@@ -53,7 +53,8 @@ class Recruit(Button):
     def click(self):
         info = {}
         info["color"] = self.player.color
-        info["owner"] = self.player.id
+        info["owner"] = self.player.name
+        info["owner_id"] = self.player.id
         info["pos"] = (5000, 5000)
         info["jednostki"] = []
         jednostka = {}
@@ -73,3 +74,21 @@ class Show(Button):
 
     def click(self, flag):
         flag.show = not flag.show
+
+
+class SquadButtonDisplay:
+    def __init__(self, width, height, color, pos, tekst=None):
+        self.image = pygame.Surface((width, height))
+        self.image.fill(color)
+        self.pos = pos
+        self.rect = self.image.get_frect(midbottom=self.pos)
+        self.tekst = tekst
+
+    def event(self, mouse_pos, squadDisplay, move_flag):
+        if move_flag is None:
+            return
+        if self.rect.collidepoint(mouse_pos):
+            self.click(squadDisplay)
+
+    def click(self, squadDisplay):
+        squadDisplay.show = not squadDisplay.show
