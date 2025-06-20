@@ -5,11 +5,7 @@ from os.path import join
 
 class Mini_map:
     def __init__(self, miasto_pos):
-        self.image = pygame.image.load(join("Grafika/mapa", minimapa_image)).convert()
-        self.scaledSurf = pygame.transform.smoothscale(
-            self.image, (mini_width, mini_height)
-        )
-        self.surf = self.scaledSurf
+        self.surf = pygame.Surface((Mapa_width / skala, Mapa_height / skala))
         self.mapRect = self.surf.get_frect(topright=mini_map_pos)
 
         self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[0] + srodek[1])
@@ -28,21 +24,18 @@ class Mini_map:
         self.rect = self.rectsurf.get_frect(topleft=self.origin)
 
     def refresh(self):
-        self.surf = self.scaledSurf.copy()
+        self.surf.fill("black")
 
     def update(self, mapa):
         if pygame.mouse.get_pressed()[0]:
             mouse_pos = pygame.mouse.get_pos()
             if self.mapRect.collidepoint(mouse_pos):
-                # jeżeli zachodzi interakcja z mini mapą, to licz współrzędne (odpowiednio zeskalowane)
                 pos_y = mouse_pos[1] - mini_map_pos[1]
                 pos_x = mouse_pos[0] + mini_width - mini_map_pos[0]
                 mapa_pos_y = pos_y * skala
                 mapa_pos_x = pos_x * skala
-                mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])  # type: ignore , srodek wyrównuje widok, przenosi origin o połowę wektora przekątnej ekranu
-                mapa.mapRect = mapa.mapSurf.get_frect(
-                    topleft=mapa.origin  # zaktualizuj położenie mapy
-                )
+                mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])
+                mapa.mapRect = mapa.mapSurf.get_frect(topleft=mapa.origin)
 
     def draw(self, screen, origin, Tile_array):
         self.refresh()
@@ -52,23 +45,24 @@ class Mini_map:
         )
         for tiles in Tile_array:
             for tile in tiles:
+                self.rysuj(tile)
                 if not tile.budynek is None:
-                    self.draw_budynek(tile.budynek.color, tile.pos)
+                    self.rysuj(tile.budynek)
                 if not tile.jednostka is None:
-                    self.draw_jednostka(tile.jednostka.color, tile.pos)
+                    self.draw_squad(tile.jednostka.color, tile.pos)
         pygame.draw.rect(self.surf, mini_map_rect_color, self.rect, width=1)
-        pygame.draw.rect(screen, (0, 0, 0), self.mapRect, width=2)  # rysuje border
-        screen.blit(self.surf, self.mapRect)  # rysuje mini mapę
+        pygame.draw.rect(screen, (0, 0, 0), self.mapRect, width=2)
+        screen.blit(self.surf, self.mapRect)
 
-    def draw_jednostka(self, color, pos):
+    def draw_squad(self, color, pos):
         pos = (pos[0] / skala, pos[1] / skala)
         surf = pygame.Surface((5, 5))
         rect = surf.get_frect(center=pos)
         pygame.draw.rect(self.surf, color, rect)
 
-    def draw_budynek(self, color, pos):
+    def rysuj(self, obiekt):
+        pos = obiekt.pos
         pos = (pos[0] / skala, pos[1] / skala)
-        surf = pygame.Surface((20, 20))
-        rect = surf.get_frect(center=pos)
-        pygame.draw.ellipse(self.surf, "grey", rect)
-        pygame.draw.ellipse(self.surf, color, rect, width=1)
+        image = pygame.transform.scale_by(obiekt.image, 1.11111111 / skala)
+        rect = image.get_frect(center=pos)
+        self.surf.blit(image, rect)

@@ -1,5 +1,22 @@
 import pygame
 from .wojownik import Wojownik
+from enum import Enum
+
+
+class Positions(Enum):
+    CENTER = (0, 0)
+    LEFT = (-28, 0)
+    RIGHT = (28, 0)
+    TOP = (0, -27)
+    BOTTOM = (0, 27)
+    TOPLEFT = (-14, -13)
+    TOPRIGHT = (14, -13)
+    BOTTOMLEFT = (-14, 13)
+    BOTTOMRIGHT = (14, 13)
+    CENTERLEFT = (-14, 0)
+    CENTERRIGHT = (14, 0)
+    CENTERTOP = (0, -13)
+    CENTERBOTTOM = (0, 13)
 
 
 class Squad(pygame.sprite.Sprite):
@@ -12,20 +29,6 @@ class Squad(pygame.sprite.Sprite):
         self.tile = tile
         self.wojownicy = []
         self.load_data(info, frakcja)
-
-    @property
-    def pos(self):
-        return self._pos
-
-    @pos.setter
-    def pos(self, value):
-        self.positions = [0 for _ in range(5)]
-        self._pos = value
-        self.positions[0] = self._pos
-        self.positions[1] = (self._pos[0] + 30, self._pos[1])
-        self.positions[2] = (self._pos[0] - 30, self._pos[1])
-        self.positions[3] = (self._pos[0], self._pos[1] + 30)
-        self.positions[4] = (self._pos[0], self._pos[1] - 30)
 
     @property
     def ruch(self):
@@ -42,17 +45,36 @@ class Squad(pygame.sprite.Sprite):
         for wojownik in self.wojownicy:
             wojownik.ruch -= diff
 
-    def draw(self, screen):
-        i = 0
+    @property
+    def range(self):
+        max_range = -1
         for wojownik in self.wojownicy:
-            screen.blit(
-                wojownik.image, wojownik.image.get_frect(center=self.positions[i])
-            )
-            i += 1
+            if wojownik.range > max_range:
+                max_range = wojownik.range
+        return max_range
 
-    def heal(self, value):
-        for wojownik in self.wojownicy:
-            wojownik.heal(value)
+    def draw(self, screen):
+        match (len(self.wojownicy)):
+            case 1:
+                self.wojownicy[0].draw(self.pos, Positions.CENTER.value, screen)
+            case 2:
+                self.wojownicy[0].draw(self.pos, Positions.CENTERLEFT.value, screen)
+                self.wojownicy[1].draw(self.pos, Positions.CENTERRIGHT.value, screen)
+            case 3:
+                self.wojownicy[0].draw(self.pos, Positions.LEFT.value, screen)
+                self.wojownicy[2].draw(self.pos, Positions.RIGHT.value, screen)
+                self.wojownicy[1].draw(self.pos, Positions.CENTERBOTTOM.value, screen)
+            case 4:
+                self.wojownicy[1].draw(self.pos, Positions.TOPLEFT.value, screen)
+                self.wojownicy[0].draw(self.pos, Positions.TOPRIGHT.value, screen)
+                self.wojownicy[2].draw(self.pos, Positions.BOTTOMLEFT.value, screen)
+                self.wojownicy[3].draw(self.pos, Positions.BOTTOMRIGHT.value, screen)
+            case 5:
+                self.wojownicy[1].draw(self.pos, Positions.TOP.value, screen)
+                self.wojownicy[0].draw(self.pos, Positions.LEFT.value, screen)
+                self.wojownicy[2].draw(self.pos, Positions.CENTER.value, screen)
+                self.wojownicy[3].draw(self.pos, Positions.RIGHT.value, screen)
+                self.wojownicy[4].draw(self.pos, Positions.BOTTOM.value, screen)
 
     def get_data(self):
         info = {}
@@ -67,10 +89,10 @@ class Squad(pygame.sprite.Sprite):
 
     def load_data(self, info, frakcja):
         for jednostka in info["jednostki"]:
-            print(jednostka)
             w = Wojownik(
-                frakcja["jednostka"][jednostka["id"]],
+                frakcja[jednostka["kategoria"]][jednostka["id"]],
                 jednostka["id"],
+                jednostka["kategoria"],
                 self.color,
                 jednostka["zdrowie"],
                 jednostka["morale"],

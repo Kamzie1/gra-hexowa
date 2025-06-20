@@ -41,7 +41,7 @@ class Gra:
             frakcja2, pos2, x2, y2, num2, name2, client.info[name2]["color"]
         )
         self.attackDisplay = AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
-        self.mapa = Mapa(pos, x, y, self.player, self.opponent, client.state)
+        self.mapa = Mapa(pos, self.player, self.opponent, client.state)
         self.resource = Resource()
         self.turn = Turn()
         self.menu = SideMenu(self.mapa)
@@ -107,9 +107,9 @@ class Gra:
             self.koniecGry.draw(self.screen)
 
     def event_handler(self):
-        if self.mapa.Tile_array[self.player.x][self.player.y].budynek is None:
+        if self.mapa.Tile_array[self.player.x][self.player.y].jednostka is None:
             self.client.end_game(-1, self.koniecGry)
-        if self.mapa.Tile_array[self.opponent.x][self.opponent.y].budynek is None:
+        if self.mapa.Tile_array[self.opponent.x][self.opponent.y].jednostka is None:
             self.client.end_game(1, self.koniecGry)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

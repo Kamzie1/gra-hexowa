@@ -12,10 +12,12 @@ Yukimura_Sanada = {
     "atak": 20,
     "koszt_ataku": 3,
     "atak_points": 12,
+    "range": 1,
     "red": "Yukimura_Sanada_red.png",
     "blue": "Yukimura_Sanada_blue.png",
     "cost": 500,
     "id": 1,
+    "kategoria": "jednostka",
 }
 
 Bodyguard = {
@@ -28,10 +30,12 @@ Bodyguard = {
     "atak": 10,
     "koszt_ataku": 3,
     "atak_points": 9,
+    "range": 1,
     "red": "Bodyguard_red.png",
     "blue": "Bodyguard_blue.png",
     "cost": 100,
     "id": 0,
+    "kategoria": "jednostka",
 }
 
 Kolumbryna = {
@@ -44,26 +48,41 @@ Kolumbryna = {
     "atak": 20,
     "koszt_ataku": 4,
     "atak_points": 8,
+    "range": 3,
     "red": "kolubryna.png",
     "blue": "kolubryna.png",
     "id": 2,
     "cost": 400,
+    "kategoria": "jednostka",
+}
+
+Miastow = {
+    "nazwa": "Miasto",
+    "zdrowie": 500,
+    "morale": 90,
+    "ruch": 0,
+    "przebicie": 15,
+    "pancerz": 10,
+    "atak": 30,
+    "koszt_ataku": 4,
+    "atak_points": 12,
+    "range": 2,
+    "red": "rec2.png",
+    "blue": "rec2.png",
+    "id": 0,
+    "kategoria": "specjalne",
 }
 
 Miasto = {
     "nazwa": "Miasto",
-    "zdrowie": 500,
-    "morale": 90,
-    "przebicie": 15,
-    "pancerz": 20,
-    "atak": 30,
-    "koszt_ataku": 2,
-    "red": "recruit_test.png",
-    "blue": "recruit_test.png",
+    "red": "miasto.png",
+    "blue": "miasto.png",
     "earn": {
         "gold": 400,
     },
     "heal": 10,
+    "id": 0,
+    "kategoria": "budynek",
 }
 
 Japonia = {
@@ -72,7 +91,8 @@ Japonia = {
         Yukimura_Sanada,
         Kolumbryna,
     ],
-    "miasto": Miasto,
+    "specjalne": [Miastow],
+    "budynek": [Miasto],
 }
 
 Japonia2 = [
