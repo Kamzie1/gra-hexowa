@@ -5,6 +5,8 @@ from .state import create_state
 import os
 import eventlet
 
+eventlet.monkey_patch()
+
 
 class Server:
     def __init__(self) -> None:
@@ -14,15 +16,16 @@ class Server:
         self._setup_events()
         self.rooms = {}
         self.users = {}
+        print("init finished")
 
     def run(self):
+        print("run started")
         self.sio.run(
             self.app,
             host="0.0.0.0",
             port=int(os.environ.get("PORT", 5000)),
             debug=False,
         )
-        print("app started")
 
     def _setup_events(self):
         @self.app.route("/")
