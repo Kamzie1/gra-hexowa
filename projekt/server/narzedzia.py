@@ -1,6 +1,23 @@
 tile_width = 112
 tile_height = 108
 
+# tablica sąsiadów
+sasiedzi1x = [-1, 0, 0, 1, 1, 1]
+
+sasiedzi1y = [0, 1, -1, 0, 1, -1]
+
+sasiedzi2x = [1, 0, 0, -1, -1, -1]
+
+sasiedzi2y = [0, 1, -1, 0, 1, -1]
+
+
+def get_sasiedzi(x, y):
+    match (y % 2):
+        case 1:
+            return (sasiedzi1x, sasiedzi1y)
+        case 0:
+            return (sasiedzi2x, sasiedzi2y)
+
 
 def id_to_pos(x, y):
     if y % 2 == 0:
@@ -14,24 +31,3 @@ def id_to_pos(x, y):
             y * tile_height / 4 * 3 + tile_height / 2,
         )
     return pos
-
-
-Miasto1 = {
-    "id": "miasto",
-    "pos": id_to_pos(6, 6),
-    "owner": 0,
-    "color": "red",
-    "zdrowie": 1000,
-    "morale": 90,
-}
-
-Miasto2 = {
-    "id": "miasto",
-    "pos": id_to_pos(24, 24),
-    "owner": 1,
-    "color": "blue",
-    "zdrowie": 1000,
-    "morale": 90,
-}
-
-starting_state = {"jednostka": [], "budynek": [Miasto1, Miasto2]}

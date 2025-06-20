@@ -1,7 +1,7 @@
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import Flask, request
 import random
-from .starting_state import starting_state
+from .state import create_state
 
 
 class Server:
@@ -74,16 +74,26 @@ class Server:
             room_id = self.users[sid]
             emit("new_state", data, room=room_id)
 
+        @self.sio.on("end_game")
+        def end_game(result):
+            sid = request.sid
+            room_id = self.users[sid]
+            emit("end_game", result, to=sid)
+            emit("end_game", -1 * result, to=room_id, skip_sid=sid)
+
     def uruchom_gre(self, room_id):
         data = self.rooms[room_id]
         package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 1}
         package2 = {
-            "x": 24,
-            "y": 24,
+            "x": 9,
+            "y": 12,
             "frakcja": "japonia",
             "color": "blue",
             "id": 0,
         }
+        starting_state = create_state(
+            package1, data["users"][0], package2, data["users"][1]
+        )
         if random.randint(1, 2) == 1:
             emit(
                 "start_game",
