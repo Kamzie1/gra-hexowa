@@ -34,13 +34,14 @@ class Server:
         @self.app.route("/")
         def main():
             print("main route viewed")
-            return "SocketIO server 1 działa!"
+            return "SocketIO server 2 działa!"
 
         @self.sio.on("connect")
         def connect():
             print("Client connected.")
             if session.get("name") and session.get("room_id"):
                 join_room(session["room_id"])
+                print("joined room again")
 
         @self.sio.on("disconnect")
         def disconnect(sid):
@@ -85,6 +86,7 @@ class Server:
 
         @self.sio.on("new_state")
         def new_state(data):
+            print("got state")
             room_id = session["room_id"]
             self.last_state = data
             self.sio.emit("new_state", data, to=room_id)
@@ -114,50 +116,98 @@ class Server:
             package1, data["users"][0], package2, data["users"][1]
         )
         self.last_state = starting_state
+        name = session["name"]
         if random.randint(1, 2) == 1:
-            emit(
-                "start_game",
-                {
-                    data["users"][0]: package1,
-                    data["users"][1]: package2,
-                    "users": [data["users"][0], data["users"][1]],
-                    "state": starting_state,
-                },
-                to=sid,
-            )
-            emit(
-                "start_game",
-                {
-                    data["users"][0]: package1,
-                    data["users"][1]: package2,
-                    "users": [data["users"][1], data["users"][0]],
-                    "state": starting_state,
-                },
-                to=room_id,
-                skip_sid=sid,
-            )
+            if data["users"][0] == name:
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package1,
+                        data["users"][1]: package2,
+                        "users": [data["users"][0], data["users"][1]],
+                        "state": starting_state,
+                    },
+                    to=sid,
+                )
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package1,
+                        data["users"][1]: package2,
+                        "users": [data["users"][1], data["users"][0]],
+                        "state": starting_state,
+                    },
+                    to=room_id,
+                    skip_sid=sid,
+                )
+            else:
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package1,
+                        data["users"][1]: package2,
+                        "users": [data["users"][1], data["users"][0]],
+                        "state": starting_state,
+                    },
+                    to=sid,
+                )
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package1,
+                        data["users"][1]: package2,
+                        "users": [data["users"][0], data["users"][1]],
+                        "state": starting_state,
+                    },
+                    to=room_id,
+                    skip_sid=sid,
+                )
+
         else:
-            emit(
-                "start_game",
-                {
-                    data["users"][0]: package2,
-                    data["users"][1]: package1,
-                    "users": [data["users"][0], data["users"][1]],
-                    "state": starting_state,
-                },
-                to=sid,
-            )
-            emit(
-                "start_game",
-                {
-                    data["users"][0]: package2,
-                    data["users"][1]: package1,
-                    "users": [data["users"][1], data["users"][0]],
-                    "state": starting_state,
-                },
-                to=room_id,
-                skip_sid=sid,
-            )
+            if data["users"][0] == name:
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package2,
+                        data["users"][1]: package1,
+                        "users": [data["users"][0], data["users"][1]],
+                        "state": starting_state,
+                    },
+                    to=sid,
+                )
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package2,
+                        data["users"][1]: package1,
+                        "users": [data["users"][1], data["users"][0]],
+                        "state": starting_state,
+                    },
+                    to=room_id,
+                    skip_sid=sid,
+                )
+            else:
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package2,
+                        data["users"][1]: package1,
+                        "users": [data["users"][1], data["users"][0]],
+                        "state": starting_state,
+                    },
+                    to=sid,
+                )
+                emit(
+                    "start_game",
+                    {
+                        data["users"][0]: package2,
+                        data["users"][1]: package1,
+                        "users": [data["users"][0], data["users"][1]],
+                        "state": starting_state,
+                    },
+                    to=room_id,
+                    skip_sid=sid,
+                )
 
     @staticmethod
     def generate(length=4):
