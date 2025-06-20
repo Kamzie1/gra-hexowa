@@ -51,3 +51,7 @@ class Wojownik:
     def display(self, id):
         representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.atak} | {self.przebicie} | {self.pancerz} | {self.atak_points}"
         return representation
+
+    def draw(self, pos, offset, screen):
+        rect = self.image.get_frect(center=(pos[0] + offset[0], pos[1] + offset[1]))
+        screen.blit(self.image, rect)
