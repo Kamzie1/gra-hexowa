@@ -1,7 +1,4 @@
-from ..ustawienia import *
-from ..jednostki import *
-from .budynek import Budynek
-from os.path import join
+from projekt.jednostki import Squad
 import pygame
 
 
@@ -12,7 +9,7 @@ class Button(pygame.sprite.Sprite):
             self.image = pygame.Surface((width, height))
             self.image.fill(color)
         else:
-            self.image=pygame.image.load(f"Grafika/{image}")
+            self.image = pygame.image.load(f"Grafika/{image}")
         self.pos = pos
         self.rect = self.image.get_frect(topleft=self.pos)
 
@@ -61,7 +58,6 @@ class Recruit(Button):
         info["jednostki"] = []
         jednostka = self.jednostka
         info["jednostki"].append(jednostka)
-        print("Recruit")
         self.mapa.move_flag = Squad(self.group, info, None, self.player.frakcja)
         r = Recruit_sample(4)
         self.mapa.correct_moves = self.mapa.possible_moves(self.x, self.y, r)
@@ -70,15 +66,15 @@ class Recruit(Button):
 
 class Menu(Button):
     def __init__(self, width, height, color, pos, button_group) -> None:
-        super().__init__(width, height, color, pos, button_group,"menu.png")
+        super().__init__(width, height, color, pos, button_group, "menu.png")
 
     def click(self, flag):
         flag.show = not flag.show
 
 
 class Surrender(Button):
-    def __init__(self, width, height, color, pos, button_group, tekst=None):
-        super().__init__(width, height, color, pos, button_group, tekst)
+    def __init__(self, width, height, color, pos, button_group, image=None):
+        super().__init__(width, height, color, pos, button_group, image)
 
     def click(self, client, koniecGry):
         client.end_game(-1, koniecGry)

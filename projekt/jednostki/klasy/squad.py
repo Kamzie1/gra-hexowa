@@ -42,6 +42,14 @@ class Squad(pygame.sprite.Sprite):
         for wojownik in self.wojownicy:
             wojownik.ruch -= diff
 
+    @property
+    def range(self):
+        max_range = -1
+        for wojownik in self.wojownicy:
+            if wojownik.range > max_range:
+                max_range = wojownik.range
+        return max_range
+
     def draw(self, screen):
         i = 0
         for wojownik in self.wojownicy:
@@ -67,10 +75,10 @@ class Squad(pygame.sprite.Sprite):
 
     def load_data(self, info, frakcja):
         for jednostka in info["jednostki"]:
-            print(jednostka)
             w = Wojownik(
-                frakcja["jednostka"][jednostka["id"]],
+                frakcja[jednostka["kategoria"]][jednostka["id"]],
                 jednostka["id"],
+                jednostka["kategoria"],
                 self.color,
                 jednostka["zdrowie"],
                 jednostka["morale"],

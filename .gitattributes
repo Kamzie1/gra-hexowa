@@ -1,1 +1,4 @@
-*.py text eol=crlf
+[core]
+    autocrlf = false
+    safecrlf = false
+    eol = crlf

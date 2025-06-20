@@ -1,21 +1,4 @@
-from .state import starting_state
-
-tile_width = 112
-tile_height = 108
-
-
-def id_to_pos(x, y):
-    if y % 2 == 0:
-        pos = (
-            x * tile_width + tile_width / 2,
-            y * tile_height / 4 * 3 + tile_height / 2,
-        )
-    else:
-        pos = (
-            x * tile_width + tile_width,
-            y * tile_height / 4 * 3 + tile_height / 2,
-        )
-    return pos
+from .state import create_state
 
 
 class Client:
@@ -51,23 +34,19 @@ class Client:
         self.import_state()
 
     def uruchom_gre(self):
-        package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 1}
+        package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 0}
         package2 = {
             "x": 24,
             "y": 24,
             "frakcja": "japonia",
             "color": "blue",
-            "id": 0,
+            "id": 1,
         }
-        starting_state["budynek"][0]["pos"] = id_to_pos(package1["x"], package1["y"])
-        starting_state["budynek"][0]["owner_id"] = package1["id"]
-        starting_state["budynek"][0]["color"] = package1["color"]
-        starting_state["budynek"][1]["owner_id"] = package2["id"]
-        starting_state["budynek"][1]["color"] = package2["color"]
-        starting_state["budynek"][1]["pos"] = id_to_pos(package2["x"], package2["y"])
+        starting_state = create_state(package1, package2)
+
         return {
-            "client1": package2,
-            "client2": package1,
+            "client1": package1,
+            "client2": package2,
             "users": ["client1", "client2"],
             "state": starting_state,
         }
