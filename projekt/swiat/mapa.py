@@ -458,7 +458,10 @@ class Mapa:
             if isinstance(budynek, Miasto):
                 if budynek.owner_id == self.player.id:
                     tile = budynek.tile
-                    if not tile.jednostka is None:
+                    if (
+                        not tile.jednostka is None
+                        and tile.jednostka.owner_id == budynek.owner_id
+                    ):
                         tile.jednostka.heal(budynek.heal)
             else:
                 print("to nie budynek")

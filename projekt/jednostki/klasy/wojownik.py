@@ -49,7 +49,7 @@ class Wojownik:
         return stan_jednostki
 
     def display(self, id):
-        representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.atak} | {self.przebicie} | {self.pancerz} | {self.atak_points}"
+        representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.atak} | {self.atak_points} | {self.range}"
         return representation
 
     def draw(self, pos, offset, screen):

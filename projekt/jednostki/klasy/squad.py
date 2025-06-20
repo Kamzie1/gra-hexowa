@@ -65,20 +65,16 @@ class Squad(pygame.sprite.Sprite):
                 self.wojownicy[2].draw(self.pos, Positions.RIGHT.value, screen)
                 self.wojownicy[1].draw(self.pos, Positions.CENTERBOTTOM.value, screen)
             case 4:
-                self.wojownicy[1].draw(self.pos, Positions.TOP.value, screen)
-                self.wojownicy[0].draw(self.pos, Positions.LEFT.value, screen)
-                self.wojownicy[2].draw(self.pos, Positions.RIGHT.value, screen)
-                self.wojownicy[3].draw(self.pos, Positions.BOTTOM.value, screen)
+                self.wojownicy[1].draw(self.pos, Positions.TOPLEFT.value, screen)
+                self.wojownicy[0].draw(self.pos, Positions.TOPRIGHT.value, screen)
+                self.wojownicy[2].draw(self.pos, Positions.BOTTOMLEFT.value, screen)
+                self.wojownicy[3].draw(self.pos, Positions.BOTTOMRIGHT.value, screen)
             case 5:
                 self.wojownicy[1].draw(self.pos, Positions.TOP.value, screen)
                 self.wojownicy[0].draw(self.pos, Positions.LEFT.value, screen)
                 self.wojownicy[2].draw(self.pos, Positions.CENTER.value, screen)
                 self.wojownicy[3].draw(self.pos, Positions.RIGHT.value, screen)
                 self.wojownicy[4].draw(self.pos, Positions.BOTTOM.value, screen)
-
-    def heal(self, value):
-        for wojownik in self.wojownicy:
-            wojownik.heal(value)
 
     def get_data(self):
         info = {}
