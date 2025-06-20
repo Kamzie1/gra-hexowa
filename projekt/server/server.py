@@ -85,7 +85,7 @@ class Server:
         data = self.rooms[room_id]
         package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 1}
         package2 = {
-            "x": 9,
+            "x": 20,
             "y": 12,
             "frakcja": "japonia",
             "color": "blue",
