@@ -314,7 +314,10 @@ class Mapa:
                                         )
                         else:
                             if not tile.jednostka is None:
-                                if tile.jednostka.owner_id == self.opponent.id:
+                                if (
+                                    tile.jednostka.owner_id == self.opponent.id
+                                    and self.move_flag.owner_id == self.player.id
+                                ):
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )
