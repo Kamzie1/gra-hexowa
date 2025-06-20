@@ -3,12 +3,13 @@ from flask import Flask, request
 import random
 from .state import create_state
 import os
+import eventlet
 
 
 class Server:
     def __init__(self) -> None:
         self.app = Flask(__name__)
-        self.sio = SocketIO(self.app)
+        self.sio = SocketIO(self.app, async_mode="eventlet")
         self.app.config["SECRET_KEY"] = "aiagfibogie"
         self._setup_events()
         self.rooms = {}
