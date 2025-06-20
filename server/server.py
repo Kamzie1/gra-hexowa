@@ -1,11 +1,12 @@
+import eventlet
+
+eventlet.monkey_patch()
+
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import Flask, request
 import random
 from .state import create_state
 import os
-import eventlet
-
-eventlet.monkey_patch()
 
 
 class Server:
