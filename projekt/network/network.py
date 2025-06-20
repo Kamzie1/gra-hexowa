@@ -61,7 +61,10 @@ class Client:
     def start(self, url="http://192.168.50.205:5000"):
         def run():
             try:
-                self.sio.connect(url)
+                self.sio.connect(
+                    "https://gra-hexowa-production.up.railway.app",
+                    transports=["websocket"],
+                )
                 self.sio.wait()
             except socketio.exceptions.ConnectionError as e:
                 print(f"cant connect with a server, {e}")
