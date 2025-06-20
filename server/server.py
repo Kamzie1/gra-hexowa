@@ -23,7 +23,7 @@ class Server:
         print("run started")
         self.sio.run(
             self.app,
-            host="0.0.0.0",
+            host="::",
             port=int(os.environ.get("PORT", 5000)),
             debug=False,
         )
@@ -31,6 +31,7 @@ class Server:
     def _setup_events(self):
         @self.app.route("/")
         def main():
+            print("main route viewed")
             return "SocketIO server działa!"
 
         @self.sio.on("connect")
@@ -84,14 +85,14 @@ class Server:
             print("new state incoming!!")
             sid = request.sid
             room_id = self.users[sid]
-            emit("new_state", data, room=room_id)
+            self.sio.emit("new_state", data, to=room_id)
 
         @self.sio.on("end_game")
         def end_game(result):
             sid = request.sid
             room_id = self.users[sid]
-            emit("end_game", result, to=sid)
-            emit("end_game", -1 * result, to=room_id, skip_sid=sid)
+            self.sio.emit("end_game", result, to=sid)
+            self.sio.emit("end_game", -1 * result, to=room_id, skip_sid=sid)
 
     def uruchom_gre(self, room_id):
         data = self.rooms[room_id]
