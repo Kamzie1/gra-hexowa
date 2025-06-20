@@ -15,7 +15,13 @@ class Server:
         self.users = {}
 
     def run(self):
-        self.sio.run(self.app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+        self.sio.run(
+            self.app,
+            host="0.0.0.0",
+            port=int(os.environ.get("PORT", 5000)),
+            debug=False,
+        )
+        print("app started")
 
     def _setup_events(self):
         @self.app.route("/")
