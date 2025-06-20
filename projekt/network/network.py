@@ -1,8 +1,8 @@
 import socketio
 import threading
 import socketio.exceptions
-import random
-from projekt.jednostki import Japonia, Japonia2
+from projekt.narzedzia import KoniecGry
+from projekt.ustawienia import Width, Height
 
 
 class Client:
@@ -14,6 +14,7 @@ class Client:
         self._setup_events()
         self.state_loaded = True
         self.turn = 0
+        self.koniecGry = KoniecGry(Width, Height)
 
     def _setup_events(self):
         @self.sio.event
@@ -49,7 +50,15 @@ class Client:
                 self.mapa.heal()
             self.state_loaded = True
 
-    def start(self, url="http://192.168.50.195:5000"):
+        @self.sio.on("end_game")
+        def end_game(result):
+            match (result):
+                case -1:
+                    self.koniecGry.display("Przegrałeś", self.mapa.player.color)
+                case 1:
+                    self.koniecGry.display("Wygrałeś", self.mapa.player.color)
+
+    def start(self, url="http://192.168.50.205:5000"):
         def run():
             try:
                 self.sio.connect(url)
@@ -86,3 +95,6 @@ class Client:
 
     def send_state(self, state):
         self.sio.emit("new_state", state)
+
+    def send_result(self, result):
+        self.sio.emit("end_game", result)

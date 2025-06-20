@@ -47,9 +47,9 @@ class Najechanie:
                     self.origin = tile.pos
                     if tile.jednostka is None:
                         self.flag = 0
-                    elif tile.jednostka.owner == player_id:
+                    elif tile.jednostka.owner_id == player_id:
                         self.flag = 1
-                    elif tile.jednostka.owner == opponent_id:
+                    elif tile.jednostka.owner_id == opponent_id:
                         self.flag = 2
 
 
@@ -77,7 +77,7 @@ class Ruch(pygame.sprite.Sprite):
         self._origin = pos
         self.image = surf
         self.rect = self.image.get_frect(center=self.origin)
-        font = pygame.font.Font(join(folder_grafiki, "consolas.ttf"), 16)
+        font = pygame.font.Font(join("Grafika/fonts", "consolas.ttf"), 16)
         display = f"{ruch}"
         text = font.render(display, True, "black")
         text_rect = text.get_rect(center=(tile_width / 2, tile_height / 2))
@@ -96,5 +96,8 @@ class Ruch(pygame.sprite.Sprite):
 class Podswietlenie(pygame.sprite.Sprite):
     def __init__(self, url, pos, group):
         super().__init__(group)
-        self.image = pygame.image.load(f"Grafika/tile-grafika/{url}")
+        self.image = pygame.image.load(f"Grafika/tile-grafika/efekty hexów/{url}")
         self.rect = self.image.get_frect(center=pos)
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)

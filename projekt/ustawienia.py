@@ -34,7 +34,6 @@ mini_width = Mapa_width / skala
 mini_height = Mapa_height / skala
 
 mini_map_pos = (Width, 0)
-minimapa_image = "mapa_test.png"
 
 # tiles
 tile_height = 108
@@ -51,7 +50,7 @@ font_size = 24
 font_color = "yellow"
 
 # recruit
-budynek_img = "recruit_test.png"
+budynek_img = "recruit_test2.png"
 rec_panel_pos = (10, 50)
 
 # side-menu

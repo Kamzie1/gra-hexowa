@@ -2,27 +2,25 @@ import pygame
 from projekt.ustawienia import *
 from pytmx.util_pygame import load_pygame
 from os.path import join
-from .tile import Tile, Ruch, Najechanie, Klikniecie, Podswietlenie
-from .budynek import Budynek
-from projekt.narzedzia import *
-from projekt.jednostki import Wojownik, Squad
+from .tile import Tile, Ruch, Najechanie, Klikniecie
+from projekt.narzedzia import (
+    oblicz_pos,
+    get_sasiedzi,
+    Queue,
+    priority_queue,
+    pozycja_myszy_na_surface,
+    clicked,
+)
+from projekt.jednostki import Squad, Miasto
 
 
 class Mapa:
-    sasiedzi1x = [-1, 0, 0, 1, 1, 1]
-
-    sasiedzi1y = [0, 1, -1, 0, 1, -1]
-
-    sasiedzi2x = [1, 0, 0, -1, -1, -1]
-
-    sasiedzi2y = [0, 1, -1, 0, 1, -1]
-
-    def __init__(self, miasto_pos, miasto_x, miasto_y, player, opponent, state):
+    def __init__(self, miasto_pos, player, opponent, state):
         self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[1] + srodek[1])
         self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
-        self.tmx = load_pygame(join(folder_grafiki, plik_mapy))
+        self.tmx = load_pygame(join("Grafika/mapa", plik_mapy))
         self.tiles_group = pygame.sprite.Group()
         self.building_group = pygame.sprite.Group()
         self.Tile_array = [
@@ -40,19 +38,25 @@ class Mapa:
 
         self.najechanie = Najechanie(
             pygame.image.load(
-                join("Grafika/tile-grafika", "Hex_najechanie.png")
+                join("Grafika/tile-grafika/efekty hexów", "white_podswietlenie.png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
             pygame.image.load(
-                join("Grafika/tile-grafika", f"{player.color}_podswietlenie.png")
+                join(
+                    "Grafika/tile-grafika/efekty hexów",
+                    f"{player.color}_podswietlenie.png",
+                )
             ).convert_alpha(),
             pygame.image.load(
-                join("Grafika/tile-grafika", f"{opponent.color}_podswietlenie.png")
+                join(
+                    "Grafika/tile-grafika/efekty hexów",
+                    f"{opponent.color}_podswietlenie.png",
+                )
             ).convert_alpha(),
         )
         self.klikniecie = Klikniecie(
             pygame.image.load(
-                join("Grafika/tile-grafika", "hex-klikniecie.png")
+                join("Grafika/tile-grafika/efekty hexów", "hex-klikniecie (2).png")
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
         )
@@ -143,6 +147,38 @@ class Mapa:
 
                     self.Tile_array[x][y] = tile
 
+    def BFS(self, x1, y1, x2, y2):
+        tablica_odwiedzonych = [
+            [0 for _ in range(map_tile_width)] for _ in range(map_tile_height)
+        ]
+        tablica_odwiedzonych[x1][y1] = 1
+        queue = Queue()
+        queue.append((x1, y1))
+        while not queue.empty():
+            x, y = queue.pop()
+            sasiedzix, sasiedziy = get_sasiedzi(x, y)
+            for i in range(6):
+                if x + sasiedzix[i] >= map_tile_width or x + sasiedzix[i] < 0:
+                    continue
+                if y + sasiedziy[i] >= map_tile_height or y + sasiedziy[i] < 0:
+                    continue
+                if tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] > 0:
+                    continue
+
+                tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] = (
+                    tablica_odwiedzonych[x][y] + 1
+                )
+
+                if x + sasiedzix[i] == x2 and y + sasiedziy[i] == y2:
+                    return tablica_odwiedzonych[x2][y2]
+                queue.append(
+                    (
+                        x + sasiedzix[i],
+                        y + sasiedziy[i],
+                    )
+                )
+        return -1
+
     def possible_moves(self, x, y, jednostka):
         tablica_odwiedzonych = [
             [-1 for _ in range(map_tile_width)] for _ in range(map_tile_height)
@@ -152,13 +188,7 @@ class Mapa:
         queue.append((x, y, jednostka.ruch))
         while not queue.empty():
             x, y, ruch = queue.pop()
-            match (y % 2):
-                case 1:
-                    sasiedzix = Mapa.sasiedzi1x
-                    sasiedziy = Mapa.sasiedzi1y
-                case 0:
-                    sasiedzix = Mapa.sasiedzi2x
-                    sasiedziy = Mapa.sasiedzi2y
+            sasiedzix, sasiedziy = get_sasiedzi(x, y)
             for i in range(6):
                 if x + sasiedzix[i] >= map_tile_width or x + sasiedzix[i] < 0:
                     continue
@@ -191,7 +221,8 @@ class Mapa:
     def draw(self, screen, flag):
         screen.blit(self.mapSurf, self.mapRect)  # rysuje mapę
         self.tiles_group.draw(self.mapSurf)  # rysuje tilesy
-        self.building_group.draw(self.mapSurf)  # rysuje budynki
+        for budynek in self.building_group:
+            budynek.draw(self.mapSurf)
         self.podswietlenie_group.draw(self.mapSurf)
         self.mapSurf.blit(
             self.najechanie.surf[self.najechanie.flag], self.najechanie.rect
@@ -202,13 +233,16 @@ class Mapa:
             if len(self.move_group) == 0:
                 for tiles in self.Tile_array:
                     for tile in tiles:
-                        if self.correct_moves[tile.x][tile.y] >= 0:
+                        if (
+                            not self.correct_moves is None
+                            and self.correct_moves[tile.x][tile.y] >= 0
+                        ):
                             Ruch(
                                 self.move_group,
                                 pygame.image.load(
                                     join(
-                                        f"{folder_grafiki}/tile-grafika",
-                                        "hex-klikniecie.png",
+                                        f"{folder_grafiki}/tile-grafika/efekty hexów",
+                                        "hex-klikniecie (2).png",
                                     )
                                 ).convert_alpha(),
                                 (tile.pos),
@@ -216,43 +250,82 @@ class Mapa:
                             )
             self.move_group.draw(self.mapSurf)
 
-    def event(self, mouse_pos, flag, turn, id):
+    def event(
+        self, mouse_pos, flag, turn, id, squadDisplay, squadButtonDisplay, attackDisplay
+    ):
+        if attackDisplay.show:
+            if attackDisplay.rect.collidepoint(mouse_pos):
+                attackDisplay.event(mouse_pos)
+                return
+
+        if squadDisplay.show:
+            if squadDisplay.rect.collidepoint(mouse_pos):
+                return
+
+        if not self.move_flag is None:
+            if squadButtonDisplay.rect.collidepoint(mouse_pos):
+                return
+
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, self.origin)
 
         for tiles in self.Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
+                    attackDisplay.show = False
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
-                    if not turn % 2 == id:
-                        return
+
                     if self.move_flag is None:
                         self.move_flag = tile.jednostka
-                        if not self.move_flag is None and tile.jednostka.owner == id:
+                        if (
+                            not self.move_flag is None
+                            and tile.jednostka.owner_id == id
+                            and turn % 2 == id
+                        ):
                             self.correct_moves = self.possible_moves(
                                 tile.x, tile.y, self.move_flag
                             )
-                        else:
-                            self.move_flag = None
 
                     else:
-                        if self.correct_moves[tile.x][tile.y] >= 0:
+                        if (
+                            not self.correct_moves is None
+                            and self.correct_moves[tile.x][tile.y] >= 0
+                        ):
                             if self.move_flag.tile is None:
                                 if tile.jednostka is None:
                                     self.recruit(tile)
-                                elif tile.jednostka.owner == self.player.id:
+                                elif tile.jednostka.owner_id == self.player.id:
                                     self.recruit_join(tile)
-                                elif tile.jednostka.owner == self.opponent.id:
+                                elif tile.jednostka.owner_id == self.opponent.id:
                                     pass
                             elif tile.jednostka is None:
                                 self.move(tile)
                             else:
-                                if tile.jednostka.owner == self.player.id:
-                                    self.join(tile.jednostka, self.move_flag, tile)
-                                elif tile.jednostka.owner == self.opponent.id:
-                                    pass
+                                if tile.jednostka.owner_id == self.player.id:
+                                    if not self.move_flag.tile == tile:
+                                        self.join(tile.jednostka, self.move_flag, tile)
+                                elif tile.jednostka.owner_id == self.opponent.id:
+                                    distance = self.attackValidate(
+                                        self.move_flag, tile.jednostka
+                                    )
+                                    if distance:
+                                        attackDisplay.update(
+                                            self.move_flag, tile.jednostka, distance
+                                        )
+                        else:
+                            if not tile.jednostka is None:
+                                if tile.jednostka.owner_id == self.opponent.id:
+                                    distance = self.attackValidate(
+                                        self.move_flag, tile.jednostka
+                                    )
+                                    if distance:
+                                        attackDisplay.update(
+                                            self.move_flag, tile.jednostka, distance
+                                        )
                         flag.klikniecie_flag = False
                         self.move_flag = None
+                        squadDisplay.show = False
+                        self.correct_moves = None
                         for tile in self.move_group:
                             tile.kill()
 
@@ -303,24 +376,29 @@ class Mapa:
             return False
         return True
 
+    def attackValidate(self, squad1, squad2):
+        distance = self.BFS(squad1.tile.x, squad1.tile.y, squad2.tile.x, squad2.tile.y)
+        if distance - 1 > squad1.range:
+            return 0
+        return distance - 1
+
     def load_state(self):
         state = {}
-        state["jednostka"] = []
-        state["budynek"] = []
+        state["jednostki"] = []
+        state["budynki"] = []
         for tiles in self.Tile_array:
             for tile in tiles:
                 if not tile.jednostka is None:
-                    state["jednostka"].append(tile.jednostka.get_data())
+                    state["jednostki"].append(tile.jednostka.get_data())
                 if not tile.budynek is None:
                     stan_budynku = {
                         "owner": tile.budynek.owner,
+                        "owner_id": tile.budynek.owner_id,
                         "pos": tile.budynek.pos,
                         "color": tile.budynek.color,
                         "id": tile.budynek.id,
-                        "zdrowie": tile.budynek.zdrowie,
-                        "morale": tile.budynek.morale,
                     }
-                    state["budynek"].append(stan_budynku)
+                    state["budynki"].append(stan_budynku)
         return state
 
     def get_tile(self, pos):
@@ -346,51 +424,50 @@ class Mapa:
                 tile.jednostka = None
                 tile.budynek = None
 
-        for jednostka in state["jednostka"]:
+        for jednostka in state["jednostki"]:
             tile = self.get_tile(jednostka["pos"])
-            if jednostka["owner"] == self.player.id:
+            if jednostka["owner_id"] == self.player.id:
                 frakcja = self.player.frakcja
             else:
                 frakcja = self.opponent.frakcja
             s = Squad(self.army_group, jednostka, tile, frakcja)
             tile.jednostka = s
 
-        for budynek in state["budynek"]:
+        for budynek in state["budynki"]:
             tile = self.get_tile(budynek["pos"])
-            if budynek["owner"] == self.player.id:
+            if budynek["owner_id"] == self.player.id:
                 frakcja = self.player.frakcja
-                color = self.player.color
-
             else:
                 frakcja = self.opponent.frakcja
-                color = self.opponent.color
-            b = Budynek(
-                frakcja[budynek["id"]],
-                budynek["id"],
-                budynek["pos"],
+
+            b = Miasto(
                 self.building_group,
-                budynek["owner"],
-                budynek["color"],
-                budynek["zdrowie"],
-                budynek["morale"],
+                budynek,
+                tile,
+                frakcja,
             )
-            Podswietlenie(
-                f"{color}_podswietlenie.png", tile.pos, self.podswietlenie_group
-            )
+
             tile.budynek = b
 
     def zarabiaj(self):
         for budynek in self.building_group:
-            if isinstance(budynek, Budynek):
+            if isinstance(budynek, Miasto):
                 budynek.zarabiaj(self.player)
             else:
                 print("to nie budynek")
 
     def heal(self):
         for budynek in self.building_group:
-            tile = self.get_tile(budynek.pos)
-            if not tile.jednostka is None:
-                tile.jednostka.heal(budynek.heal)
+            if isinstance(budynek, Miasto):
+                if budynek.owner_id == self.player.id:
+                    tile = budynek.tile
+                    if (
+                        not tile.jednostka is None
+                        and tile.jednostka.owner_id == budynek.owner_id
+                    ):
+                        tile.jednostka.heal(budynek.heal)
+            else:
+                print("to nie budynek")
 
     def __str__(self):
         for layer in self.tmx.layers:

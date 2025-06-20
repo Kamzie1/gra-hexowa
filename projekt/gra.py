@@ -1,11 +1,18 @@
 import pygame
 from sys import exit
 from projekt.ustawienia import *  # plik z ustawieniami
-from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Turn
+from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Turn, SquadButtonDisplay
 from projekt.player import Player
-from projekt.narzedzia import oblicz_pos, TurnDisplay
+from projekt.narzedzia import (
+    oblicz_pos,
+    TurnDisplay,
+    SquadDisplay,
+    KoniecGry,
+    AttackDisplay,
+)
 from projekt.flag import Flag
 from projekt.jednostki import get_fraction
+from projekt.network import Client
 
 
 class Gra:
@@ -33,7 +40,8 @@ class Gra:
         self.opponent = Player(
             frakcja2, pos2, x2, y2, num2, name2, client.info[name2]["color"]
         )
-        self.mapa = Mapa(pos, x, y, self.player, self.opponent, client.state)
+        self.attackDisplay = AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
+        self.mapa = Mapa(pos, self.player, self.opponent, client.state)
         self.resource = Resource()
         self.turn = Turn()
         self.menu = SideMenu(self.player, self.mapa)
@@ -44,6 +52,10 @@ class Gra:
         client.id = self.player.id
         self.turn_display = TurnDisplay(
             300, 34, (srodek[0] - 25, 0), "consolas.ttf", 20
+        )
+        self.squadDisplay = SquadDisplay(Width / 2, Height / 2, srodek, "black")
+        self.DisplaySquadButton = SquadButtonDisplay(
+            80, 80, "blue", (srodek[0], Height - 50)
         )
 
     # metoda uruchamiająca grę
@@ -78,16 +90,46 @@ class Gra:
         for jednostka in self.mapa.army_group:
             jednostka.draw(self.mapa.mapSurf)
 
+        if not self.mapa.move_flag is None:
+            self.screen.blit(
+                self.DisplaySquadButton.image, self.DisplaySquadButton.rect
+            )
+        if self.attackDisplay.show:
+            self.attackDisplay.display(self.screen)
+
         self.turn.draw(self.screen)
 
+        if self.squadDisplay.show and not self.mapa.move_flag is None:
+            self.squadDisplay.display(self.mapa.move_flag, self.screen)
+        if self.client.koniecGry.show:
+            self.client.koniecGry.draw(self.screen)
+
     def event_handler(self):
+        if self.mapa.Tile_array[self.opponent.x][self.opponent.y].jednostka is None:
+            self.client.send_result(1)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
-                self.mapa.event(mouse_pos, self.flag, self.client.turn, self.client.id)
+                if self.client.koniecGry.show:
+                    pygame.quit()
+                    exit()
+
+                self.mapa.event(
+                    mouse_pos,
+                    self.flag,
+                    self.client.turn,
+                    self.client.id,
+                    self.squadDisplay,
+                    self.DisplaySquadButton,
+                    self.attackDisplay,
+                )
+
                 self.turn.event(mouse_pos, self.mapa, self.client)
-                self.resource.event(mouse_pos, self.flag)
+                self.resource.event(mouse_pos, self.flag, self.client)
                 self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)
+                self.DisplaySquadButton.event(
+                    mouse_pos, self.squadDisplay, self.mapa.move_flag
+                )

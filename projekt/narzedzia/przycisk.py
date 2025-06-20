@@ -11,7 +11,7 @@ class Przycisk:
         self.pos = pos
         self.rect = self.surf.get_frect(topleft=self.pos)
         self.display = tekst
-        self.font = pygame.font.Font(join(folder_grafiki, font), 24)
+        self.font = pygame.font.Font(join("Grafika/fonts", font), 24)
         self.font_color = font_color
 
     def draw(self, screen):

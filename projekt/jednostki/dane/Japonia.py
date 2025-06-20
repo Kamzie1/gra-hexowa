@@ -1,92 +1,86 @@
+from .bronie import *
+from .inne import *
+
 # Dane frakcji nr. 1
 
 
-# dane jednostki Yukimura Sanda w schemacie słownika, dostęp do danych: Yukimura_Sanda['nazwa_informacji'] np. Yukimura_Sanda['zdrowie'] da nam 500
-Yukimura_Sanada = {
-    "nazwa": "Yukimura Sanada",
-    "zdrowie": 500,
-    "morale": 100,
-    "ruch": 15,
-    "przebicie": 10,
-    "pancerz": 8,
-    "atak": 20,
-    "koszt_ataku": 3,
-    "red": "Yukimura_Sanada_red.png",
-    "blue": "Yukimura_Sanada_blue.png",
-    "cost": 500,
-    "id": 1,
-}
-
-Bodyguard = {
-    "nazwa": "Bodyguard",
-    "zdrowie": 100,
-    "morale": 70,
-    "ruch": 10,
-    "przebicie": 6,
-    "pancerz": 4,
-    "atak": 10,
-    "koszt_ataku": 3,
-    "red": "Bodyguard_red.png",
-    "blue": "Bodyguard_blue.png",
-    "cost": 100,
-    "id": 0,
-}
-
-Kolumbryna = {
-    "nazwa": "Kolumbryna",
-    "zdrowie": 80,
-    "morale": 90,
-    "ruch": 5,
-    "przebicie": 12,
-    "pancerz": 2,
-    "atak": 20,
-    "koszt_ataku": 4,
-    "red": "kolubryna.png",
-    "blue": "kolubryna.png",
-    "id": 2,
-    "cost": 400,
-}
-
-Miasto = {
-    "nazwa": "Miasto",
-    "zdrowie": 1000,
-    "morale": 90,
-    "przebicie": 15,
-    "pancerz": 20,
-    "atak": 30,
-    "koszt_ataku": 2,
-    "red": "recruit_test.png",
-    "blue": "recruit_test.png",
-    "earn": {
-        "gold": 400,
-    },
-    "heal": 40,
-}
+# dane jednostek w schemacie słownika, dostęp do danych: Frakcja['typ jednostki']['id']['informacja'] np. Japonia['jednostki'][0]['zdrowie'] da nam 60
 
 Japonia = {
     "jednostka": [
-        Bodyguard,
-        Yukimura_Sanada,
-        Kolumbryna,
+        {
+            "nazwa": "Bodyguard",
+            "zdrowie": 60,
+            "morale": 70,
+            "ruch": 11,
+            "bronie": [Katana],
+            "wzrok": Oczy,
+            "pancerz": 4,
+            "atak_points": 9,
+            "red": "Bodyguard_red.png",
+            "blue": "Bodyguard_blue.png",
+            "cost": 100,
+            "id": 0,
+            "kategoria": "jednostka",
+        },
+        {
+            "nazwa": "Yukimura Sanada",
+            "zdrowie": 100,
+            "morale": 100,
+            "ruch": 15,
+            "bronie": [Yumonji_Jari_2],
+            "wzrok": Oczy,
+            "pancerz": 8,
+            "atak_points": 12,
+            "red": "Yukimura_Sanada_red.png",
+            "blue": "Yukimura_Sanada_blue.png",
+            "cost": 400,
+            "id": 1,
+            "kategoria": "jednostka",
+        },
+        {
+            "nazwa": "Kolumbryna",
+            "zdrowie": 55,
+            "morale": 90,
+            "ruch": 6,
+            "bronie": [Kolumbryna],
+            "wzrok": Lornetka,
+            "pancerz": 2,
+            "atak_points": 8,
+            "red": "kolubryna.png",
+            "blue": "kolubryna.png",
+            "id": 2,
+            "cost": 300,
+            "kategoria": "jednostka",
+        },
     ],
-    "miasto": Miasto,
+    "specjalne": [
+        {
+            "nazwa": "Miasto",
+            "zdrowie": 500,
+            "morale": 90,
+            "ruch": 0,
+            "bronie": [Kolumbryna],
+            "wzrok": Wieża_Obserwacyjna,
+            "pancerz": 10,
+            "atak_points": 16,
+            "red": "rec2.png",
+            "blue": "rec2.png",
+            "id": 0,
+            "kategoria": "specjalne",
+        }
+    ],
+    "budynek": [
+        {
+            "nazwa": "Miasto",
+            "red": "miasto.png",
+            "blue": "miasto.png",
+            "earn": {
+                "gold": 30,
+            },
+            "heal": 10,
+            "id": 0,
+            "kategoria": "budynek",
+        }
+    ],
 }
-
-Japonia2 = [
-    Bodyguard,
-    Yukimura_Sanada,
-    Kolumbryna,
-    Bodyguard,
-    Yukimura_Sanada,
-    Kolumbryna,
-]
-
-
-def get_fraction(frakcja):
-    match (frakcja):
-        case "japonia":
-            return Japonia
-        case "japonia2":
-            return Japonia2
-        case _:
-            raise ValueError
