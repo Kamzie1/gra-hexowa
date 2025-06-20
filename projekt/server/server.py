@@ -2,6 +2,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import Flask, request
 import random
 from .state import create_state
+import os
 
 
 class Server:
@@ -14,7 +15,7 @@ class Server:
         self.users = {}
 
     def run(self):
-        self.sio.run(self.app, host="0.0.0.0", port=5000, debug=True)
+        self.sio.run(self.app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
     def _setup_events(self):
         @self.app.route("/")
