@@ -1,6 +1,5 @@
 import pygame
 from os.path import join
-from projekt.ustawienia import folder_grafiki
 from projekt.swiat.tile import Podswietlenie
 
 
@@ -67,3 +66,6 @@ class Miasto(pygame.sprite.Sprite):
     def zarabiaj(self, player):
         if self.owner_id == player.id:
             player.gold += self.earn["gold"]
+
+    def own(self, owner, owner_id, color):
+        return
