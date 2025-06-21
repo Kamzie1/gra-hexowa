@@ -81,6 +81,18 @@ Japonia = {
             "heal": 10,
             "id": 0,
             "kategoria": "budynek",
-        }
+        },
+        {
+            "nazwa": "Wioska",
+            "red": "miasto.png",
+            "blue": "miasto.png",
+            "grey": "miasto.png",
+            "earn": {
+                "gold": 30,
+            },
+            "heal": 10,
+            "id": 1,
+            "kategoria": "budynek",
+        },
     ],
 }

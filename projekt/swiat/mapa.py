@@ -11,7 +11,7 @@ from projekt.narzedzia import (
     pozycja_myszy_na_surface,
     clicked,
 )
-from projekt.jednostki import Squad, Miasto
+from projekt.jednostki import Squad, Miasto, Wioska
 
 
 class Mapa:
@@ -338,6 +338,11 @@ class Mapa:
         self.move_flag.tile = tile
         self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
         tile.jednostka = self.move_flag
+        if tile.budynek is not None:
+            print("owning...")
+            tile.budynek.own(
+                self.move_flag.owner, self.move_flag.owner_id, self.move_flag.color
+            )
 
     def recruit(self, tile):
         try:
@@ -442,13 +447,20 @@ class Mapa:
                 frakcja = self.player.frakcja
             else:
                 frakcja = self.opponent.frakcja
-
-            b = Miasto(
-                self.building_group,
-                budynek,
-                tile,
-                frakcja,
-            )
+            if budynek["id"] == 0:
+                b = Miasto(
+                    self.building_group,
+                    budynek,
+                    tile,
+                    frakcja,
+                )
+            else:
+                b = Wioska(
+                    self.building_group,
+                    budynek,
+                    tile,
+                    frakcja,
+                )
 
             tile.budynek = b
 

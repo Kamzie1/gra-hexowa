@@ -1,6 +1,7 @@
 from .klasy.wojownik import Wojownik
 from .klasy.squad import Squad
 from .klasy.miasto import Miasto
+from .klasy.wioska import Wioska
 from .dane.Japonia import Japonia
 
 
