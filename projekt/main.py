@@ -14,7 +14,7 @@ class Main:
         self.screen.fill("white")
         self.clock = pygame.time.Clock()
         self.client = Client()
-        self.client.test()
+        self.client.start()
         self.pokoje = Pokoje()
         self.kolejka = Kolejka()
 
