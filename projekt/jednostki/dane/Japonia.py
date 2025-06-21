@@ -61,7 +61,7 @@ Japonia = {
             "morale": 90,
             "ruch": 0,
             "bronie": [Kolumbryna],
-            "wzrok": Wieża_Obserwacyjna,
+            "wzrok": Lornetka,
             "pancerz": 10,
             "atak_points": 16,
             "red": "rec2.png",

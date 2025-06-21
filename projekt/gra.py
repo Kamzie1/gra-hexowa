@@ -86,9 +86,9 @@ class Gra:
         self.turn_display.display(
             "grey", self.screen, self.client.turn, self.player, self.opponent
         )
-        self.mini_mapa.draw(self.screen, self.mapa.origin, self.mapa.Tile_array)
-        for jednostka in self.mapa.army_group:
-            jednostka.draw(self.mapa.mapSurf)
+        self.mini_mapa.draw(
+            self.screen, self.mapa.origin, self.mapa.Tile_array, self.mapa.widok
+        )
 
         if not self.mapa.move_flag is None:
             self.screen.blit(

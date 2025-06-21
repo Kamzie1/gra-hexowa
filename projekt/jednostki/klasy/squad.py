@@ -53,6 +53,14 @@ class Squad(pygame.sprite.Sprite):
                 max_range = wojownik.bronie[0]["range"]
         return max_range
 
+    @property
+    def wzrok(self):
+        maks = -1
+        for wojownik in self.wojownicy:
+            if wojownik.jednostka["wzrok"] > maks:
+                maks = wojownik.jednostka["wzrok"]
+        return maks
+
     def draw(self, screen):
         match (len(self.wojownicy)):
             case 1:

@@ -2,7 +2,7 @@ import pygame
 from projekt.ustawienia import *
 from pytmx.util_pygame import load_pygame
 from os.path import join
-from .tile import Tile, Ruch, Najechanie, Klikniecie
+from .tile import Tile, Ruch, Najechanie, Klikniecie, Chmura
 from projekt.narzedzia import (
     oblicz_pos,
     get_sasiedzi,
@@ -10,6 +10,7 @@ from projekt.narzedzia import (
     priority_queue,
     pozycja_myszy_na_surface,
     clicked,
+    id_to_pos,
 )
 from projekt.jednostki import Squad, Miasto, Wioska
 
@@ -26,12 +27,19 @@ class Mapa:
         self.Tile_array = [
             [None for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
+        self.widok = [
+            [-1 for _ in range(map_tile_height)] for _ in range(map_tile_width)
+        ]
+        self.widziane = [
+            [0 for _ in range(map_tile_height)] for _ in range(map_tile_width)
+        ]
         self.load_tiles()
         self.move_group = pygame.sprite.Group()
         self.move_flag = None
         self.correct_moves = None
         self.army_group = pygame.sprite.Group()
         self.podswietlenie_group = pygame.sprite.Group()
+        self.widok_group = pygame.sprite.Group()
 
         self.player = player
         self.opponent = opponent
@@ -61,6 +69,7 @@ class Mapa:
             (tile_width / 2, tile_height / 2),
         )
         self.import_state(state)
+        self.calculate_widok()
 
     @property
     def origin(self):
@@ -77,7 +86,12 @@ class Mapa:
         self.update_based_border(mouse_pos)
         self.update_based_mouse(mouse_pos)
         self.najechanie.update(
-            mouse_pos, self.Tile_array, self.origin, self.player.id, self.opponent.id
+            mouse_pos,
+            self.Tile_array,
+            self.origin,
+            self.player.id,
+            self.opponent.id,
+            self.widok,
         )
 
     def update_based_mouse(self, mouse_pos):
@@ -142,6 +156,7 @@ class Mapa:
                         group=self.tiles_group,
                         id=x + 30 * y,
                         koszt_ruchu=props["koszt_ruchu"],
+                        widocznosc=props["widocznosc"],
                         typ=props["id"],
                     )
 
@@ -218,15 +233,71 @@ class Mapa:
                 )
         return tablica_odwiedzonych
 
+    def widok_jednostka(self, x, y, jednostka):
+        self.widziane[x][y] = 1
+        self.widok[x][y] = jednostka.wzrok
+        queue = priority_queue()
+        queue.append((x, y, jednostka.wzrok))
+        while not queue.empty():
+            x, y, wzrok = queue.pop()
+            sasiedzix, sasiedziy = get_sasiedzi(x, y)
+            for i in range(6):
+                if x + sasiedzix[i] >= map_tile_width or x + sasiedzix[i] < 0:
+                    continue
+                if y + sasiedziy[i] >= map_tile_height or y + sasiedziy[i] < 0:
+                    continue
+                if (
+                    self.widok[x + sasiedzix[i]][y + sasiedziy[i]]
+                    > wzrok
+                    - self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].widocznosc
+                ):
+                    continue
+                if (
+                    wzrok
+                    - self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].widocznosc
+                    < 0
+                ):
+                    continue
+                self.widok[x + sasiedzix[i]][y + sasiedziy[i]] = (
+                    wzrok
+                    - self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].widocznosc
+                )
+                self.widziane[x + sasiedzix[i]][y + sasiedziy[i]] = 1
+                queue.append(
+                    (
+                        x + sasiedzix[i],
+                        y + sasiedziy[i],
+                        wzrok
+                        - self.Tile_array[x + sasiedzix[i]][
+                            y + sasiedziy[i]
+                        ].widocznosc,
+                    )
+                )
+
+    def calculate_widok(self):
+        print("calculating...")
+        for jednostka in self.army_group:
+            if jednostka.owner_id == self.player.id:
+                self.widok_jednostka(jednostka.tile.x, jednostka.tile.y, jednostka)
+
     def draw(self, screen, flag):
-        screen.blit(self.mapSurf, self.mapRect)  # rysuje mapę
-        self.tiles_group.draw(self.mapSurf)  # rysuje tilesy
+        self.mapSurf.fill("black")
+        for tile in self.tiles_group:
+            if self.widok[tile.x][tile.y] >= 0:
+                tile.draw(self.mapSurf)
+
         for budynek in self.building_group:
-            budynek.draw(self.mapSurf)
-        self.podswietlenie_group.draw(self.mapSurf)
-        self.mapSurf.blit(
-            self.najechanie.surf[self.najechanie.flag], self.najechanie.rect
-        )
+            if self.widok[budynek.tile.x][budynek.tile.y] > 0:
+                budynek.draw(self.mapSurf)
+
+        for podswietlenie in self.podswietlenie_group:
+            if self.widok[budynek.tile.x][budynek.tile.y] > 0:
+                podswietlenie.draw(self.mapSurf)
+
+        if self.najechanie.flag != -1:
+            self.mapSurf.blit(
+                self.najechanie.surf[self.najechanie.flag], self.najechanie.rect
+            )
         if flag.klikniecie_flag:
             self.mapSurf.blit(self.klikniecie.image, self.klikniecie.rect)
         if not self.move_flag is None:
@@ -249,6 +320,13 @@ class Mapa:
                                 self.correct_moves[tile.x][tile.y],
                             )
             self.move_group.draw(self.mapSurf)
+        for jednostka in self.army_group:
+            if (
+                jednostka.tile is not None
+                and self.widok[jednostka.tile.x][jednostka.tile.y] >= 0
+            ):
+                jednostka.draw(self.mapSurf)
+        screen.blit(self.mapSurf, self.mapRect)  # rysuje mapędd
 
     def event(
         self, mouse_pos, flag, turn, id, squadDisplay, squadButtonDisplay, attackDisplay
@@ -272,7 +350,8 @@ class Mapa:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
                     attackDisplay.show = False
-                    flag.klikniecie_flag = True
+                    if self.widok[tile.x][tile.y] >= 0:
+                        flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
 
                     if self.move_flag is None:
@@ -343,6 +422,7 @@ class Mapa:
             tile.budynek.own(
                 self.move_flag.owner, self.move_flag.owner_id, self.move_flag.color
             )
+        self.calculate_widok()
 
     def recruit(self, tile):
         try:

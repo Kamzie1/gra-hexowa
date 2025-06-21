@@ -44,6 +44,32 @@ def mark(x, y):
         if y + sasiedziy[j] < 0 or y + sasiedziy[j] > 29:
             continue
         mapa[x + sasiedzix[j]][y + sasiedziy[j]] = 1
+        for i in range(6):
+            if (
+                x + sasiedzix[j] + sasiedzix[i] < 0
+                or x + sasiedzix[j] + sasiedzix[i] > 29
+            ):
+                continue
+            if (
+                y + sasiedziy[j] + sasiedziy[i] < 0
+                or y + sasiedziy[j] + sasiedziy[i] > 29
+            ):
+                continue
+            mapa[x + sasiedzix[j] + sasiedzix[i]][y + sasiedziy[j] + sasiedziy[i]] = 1
+            for z in range(6):
+                if (
+                    x + sasiedzix[j] + sasiedzix[i] + sasiedzix[z] < 0
+                    or x + sasiedzix[j] + sasiedzix[i] + sasiedzix[z] > 29
+                ):
+                    continue
+                if (
+                    y + sasiedziy[j] + sasiedziy[i] + sasiedziy[z] < 0
+                    or y + sasiedziy[j] + sasiedziy[i] + sasiedziy[z] > 29
+                ):
+                    continue
+                mapa[x + sasiedzix[j] + sasiedzix[i] + sasiedzix[z]][
+                    y + sasiedziy[j] + sasiedziy[i] + sasiedziy[z]
+                ] = 1
 
 
 def generate_space(x, y):

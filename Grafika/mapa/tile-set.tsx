@@ -4,37 +4,37 @@
  <tile id="0">
   <properties>
    <property name="koszt_ruchu" type="int" value="7"/>
-   <property name="widocznosc" value="3"/>
+   <property name="widocznosc" type="int" value="3"/>
   </properties>
  </tile>
  <tile id="1" probability="3">
   <properties>
    <property name="koszt_ruchu" type="int" value="3"/>
-   <property name="widocznosc" value="2"/>
+   <property name="widocznosc" type="int" value="2"/>
   </properties>
  </tile>
  <tile id="2" probability="3">
   <properties>
    <property name="koszt_ruchu" type="int" value="4"/>
-   <property name="widocznosc" value="4"/>
+   <property name="widocznosc" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="3" probability="5">
   <properties>
    <property name="koszt_ruchu" type="int" value="4"/>
-   <property name="widocznosc" value="4"/>
+   <property name="widocznosc" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="4" probability="3">
   <properties>
    <property name="koszt_ruchu" type="int" value="5"/>
-   <property name="widocznosc" value="2"/>
+   <property name="widocznosc" type="int" value="2"/>
   </properties>
  </tile>
  <tile id="5" probability="3">
   <properties>
    <property name="koszt_ruchu" type="int" value="7"/>
-   <property name="widocznosc" value="4"/>
+   <property name="widocznosc" type="int" value="4"/>
   </properties>
  </tile>
 </tileset>

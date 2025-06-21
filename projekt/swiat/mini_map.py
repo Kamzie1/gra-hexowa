@@ -24,7 +24,7 @@ class Mini_map:
         self.rect = self.rectsurf.get_frect(topleft=self.origin)
 
     def refresh(self):
-        self.surf.fill("black")
+        self.surf.fill((20, 20, 20))
 
     def update(self, mapa):
         if pygame.mouse.get_pressed()[0]:
@@ -37,7 +37,7 @@ class Mini_map:
                 mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])
                 mapa.mapRect = mapa.mapSurf.get_frect(topleft=mapa.origin)
 
-    def draw(self, screen, origin, Tile_array):
+    def draw(self, screen, origin, Tile_array, widok):
         self.refresh()
         self.origin = (
             -origin[0] / skala,
@@ -45,13 +45,14 @@ class Mini_map:
         )
         for tiles in Tile_array:
             for tile in tiles:
-                self.rysuj(tile)
-                if not tile.budynek is None:
-                    self.rysuj(tile.budynek)
-                if not tile.jednostka is None:
-                    self.draw_squad(tile.jednostka.color, tile.pos)
+                if widok[tile.x][tile.y] >= 0:
+                    self.rysuj(tile)
+                    if not tile.budynek is None:
+                        self.rysuj(tile.budynek)
+                    if not tile.jednostka is None:
+                        self.draw_squad(tile.jednostka.color, tile.pos)
         pygame.draw.rect(self.surf, mini_map_rect_color, self.rect, width=1)
-        pygame.draw.rect(screen, (0, 0, 0), self.mapRect, width=2)
+        pygame.draw.rect(screen, "grey", self.mapRect, width=5)
         screen.blit(self.surf, self.mapRect)
 
     def draw_squad(self, color, pos):

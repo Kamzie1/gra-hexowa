@@ -6,7 +6,18 @@ from ..ustawienia import folder_grafiki, tile_height, tile_width
 
 class Tile(pygame.sprite.Sprite):
     def __init__(
-        self, surf, x, y, pos, group, id, koszt_ruchu, typ, budynek=None, jednostka=None
+        self,
+        surf,
+        x,
+        y,
+        pos,
+        group,
+        id,
+        koszt_ruchu,
+        widocznosc,
+        typ,
+        budynek=None,
+        jednostka=None,
     ) -> None:
         super().__init__(group)
         self.x = x
@@ -19,6 +30,10 @@ class Tile(pygame.sprite.Sprite):
         self.pos = pos
         self.koszt_ruchu = koszt_ruchu
         self.typ = typ
+        self.widocznosc = widocznosc
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
 
 
 class Najechanie:
@@ -38,14 +53,16 @@ class Najechanie:
         self._origin = value
         self.rect = self.surf[0].get_frect(center=self.origin)
 
-    def update(self, mouse_pos, Tile_array, origin, player_id, opponent_id):
+    def update(self, mouse_pos, Tile_array, origin, player_id, opponent_id, widok):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
 
         for tiles in Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
                     self.origin = tile.pos
-                    if tile.jednostka is None:
+                    if widok[tile.x][tile.y] < 0:
+                        self.flag = -1
+                    elif tile.jednostka is None:
                         self.flag = 0
                     elif tile.jednostka.owner_id == player_id:
                         self.flag = 1
@@ -101,3 +118,18 @@ class Podswietlenie(pygame.sprite.Sprite):
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+
+
+class Chmura(pygame.sprite.Sprite):
+    def __init__(self, pos, group, type):
+        super().__init__(group)
+        match (type):
+            case "weak":
+                self.image = pygame.image.load(
+                    "Grafika/tile-grafika/efekty hexów/chmura_weak.png"
+                )
+            case "strong":
+                self.image = pygame.image.load(
+                    "Grafika/tile-grafika/efekty hexów/chmura_strong.png"
+                )
+        self.rect = self.image.get_frect(center=pos)
