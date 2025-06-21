@@ -39,7 +39,9 @@ class Server:
         def connect(auth):
             print("Client connected.")
             name = auth["name"]
+            print("name", name)
             if name is not None and name in self.users:
+                print("name is found...")
                 for client in self.rooms[self.users[name]]["users"]:
                     if client["name"] == name:
                         client["sid"] = request.sid
