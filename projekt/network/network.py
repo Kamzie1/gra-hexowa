@@ -3,6 +3,7 @@ import threading
 import socketio.exceptions
 from projekt.narzedzia import KoniecGry
 from projekt.ustawienia import Width, Height
+import time
 
 
 class Client:
@@ -10,18 +11,19 @@ class Client:
         self.ekran = 0
         self.start_game = False
         self.connected = False
-        self.sio = socketio.Client()
+        self.sio = socketio.Client(reconnection=True)
         self._setup_events()
         self.state_loaded = True
         self.turn = 0
         self.koniecGry = KoniecGry(Width, Height)
-        self.name = None
+        self.name = "anonim"
 
     def _setup_events(self):
         @self.sio.event
         def connect():
             print("[CLIENT] Connected to server")
             self.connected = True
+            self.sio.emit("sync", self.name)
 
         @self.sio.event
         def disconnect():
@@ -58,18 +60,20 @@ class Client:
                 self.koniecGry.display("Wygrałeś", self.mapa.player.color)
             else:
                 self.koniecGry.display("Przegrałeś", self.mapa.player.color)
+            self.name = None
 
     def start(self, url="http://192.168.50.205:5000"):
         def run():
-            try:
-                self.sio.connect(
-                    "https://gra-hexowa-production.up.railway.app",
-                    transports=["websocket"],
-                    auth={"name": self.name},
-                )
-                self.sio.wait()
-            except socketio.exceptions.ConnectionError as e:
-                print(f"cant connect with a server, {e}")
+            while True:
+                try:
+                    self.sio.connect(
+                        "https://gra-hexowa-production.up.railway.app",
+                        transports=["websocket"],
+                    )
+                    break
+                except socketio.exceptions.ConnectionError as e:
+                    print(f"cant connect with a server, {e}")
+                    time.sleep(5)
 
         threading.Thread(target=run, daemon=True).start()
 
@@ -79,7 +83,6 @@ class Client:
                 self.sio.connect(
                     "http://localhost:5000",
                     transports=["websocket"],
-                    auth={"name": self.name},
                 )
                 self.sio.wait()
             except socketio.exceptions.ConnectionError as e:
@@ -108,11 +111,13 @@ class Client:
         if self.connected:
             self.sio.emit("join", (id, name), callback=self.handle_join)
             self.name = name
+            print("new name:", self.name)
 
     def create_room(self, name):
         if self.connected:
             self.sio.emit("create", name, callback=self.handle_create)
             self.name = name
+            print("new name:", self.name)
 
     def send_state(self, state):
         player = {"name": self.name, "gold": self.mapa.player.gold}
