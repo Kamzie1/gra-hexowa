@@ -106,7 +106,7 @@ class Gra:
 
     def event_handler(self):
         if self.mapa.Tile_array[self.opponent.x][self.opponent.y].jednostka is None:
-            self.client.send_result(1)
+            self.client.send_result(self.client.name)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

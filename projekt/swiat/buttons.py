@@ -77,7 +77,7 @@ class Surrender(Button):
         super().__init__(width, height, color, pos, button_group, image)
 
     def click(self, client):
-        client.send_result(-1)
+        client.send_result(client.mapa.opponent.name)
 
 
 class SquadButtonDisplay:
