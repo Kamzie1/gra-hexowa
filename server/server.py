@@ -36,9 +36,15 @@ class Server:
             return "SocketIO server 2 działa!"
 
         @self.sio.on("connect")
-        def connect(auth):
+        def connect():
             print("Client connected.")
-            name = auth["name"]
+
+        @self.sio.on("disconnect")
+        def disconnect(sid):
+            print("Client disconnected.")
+
+        @self.sio.on("sync")
+        def sync(name):
             print("name", name)
             if name is not None and name in self.users:
                 print("name is found...")
@@ -57,10 +63,6 @@ class Server:
                             },
                             to=room_id,
                         )
-
-        @self.sio.on("disconnect")
-        def disconnect(sid):
-            print("Client disconnected.")
 
         @self.sio.on("join")
         def join(id, name):
