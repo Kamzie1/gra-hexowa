@@ -212,25 +212,58 @@ class Mapa:
                 if tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] >= 0:
                     continue
                 if (
-                    ruch
-                    - self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].koszt_ruchu
-                    < 0
+                    self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].budynek
+                    is not None
                 ):
-                    continue
-                tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] = (
-                    ruch
-                    - self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].koszt_ruchu
-                )
-                queue.append(
-                    (
-                        x + sasiedzix[i],
-                        y + sasiedziy[i],
+                    if (
                         ruch
                         - self.Tile_array[x + sasiedzix[i]][
                             y + sasiedziy[i]
-                        ].koszt_ruchu,
+                        ].budynek.koszt_ruchu
+                        < 0
+                    ):
+                        continue
+                    tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] = (
+                        ruch
+                        - self.Tile_array[x + sasiedzix[i]][
+                            y + sasiedziy[i]
+                        ].budynek.koszt_ruchu
                     )
-                )
+                    queue.append(
+                        (
+                            x + sasiedzix[i],
+                            y + sasiedziy[i],
+                            ruch
+                            - self.Tile_array[x + sasiedzix[i]][
+                                y + sasiedziy[i]
+                            ].budynek.koszt_ruchu,
+                        )
+                    )
+                else:
+                    if (
+                        ruch
+                        - self.Tile_array[x + sasiedzix[i]][
+                            y + sasiedziy[i]
+                        ].koszt_ruchu
+                        < 0
+                    ):
+                        continue
+                    tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] = (
+                        ruch
+                        - self.Tile_array[x + sasiedzix[i]][
+                            y + sasiedziy[i]
+                        ].koszt_ruchu
+                    )
+                    queue.append(
+                        (
+                            x + sasiedzix[i],
+                            y + sasiedziy[i],
+                            ruch
+                            - self.Tile_array[x + sasiedzix[i]][
+                                y + sasiedziy[i]
+                            ].koszt_ruchu,
+                        )
+                    )
         return tablica_odwiedzonych
 
     def widok_jednostka(self, x, y, jednostka):
@@ -275,7 +308,9 @@ class Mapa:
                 )
 
     def calculate_widok(self):
-        print("calculating...")
+        self.widok = [
+            [-1 for _ in range(map_tile_width)] for _ in range(map_tile_height)
+        ]
         for jednostka in self.army_group:
             if jednostka.owner_id == self.player.id:
                 self.widok_jednostka(jednostka.tile.x, jednostka.tile.y, jednostka)
@@ -352,6 +387,8 @@ class Mapa:
                     attackDisplay.show = False
                     if self.widok[tile.x][tile.y] >= 0:
                         flag.klikniecie_flag = True
+                    else:
+                        flag.klikniecie_flag = False
                     self.klikniecie.origin = tile.pos
 
                     if self.move_flag is None:

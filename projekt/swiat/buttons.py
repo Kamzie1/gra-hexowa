@@ -59,7 +59,7 @@ class Recruit(Button):
         jednostka = self.jednostka
         info["jednostki"].append(jednostka)
         self.mapa.move_flag = Squad(self.group, info, None, self.player.frakcja)
-        r = Recruit_sample(4)
+        r = Recruit_sample(2)
         self.mapa.correct_moves = self.mapa.possible_moves(self.x, self.y, r)
         self.mapa.move_group.empty()
 

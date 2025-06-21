@@ -9,6 +9,7 @@ from projekt.narzedzia import (
     SquadDisplay,
     KoniecGry,
     AttackDisplay,
+    Display,
 )
 from projekt.flag import Flag
 from projekt.jednostki import get_fraction
@@ -57,6 +58,9 @@ class Gra:
         self.DisplaySquadButton = SquadButtonDisplay(
             80, 80, "blue", (srodek[0], Height - 50)
         )
+        self.not_you_turnDisplay = Display(
+            Width / 2, 100, (srodek[0] - Width / 4, srodek[1] / 2), "consolas.ttf", 100
+        )
 
     # metoda uruchamiająca grę
     def run(self):
@@ -98,6 +102,10 @@ class Gra:
             self.attackDisplay.display(self.screen)
 
         self.turn.draw(self.screen)
+        if self.client.turn % 2 != self.player.id:
+            self.not_you_turnDisplay.display(
+                "Tura Przeciwnika", self.opponent.color, self.screen
+            )
 
         if self.squadDisplay.show and not self.mapa.move_flag is None:
             self.squadDisplay.display(self.mapa.move_flag, self.screen)

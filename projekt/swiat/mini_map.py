@@ -48,7 +48,7 @@ class Mini_map:
                 if widok[tile.x][tile.y] >= 0:
                     self.rysuj(tile)
                     if not tile.budynek is None:
-                        self.rysuj(tile.budynek)
+                        self.draw_budynek(tile.budynek)
                     if not tile.jednostka is None:
                         self.draw_squad(tile.jednostka.color, tile.pos)
         pygame.draw.rect(self.surf, mini_map_rect_color, self.rect, width=1)
@@ -67,3 +67,27 @@ class Mini_map:
         image = pygame.transform.scale_by(obiekt.image, 1.11111111 / skala)
         rect = image.get_frect(center=pos)
         self.surf.blit(image, rect)
+
+    def draw_budynek(self, budynek):
+        pos = budynek.pos
+        pos = (pos[0] / skala, pos[1] / skala)
+        image = pygame.transform.scale_by(budynek.image, 1.11111111 / skala)
+        rect = image.get_frect(center=pos)
+        w = tile_width / 2 / skala
+        h = tile_height / 2 / skala
+        hp = 54 / 2 / skala
+        self.surf.blit(image, rect)
+        pygame.draw.circle(self.surf, budynek.color, pos, w, width=1)
+        # pygame.draw.polygon(
+        # self.surf,
+        # budynek.color,
+        # [
+        # (pos[0] - w, pos[1] - hp),
+        # (pos[0] - w, pos[1] + hp),
+        # (pos[0], pos[1] - h),
+        # (pos[0] + w, pos[1] - hp),
+        # (pos[0] + w, pos[1] + hp),
+        # (pos[0], pos[1] + h),
+        # ],
+        # width=2,
+        # )

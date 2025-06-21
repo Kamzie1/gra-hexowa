@@ -15,7 +15,6 @@ class Display:
         text = self.font.render(content, True, color)
         text_rect = text.get_frect(topleft=(5, 5))
         self.surf.blit(text, text_rect)
-        pygame.draw.rect(self.surf, "red", self.rect, 2)
         screen.blit(self.surf, self.rect)
 
 

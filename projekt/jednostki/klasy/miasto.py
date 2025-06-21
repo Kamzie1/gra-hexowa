@@ -21,6 +21,7 @@ class Miasto(pygame.sprite.Sprite):
         self.heal = self.budynek["heal"]
         self.earn = self.budynek["earn"]
         self.id = info["id"]
+        self.koszt_ruchu = self.budynek["koszt_ruchu"]
         self.podswietlenie_group = pygame.sprite.Group()
         Podswietlenie(
             f"{self.color}_podswietlenie.png",

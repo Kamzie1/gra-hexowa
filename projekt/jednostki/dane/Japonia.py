@@ -81,6 +81,7 @@ Japonia = {
             "heal": 10,
             "id": 0,
             "kategoria": "budynek",
+            "koszt_ruchu": 2,
         },
         {
             "nazwa": "Wioska",
@@ -93,6 +94,7 @@ Japonia = {
             "heal": 10,
             "id": 1,
             "kategoria": "budynek",
+            "koszt_ruchu": 3,
         },
     ],
 }
