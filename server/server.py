@@ -3,7 +3,7 @@ import eventlet
 eventlet.monkey_patch()
 
 from flask_socketio import SocketIO, emit, join_room, leave_room
-from flask import Flask, request, session
+from flask import Flask, request
 import random
 from .state import create_state
 import os
@@ -14,10 +14,9 @@ class Server:
         self.app = Flask(__name__)
         self.sio = SocketIO(self.app, async_mode="eventlet")
         self.app.config["SECRET_KEY"] = "aiagfibogie"
-        self.app.config["SESSION_PERMANENT"] = True
-        self.app.config["SESSION_TYPE"] = "filesystem"
         self._setup_events()
         self.rooms = {}
+        self.users = {}
         self.last_state = None
         print("init finished")
 
@@ -37,11 +36,25 @@ class Server:
             return "SocketIO server 2 działa!"
 
         @self.sio.on("connect")
-        def connect():
+        def connect(auth):
             print("Client connected.")
-            if session.get("name") and session.get("room_id"):
-                join_room(session["room_id"])
-                print("joined room again")
+            name = auth["name"]
+            if name is not None and name in self.users:
+                for client in self.rooms[self.users[name]]["users"]:
+                    if client["name"] == name:
+                        client["sid"] = request.sid
+                        join_room(self.users[name], sid=client["sid"])
+                        room_id = self.users[name]
+                        print("reconnected")
+                        emit(
+                            "new state",
+                            {
+                                "state": self.rooms[room_id]["state"],
+                                "turn": self.rooms[room_id]["turn"],
+                                "players": self.rooms[room_id]["players"],
+                            },
+                            to=room_id,
+                        )
 
         @self.sio.on("disconnect")
         def disconnect(sid):
@@ -50,16 +63,17 @@ class Server:
         @self.sio.on("join")
         def join(id, name):
             flag = False
-            if session.get("name") and session.get("room_id"):
+            if name in self.users:
                 return {"joined": False, "message": "Nazwa już istnieje"}
             for room_id, data in self.rooms.items():
                 if room_id == id and not data["active"]:
-                    data["users"].append(name)
-                    session["name"] = name
-                    session["room_id"] = room_id
-                    join_room(room_id)
+                    client = {"name": name, "sid": request.sid}
+                    data["users"].append(client)
+                    self.rooms[room_id]["players"][name] = 1000
+                    self.users[name] = room_id
+                    join_room(room_id, sid=request.sid)
                     if len(data["users"]) == 2:
-                        print(self.rooms[room_id])
+                        print("start: ", self.rooms[room_id])
                         data["active"] = True
                         self.uruchom_gre(room_id)
                     flag = True
@@ -72,14 +86,20 @@ class Server:
 
         @self.sio.on("create")
         def create(name):
-            if session.get("name") and session.get("room_id"):
+            if name in self.users:
                 return {"created": False, "message": "Nazwa już istnieje"}
             try:
                 room_id = self.generate(4)
-                self.rooms[room_id] = {"users": [name], "active": False}
-                session["room_id"] = room_id
-                session["name"] = name
-                join_room(room_id)
+                client = {"name": name, "sid": request.sid}
+                self.rooms[room_id] = {
+                    "users": [client],
+                    "active": False,
+                    "state": None,
+                    "players": {name: 1000},
+                    "turn": 0,
+                }
+                join_room(room_id, sid=request.sid)
+                self.users[name] = room_id
                 return {"created": True, "id": room_id}
             except:
                 return {"created": False, "message": "Coś poszło nie tak"}
@@ -87,22 +107,38 @@ class Server:
         @self.sio.on("new_state")
         def new_state(data):
             print("got state")
-            room_id = session["room_id"]
-            self.last_state = data
-            self.sio.emit("new_state", data, to=room_id)
+            room_id = self.users[data["nadawca"]]
+            self.rooms[room_id]["state"] = data["state"]
+            self.rooms[room_id]["players"][data["player"]["name"]] = data["player"][
+                "gold"
+            ]
+            self.rooms[room_id]["turn"] += 1
+            print(
+                "Turn",
+                self.rooms[room_id]["turn"],
+                "----------------------------------------------",
+            )
+            self.sio.emit(
+                "new_state",
+                {
+                    "state": self.rooms[room_id]["state"],
+                    "turn": self.rooms[room_id]["turn"],
+                    "players": self.rooms[room_id]["players"],
+                },
+                to=room_id,
+            )
 
         @self.sio.on("end_game")
-        def end_game(result):
-            sid = request.sid
-            room_id = session["room_id"]
-            self.sio.emit("end_game", result, to=sid)
-            self.sio.emit("end_game", -1 * result, to=room_id, skip_sid=sid)
-            session.pop("name", default=None)
-            session.pop("room_id", default=None)
+        def end_game(data):
+            room_id = self.users[data["nadawca"]]
+            self.sio.emit("end_game", data["result"], to=room_id)
+            clients = self.rooms[room_id]["users"]
+            for client in clients:
+                self.users.pop(client["name"])
+                leave_room(room_id, sid=client["sid"])
             self.rooms.pop(room_id)
 
     def uruchom_gre(self, room_id):
-        sid = request.sid
         data = self.rooms[room_id]
         package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 1}
         package2 = {
@@ -112,102 +148,34 @@ class Server:
             "color": "blue",
             "id": 0,
         }
+        num = random.randint(0, 1)
         starting_state = create_state(
-            package1, data["users"][0], package2, data["users"][1]
+            package1,
+            data["users"][num]["name"],
+            package2,
+            data["users"][1 - num]["name"],
         )
         self.last_state = starting_state
-        name = session["name"]
-        if random.randint(1, 2) == 1:
-            if data["users"][0] == name:
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package1,
-                        data["users"][1]: package2,
-                        "users": [data["users"][0], data["users"][1]],
-                        "state": starting_state,
-                    },
-                    to=sid,
-                )
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package1,
-                        data["users"][1]: package2,
-                        "users": [data["users"][1], data["users"][0]],
-                        "state": starting_state,
-                    },
-                    to=room_id,
-                    skip_sid=sid,
-                )
-            else:
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package1,
-                        data["users"][1]: package2,
-                        "users": [data["users"][1], data["users"][0]],
-                        "state": starting_state,
-                    },
-                    to=sid,
-                )
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package1,
-                        data["users"][1]: package2,
-                        "users": [data["users"][0], data["users"][1]],
-                        "state": starting_state,
-                    },
-                    to=room_id,
-                    skip_sid=sid,
-                )
-
-        else:
-            if data["users"][0] == name:
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package2,
-                        data["users"][1]: package1,
-                        "users": [data["users"][0], data["users"][1]],
-                        "state": starting_state,
-                    },
-                    to=sid,
-                )
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package2,
-                        data["users"][1]: package1,
-                        "users": [data["users"][1], data["users"][0]],
-                        "state": starting_state,
-                    },
-                    to=room_id,
-                    skip_sid=sid,
-                )
-            else:
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package2,
-                        data["users"][1]: package1,
-                        "users": [data["users"][1], data["users"][0]],
-                        "state": starting_state,
-                    },
-                    to=sid,
-                )
-                emit(
-                    "start_game",
-                    {
-                        data["users"][0]: package2,
-                        data["users"][1]: package1,
-                        "users": [data["users"][0], data["users"][1]],
-                        "state": starting_state,
-                    },
-                    to=room_id,
-                    skip_sid=sid,
-                )
+        emit(
+            "start_game",
+            {
+                data["users"][num]["name"]: package1,
+                data["users"][1 - num]["name"]: package2,
+                "users": [data["users"][0]["name"], data["users"][1]["name"]],
+                "state": starting_state,
+            },
+            to=data["users"][0]["sid"],
+        )
+        emit(
+            "start_game",
+            {
+                data["users"][num]["name"]: package1,
+                data["users"][1 - num]["name"]: package2,
+                "users": [data["users"][1]["name"], data["users"][0]["name"]],
+                "state": starting_state,
+            },
+            to=data["users"][1]["sid"],
+        )
 
     @staticmethod
     def generate(length=4):
