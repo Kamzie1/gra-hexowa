@@ -23,7 +23,7 @@ class SideMenu:
         self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
         self.res_font = pygame.font.Font(join("Grafika/fonts", font), 10)
 
-        self.gold_icon = pygame.image.load(join("grafika", "złoto.png"))
+        self.gold_icon = pygame.image.load(join("Grafika", "złoto.png"))
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
 
         display = "Rekrutuj"

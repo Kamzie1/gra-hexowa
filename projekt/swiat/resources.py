@@ -26,7 +26,7 @@ class Resource:
 
     def display_gold(self, player, pos):
         # icon
-        image = pygame.image.load(join("grafika", "złoto.png"))
+        image = pygame.image.load(join("Grafika", "złoto.png"))
         rect = image.get_frect(topleft=(150, (resource_height - font_size) / 2))
         self.surf.blit(image, rect)
         # number
