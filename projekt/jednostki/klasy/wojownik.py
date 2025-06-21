@@ -11,12 +11,9 @@ class Wojownik:
         self._zdrowie = zdrowie
         self.morale = morale
         self.ruch = jednostka["ruch"]
-        self.przebicie = jednostka["przebicie"]
         self.pancerz = jednostka["pancerz"]
-        self.atak = jednostka["atak"]
-        self.koszt_ataku = jednostka["koszt_ataku"]
+        self.bronie = jednostka["bronie"]
         self.atak_points = jednostka["atak_points"]
-        self.range = jednostka["range"]
         self.kategoria = kategoria
         self.original_ruch = self.ruch
         self.original_zdrowie = self.zdrowie
@@ -49,7 +46,7 @@ class Wojownik:
         return stan_jednostki
 
     def display(self, id):
-        representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.atak} | {self.atak_points} | {self.range}"
+        representation = f"{self.name} ({id}) : {self.zdrowie} | {self.morale} | {self.ruch} | {self.bronie[0]["atak"]} | {self.atak_points} | {self.bronie[0]["range"]}"
         return representation
 
     def draw(self, pos, offset, screen):

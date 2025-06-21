@@ -274,11 +274,14 @@ class Mapa:
                     attackDisplay.show = False
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
-                    if not turn % 2 == id:
-                        return
+
                     if self.move_flag is None:
                         self.move_flag = tile.jednostka
-                        if not self.move_flag is None and tile.jednostka.owner_id == id:
+                        if (
+                            not self.move_flag is None
+                            and tile.jednostka.owner_id == id
+                            and turn % 2 == id
+                        ):
                             self.correct_moves = self.possible_moves(
                                 tile.x, tile.y, self.move_flag
                             )
@@ -311,7 +314,10 @@ class Mapa:
                                         )
                         else:
                             if not tile.jednostka is None:
-                                if tile.jednostka.owner_id == self.opponent.id:
+                                if (
+                                    tile.jednostka.owner_id == self.opponent.id
+                                    and self.move_flag.owner_id == self.player.id
+                                ):
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )

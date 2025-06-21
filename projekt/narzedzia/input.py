@@ -10,7 +10,7 @@ class Input:
         self.rect = self.surf.get_frect(topleft=pos)
         self.surf.fill(color)
         self.color = color
-        self.font = pygame.font.Font(join(folder_grafiki, font), 24)
+        self.font = pygame.font.Font(join("Grafika/fonts", font), 24)
         self.font_color = font_color
         self.message = message
         self._display = message

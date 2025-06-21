@@ -49,8 +49,8 @@ class Squad(pygame.sprite.Sprite):
     def range(self):
         max_range = -1
         for wojownik in self.wojownicy:
-            if wojownik.range > max_range:
-                max_range = wojownik.range
+            if wojownik.bronie[0]["range"] > max_range:
+                max_range = wojownik.bronie[0]["range"]
         return max_range
 
     def draw(self, screen):

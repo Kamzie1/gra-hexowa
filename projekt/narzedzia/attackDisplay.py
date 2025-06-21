@@ -133,7 +133,7 @@ class SurfAttack(SurfOddzialu):
             for surf in self.surfs:
                 if (
                     surf.rect.collidepoint(mouse_pos)
-                    and surf.jednostka.range >= self.distance
+                    and surf.jednostka.bronie[0]["range"] >= self.distance
                 ):
                     self.selected = surf.jednostka
                     surf.selected = True
@@ -148,7 +148,7 @@ class SurfAttack(SurfOddzialu):
         self.surf.blit(text, text_rect)
 
         for surf in self.surfs:
-            if surf.jednostka.range < self.distance:
+            if surf.jednostka.bronie[0]["range"] < self.distance:
                 surf.display(self.surf, self.pos, origin, "grey")
             else:
                 surf.display(self.surf, self.pos, origin, self.squad.color)
@@ -288,8 +288,10 @@ class WojownikSurfDefend(WojownikSurf):
     def event(self, selected, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
             if selected.atak_points > 0:
-                selected.atak_points -= selected.koszt_ataku
-                self.squad.zdrowie(self.poz, self.jednostka.zdrowie - selected.atak)
+                selected.atak_points -= selected.bronie[0]["koszt_ataku"]
+                self.squad.zdrowie(
+                    self.poz, self.jednostka.zdrowie - selected.bronie[0]["atak"]
+                )
 
 
 """

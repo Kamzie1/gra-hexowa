@@ -22,8 +22,9 @@ class SquadDisplay:
         y = int(self.width / 20) * 2
         i = 1
         for wojownik in squad.wojownicy:
-            self.display_wojownik(wojownik, (40, y), i, self.wojownik_font)
-            y = y + i * int(self.width / 30)
+            self.display_wojownik(
+                wojownik, (40, y + i * int(self.width / 20)), i, self.wojownik_font
+            )
             i += 1
         screen.blit(self.surf, self.rect)
         pygame.draw.rect(screen, squad.color, self.rect, 4)
