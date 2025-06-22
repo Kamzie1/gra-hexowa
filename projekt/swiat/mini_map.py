@@ -37,7 +37,7 @@ class Mini_map:
                 mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])
                 mapa.mapRect = mapa.mapSurf.get_frect(topleft=mapa.origin)
 
-    def draw(self, screen, origin, Tile_array, widok):
+    def draw(self, screen, origin, Tile_array, widok, widziane):
         self.refresh()
         self.origin = (
             -origin[0] / skala,
@@ -45,12 +45,15 @@ class Mini_map:
         )
         for tiles in Tile_array:
             for tile in tiles:
-                if widok[tile.x][tile.y] >= 0:
+                if widziane[tile.x][tile.y]:
                     self.rysuj(tile)
                     if not tile.budynek is None:
                         self.draw_budynek(tile.budynek)
+                if widok[tile.x][tile.y] >= 0:
                     if not tile.jednostka is None:
                         self.draw_squad(tile.jednostka.color, tile.pos)
+                elif widziane[tile.x][tile.y]:
+                    self.rysujChmure(tile)
         pygame.draw.rect(self.surf, mini_map_rect_color, self.rect, width=1)
         pygame.draw.rect(screen, "grey", self.mapRect, width=5)
         screen.blit(self.surf, self.mapRect)
@@ -65,6 +68,13 @@ class Mini_map:
         pos = obiekt.pos
         pos = (pos[0] / skala, pos[1] / skala)
         image = pygame.transform.scale_by(obiekt.image, 1.11111111 / skala)
+        rect = image.get_frect(center=pos)
+        self.surf.blit(image, rect)
+
+    def rysujChmure(self, obiekt):
+        pos = obiekt.pos
+        pos = (pos[0] / skala, pos[1] / skala)
+        image = pygame.transform.scale_by(obiekt.chmura_surf, 1.11111111 / skala)
         rect = image.get_frect(center=pos)
         self.surf.blit(image, rect)
 

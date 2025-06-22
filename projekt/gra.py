@@ -91,7 +91,11 @@ class Gra:
             "grey", self.screen, self.client.turn, self.player, self.opponent
         )
         self.mini_mapa.draw(
-            self.screen, self.mapa.origin, self.mapa.Tile_array, self.mapa.widok
+            self.screen,
+            self.mapa.origin,
+            self.mapa.Tile_array,
+            self.mapa.widok,
+            self.mapa.widziane,
         )
 
         if not self.mapa.move_flag is None:

@@ -31,9 +31,16 @@ class Tile(pygame.sprite.Sprite):
         self.koszt_ruchu = koszt_ruchu
         self.typ = typ
         self.widocznosc = widocznosc
+        self.chmura_surf = pygame.image.load(
+            "Grafika/tile-grafika/efekty hexów/chmura_weak2.png"
+        ).convert_alpha()
+        self.chmura_rect = self.chmura_surf.get_frect(center=self.pos)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+
+    def drawChmura(self, screen):
+        screen.blit(self.chmura_surf, self.chmura_rect)
 
 
 class Najechanie:
@@ -53,7 +60,9 @@ class Najechanie:
         self._origin = value
         self.rect = self.surf[0].get_frect(center=self.origin)
 
-    def update(self, mouse_pos, Tile_array, origin, player_id, opponent_id, widok):
+    def update(
+        self, mouse_pos, Tile_array, origin, player_id, opponent_id, widok, widziane
+    ):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
 
         for tiles in Tile_array:
@@ -61,7 +70,10 @@ class Najechanie:
                 if clicked(tile.pos, mouse_pos):
                     self.origin = tile.pos
                     if widok[tile.x][tile.y] < 0:
-                        self.flag = -1
+                        if widziane[tile.x][tile.y]:
+                            self.flag = 0
+                        else:
+                            self.flag = -1
                     elif tile.jednostka is None:
                         self.flag = 0
                     elif tile.jednostka.owner_id == player_id:

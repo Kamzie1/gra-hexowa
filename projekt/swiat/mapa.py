@@ -31,14 +31,13 @@ class Mapa:
             [-1 for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
         self.widziane = [
-            [0 for _ in range(map_tile_height)] for _ in range(map_tile_width)
+            [False for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
         self.load_tiles()
         self.move_group = pygame.sprite.Group()
         self.move_flag = None
         self.correct_moves = None
         self.army_group = pygame.sprite.Group()
-        self.podswietlenie_group = pygame.sprite.Group()
         self.widok_group = pygame.sprite.Group()
 
         self.player = player
@@ -92,6 +91,7 @@ class Mapa:
             self.player.id,
             self.opponent.id,
             self.widok,
+            self.widziane,
         )
 
     def update_based_mouse(self, mouse_pos):
@@ -267,7 +267,7 @@ class Mapa:
         return tablica_odwiedzonych
 
     def widok_jednostka(self, x, y, jednostka):
-        self.widziane[x][y] = 1
+        self.widziane[x][y] = True
         self.widok[x][y] = jednostka.wzrok
         queue = priority_queue()
         queue.append((x, y, jednostka.wzrok))
@@ -295,7 +295,7 @@ class Mapa:
                     wzrok
                     - self.Tile_array[x + sasiedzix[i]][y + sasiedziy[i]].widocznosc
                 )
-                self.widziane[x + sasiedzix[i]][y + sasiedziy[i]] = 1
+                self.widziane[x + sasiedzix[i]][y + sasiedziy[i]] = True
                 queue.append(
                     (
                         x + sasiedzix[i],
@@ -312,22 +312,22 @@ class Mapa:
             [-1 for _ in range(map_tile_width)] for _ in range(map_tile_height)
         ]
         for jednostka in self.army_group:
-            if jednostka.owner_id == self.player.id:
+            if jednostka.owner_id == self.player.id and jednostka.tile is not None:
                 self.widok_jednostka(jednostka.tile.x, jednostka.tile.y, jednostka)
 
     def draw(self, screen, flag):
         self.mapSurf.fill("black")
         for tile in self.tiles_group:
-            if self.widok[tile.x][tile.y] >= 0:
+            if self.widziane[tile.x][tile.y]:
                 tile.draw(self.mapSurf)
 
         for budynek in self.building_group:
-            if self.widok[budynek.tile.x][budynek.tile.y] > 0:
+            if self.widziane[budynek.tile.x][budynek.tile.y]:
                 budynek.draw(self.mapSurf)
 
-        for podswietlenie in self.podswietlenie_group:
-            if self.widok[budynek.tile.x][budynek.tile.y] > 0:
-                podswietlenie.draw(self.mapSurf)
+        for tile in self.tiles_group:
+            if self.widziane[tile.x][tile.y] == 1 and self.widok[tile.x][tile.y] < 0:
+                tile.drawChmura(self.mapSurf)
 
         if self.najechanie.flag != -1:
             self.mapSurf.blit(
@@ -385,10 +385,8 @@ class Mapa:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
                     attackDisplay.show = False
-                    if self.widok[tile.x][tile.y] >= 0:
-                        flag.klikniecie_flag = True
-                    else:
-                        flag.klikniecie_flag = False
+                    flag.klikniecie_falg = self.widziane[tile.x][tile.y]
+
                     self.klikniecie.origin = tile.pos
 
                     if self.move_flag is None:
@@ -419,7 +417,12 @@ class Mapa:
                             else:
                                 if tile.jednostka.owner_id == self.player.id:
                                     if not self.move_flag.tile == tile:
-                                        self.join(tile.jednostka, self.move_flag, tile)
+                                        try:
+                                            self.join(
+                                                tile.jednostka, self.move_flag, tile
+                                            )
+                                        except:
+                                            print("to many people in this squad")
                                 elif tile.jednostka.owner_id == self.opponent.id:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
@@ -479,14 +482,13 @@ class Mapa:
             self.player.gold -= self.player.frakcja["jednostka"][
                 self.move_flag.wojownicy[0].id
             ]["cost"]
-        except:
-            print("not enough money")
-        else:
             self.join(tile.jednostka, self.move_flag, tile)
+        except:
+            print("not enough money or cant join")
 
     def join(self, squad1, squad2, tile):
         if not self.validate_join(squad1, squad2):
-            return
+            raise ValueError
 
         squad2.ruch = self.correct_moves[tile.x][tile.y]
 
@@ -537,12 +539,8 @@ class Mapa:
         for jednostka in self.building_group:
             jednostka.kill()
 
-        for jednostka in self.podswietlenie_group:
-            jednostka.kill()
-
         self.army_group.empty()
         self.building_group.empty()
-        self.podswietlenie_group.empty()
 
         for tiles in self.Tile_array:
             for tile in tiles:
