@@ -7,7 +7,7 @@ class Display:
         self.surf = pygame.Surface((width, height), pygame.SRCALPHA)
         self.surf.fill((0, 0, 0, 0))
         self.rect = self.surf.get_rect(topleft=pos)
-        self.font = pygame.font.Font(join("grafika", font), font_size)
+        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
 
     def display(self, content, color, screen):
 
@@ -15,7 +15,6 @@ class Display:
         text = self.font.render(content, True, color)
         text_rect = text.get_frect(topleft=(5, 5))
         self.surf.blit(text, text_rect)
-        pygame.draw.rect(self.surf, "red", self.rect, 2)
         screen.blit(self.surf, self.rect)
 
 
