@@ -1,7 +1,3 @@
-import eventlet
-
-eventlet.monkey_patch()
-
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import Flask, request
 import random
@@ -12,7 +8,7 @@ import os
 class Server:
     def __init__(self) -> None:
         self.app = Flask(__name__)
-        self.sio = SocketIO(self.app, async_mode="eventlet")
+        self.sio = SocketIO(self.app)
         self.app.config["SECRET_KEY"] = "aiagfibogie"
         self._setup_events()
         self.rooms = {}
@@ -24,9 +20,9 @@ class Server:
         print("run started")
         self.sio.run(
             self.app,
-            host="::",
-            port=int(os.environ.get("PORT", 5000)),
-            debug=False,
+            host="0.0.0.0",
+            port=5000,
+            debug=True,
         )
 
     def _setup_events(self):
