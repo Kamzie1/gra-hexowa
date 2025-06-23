@@ -1,7 +1,12 @@
-from ..ustawienia import *
-from ..jednostki import *
-from ..narzedzia import pozycja_myszy_na_surface
-from .buttons import Recruit
+from projekt.ustawienia import (
+    menu_color,
+    menu_height,
+    menu_width,
+    menu_pos,
+    rec_panel_pos,
+)
+from projekt.narzedzia import pozycja_myszy_na_surface
+from .buttons import Recruit, TextButton, RekrutacjaShowButton, AkcjeShowButton
 import pygame
 from os.path import join
 
@@ -11,114 +16,172 @@ class SideMenu:
         self.surf = pygame.Surface((menu_width, menu_height), pygame.SRCALPHA)
         self.surf.fill(menu_color)
         self.rect = self.surf.get_frect(topleft=menu_pos)
-        self.player = mapa.player
-        self.group = mapa.army_group
-        self.button_group = pygame.sprite.Group()
-        self.recruit_group = pygame.sprite.Group()
         self.mapa = mapa
+        self.rekrutacja = PoleRekrutacji(
+            menu_width, menu_height, mapa, mapa.player, (0, 60)
+        )
+        self.akcje = Pole(menu_width, menu_height, mapa, mapa.player, (0, 60))
+        self.type = 0  # 0 to rekrutacja, 1 to akcje
 
-        self.recruit_surface = pygame.Surface((menu_width - 20, 300), pygame.SRCALPHA)
-        self.recruit_surface.fill((50, 50, 50, 70))
-        self.recruit_rec = self.recruit_surface.get_frect(topleft=rec_panel_pos)
-        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
-        self.res_font = pygame.font.Font(join("Grafika/fonts", font), 10)
-
-        self.gold_icon = pygame.image.load(join("grafika", "złoto.png"))
-        self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
-
-        display = "Rekrutuj"
-        text = self.font.render(display, True, "white")
-        text_rect = text.get_rect(topleft=(5, 5))
-        self.recruit_surface.blit(text, text_rect)
-
-        x, y = 5, 40
-        id = 0
-        for jednostka in self.player.frakcja["jednostka"]:
-            self.create_recruit_button(
-                jednostka,
-                id,
-                x,
-                y,
-                self.player.recruit_pos,
-                self.player.x,
-                self.player.y,
-            )
-            x += 95
-            id += 1
-            if x > menu_width - 25:
-                x = 5
-                y += 50
+        self.button_group = pygame.sprite.Group()
+        self.rekrutacjaButton = RekrutacjaShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (0, 10),
+            self.button_group,
+            "Rekrutuj",
+            "consolas.ttf",
+            28,
+            mapa.player.color,
+        )
+        self.akcjeButton = AkcjeShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (menu_width / 2 + 5, 10),
+            self.button_group,
+            "Akcje",
+            "consolas.ttf",
+            28,
+            mapa.player.color,
+        )
 
     def fill(self):
         self.surf.fill(menu_color)
 
     def event(self, mouse_pos, flag, turn, id):
-        mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
         if self.rect.collidepoint(mouse_pos) and flag.show:
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
             flag.klikniecie_flag = False
-            mouse_pos = pozycja_myszy_na_surface(mouse_pos, rec_panel_pos)
-            if turn % 2 == id:
-                for button in self.recruit_group:
-                    if button.rect.collidepoint(mouse_pos):
-                        button.click()
-
-    def draw(self, screen):
-        self.fill()
-        self.recruit_group.draw(self.recruit_surface)
-        self.surf.blit(self.recruit_surface, self.recruit_rec)
-        screen.blit(self.surf, self.rect)
-
-    def create_recruit_button(
-        self, jednostka, id, x, y, recruit_pos, miasto_x, miasto_y
-    ):
-        Recruit(
-            40,
-            40,
-            "red",
-            (x, y),
-            jednostka,
-            id,
-            self.group,
-            self.recruit_group,
-            recruit_pos,
-            self.player,
-            self.mapa,
-            miasto_x,
-            miasto_y,
-        )
-
-        self.gold_rect = self.scaled_gold_icon.get_frect(topleft=(x + 45, y + 5))
-        self.recruit_surface.blit(self.scaled_gold_icon, self.gold_rect)
-        display = f"{jednostka["cost"]}"
-        text = self.res_font.render(display, True, "white")
-        text_rect = text.get_rect(topleft=(x + 60, y + 10))
-        self.recruit_surface.blit(text, text_rect)
+            for button in self.button_group:
+                if button.rect.collidepoint(mouse_pos):
+                    self.type = button.click()
+                    return
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, (0, 60))
+            if self.type:
+                self.akcje.event(mouse_pos, turn, id)
+            else:
+                self.rekrutacja.event(mouse_pos, turn, id)
 
     def swap(self, player):
-        for button in self.recruit_group:
-            button.kill()
-        self.recruit_group.empty()
-
         for button in self.button_group:
             button.kill()
         self.button_group.empty()
 
-        self.recruit_surface.fill((50, 50, 50, 70))
-        display = "Rekrutuj"
-        text = self.font.render(display, True, "white")
-        text_rect = text.get_rect(topleft=(5, 5))
-        self.recruit_surface.blit(text, text_rect)
+        self.surf.fill((50, 50, 50, 70))
 
+        self.rekrutacja = PoleRekrutacji(
+            menu_width, menu_height, self.mapa, player, (0, 60)
+        )
+        self.akcje = Pole(menu_width, menu_height, self.mapa, player, (0, 60))
+
+        self.rekrutacjaButton = RekrutacjaShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (0, 10),
+            self.button_group,
+            "Rekrutuj",
+            "consolas.ttf",
+            28,
+            player.color,
+        )
+        self.akcjeButton = AkcjeShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (menu_width / 2 + 5, 10),
+            self.button_group,
+            "Akcje",
+            "consolas.ttf",
+            28,
+            player.color,
+        )
+
+    def draw(self, screen):
+        self.surf.fill(menu_color)
+        self.button_group.draw(self.surf)
+        if self.type:
+            self.akcje.draw(self.surf)
+            pygame.draw.line(
+                self.surf, (230, 230, 230), (0, 50), (menu_width / 2 + 5, 50)
+            )
+            pygame.draw.line(
+                self.surf,
+                (230, 230, 230),
+                (menu_width / 2 + 5, 50),
+                (menu_width / 2 + 5, 10),
+            )
+            pygame.draw.line(
+                self.surf, (230, 230, 230), (menu_width / 2 + 5, 10), (menu_width, 10)
+            )
+        else:
+            self.rekrutacja.draw(self.surf)
+            pygame.draw.line(
+                self.surf,
+                (230, 230, 230),
+                ((menu_width - 10) / 2, 50),
+                (menu_width, 50),
+            )
+            pygame.draw.line(
+                self.surf,
+                (230, 230, 230),
+                ((menu_width - 10) / 2, 50),
+                ((menu_width - 10) / 2, 10),
+            )
+            pygame.draw.line(
+                self.surf, (230, 230, 230), ((menu_width - 10) / 2, 10), (0, 10)
+            )
+        screen.blit(self.surf, self.rect)
+
+
+class Pole:
+    def __init__(self, w, h, mapa, player, pos):
+        self.surf = pygame.Surface((w, h), pygame.SRCALPHA)
+        self.rect = self.surf.get_frect(topleft=pos)
         self.player = player
-        x, y = 5, 40
+        self.mapa = mapa
+        self.button_group = pygame.sprite.Group()
+        self.setup()
+
+    def setup(self):
+        pass
+
+    def draw(self, screen):
+        self.surf.fill((0, 0, 0, 0))
+        for button in self.button_group:
+            button.draw(self.surf)
+        screen.blit(self.surf, self.rect)
+
+    def event(self, mouse_pos, turn, id):
+        if turn % 2 == id:
+            for button in self.button_group:
+                if button.rect.collidepoint(mouse_pos):
+                    button.click()
+
+
+class PoleRekrutacji(Pole):
+    def __init__(self, w, h, mapa, player, pos):
+        self.group = mapa.army_group
+        super().__init__(w, h, mapa, player, pos)
+
+    def setup(self):
+        x, y = 5, 5
         id = 0
         for jednostka in self.player.frakcja["jednostka"]:
-            self.create_recruit_button(
+            Recruit(
+                40,
+                40,
+                "red",
+                (x, y),
                 jednostka,
                 id,
-                x,
-                y,
+                self.group,
+                self.button_group,
                 self.player.recruit_pos,
+                self.player,
+                self.mapa,
                 self.player.x,
                 self.player.y,
             )

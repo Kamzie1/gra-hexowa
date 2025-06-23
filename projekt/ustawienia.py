@@ -54,7 +54,7 @@ budynek_img = "recruit_test2.png"
 rec_panel_pos = (10, 50)
 
 # side-menu
-menu_width = 300
+menu_width = Width / 4
 menu_height = Height
 menu_color = (0, 0, 0, 100)
 menu_pos = (0, 0 + resource_height)
