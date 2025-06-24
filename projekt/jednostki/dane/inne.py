@@ -1,2 +1,2 @@
-Oczy = 10
-Lornetka = 12
+Oczy = 15
+Lornetka = 20
