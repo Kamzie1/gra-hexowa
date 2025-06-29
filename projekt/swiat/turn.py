@@ -11,7 +11,10 @@ class Turn:
         self.drect = self.surf.get_frect(bottomright=(Width - 15, Height - 15))
 
     def event(self, mouse_pos, mapa, client):
-        if self.drect.collidepoint(mouse_pos) and client.turn % 2 == client.id:
+        if (
+            self.drect.collidepoint(mouse_pos)
+            and client.turn % len(client.users) == client.id
+        ):
             new_state = mapa.load_state()
             client.send_state(new_state)
 

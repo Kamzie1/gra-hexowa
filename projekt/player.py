@@ -1,16 +1,18 @@
 import pygame
+from projekt.jednostki import get_fraction
+from projekt.narzedzia import id_to_pos
 
 
 class Player:
-    def __init__(self, Frakcja, pos, x, y, id, name, color):
-        self.id = id
-        self.name = name
-        self._gold = 1000
-        self.frakcja = Frakcja
-        self.recruit_pos = pos
-        self.x = x
-        self.y = y
-        self.color = color
+    def __init__(self, user):
+        self.id = user["id"]
+        self.name = user["name"]
+        self._gold = user["gold"]
+        self.frakcja = get_fraction(user["fraction"])
+        self.recruit_pos = id_to_pos(user["x"], user["y"])
+        self.x = user["x"]
+        self.y = user["y"]
+        self.color = user["color"]
 
     @property
     def gold(self):

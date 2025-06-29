@@ -2,6 +2,7 @@ from projekt.ustawienia import FPS
 from projekt.network import Client
 from projekt.kolejka import Kolejka
 from projekt.pokoje import Pokoje
+from projekt.gra import Gra
 from sys import exit
 import pygame
 
@@ -9,40 +10,31 @@ import pygame
 class Main:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1000, 600))  # okienko
-        pygame.display.set_caption("Main")
-        self.screen.fill("white")
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.clock = pygame.time.Clock()
         self.client = Client()
         self.client.start()
         self.pokoje = Pokoje()
         self.kolejka = Kolejka()
+        self.gra_created = False
 
     def run(self):
         while True:
-            self.screen.fill("white")
-            self.event_handler()
             match (self.client.ekran):
                 case 0:
-                    self.pokoje.draw(self.screen)
+                    self.pokoje.run(self.screen, self.client)
                 case 1:
-                    self.kolejka.draw()
+                    self.kolejka.run(self.screen, self.client)
+                case 2:
+                    if not self.gra_created:
+                        gra = Gra(self.client)
+                        self.gra_created = True
+                        print("created game")
+                    gra.run(self.screen)
 
             pygame.display.update()  # odświeża display
 
             self.clock.tick(FPS)  # maks 60 FPS
-
-    def event_handler(self):
-        self.pokoje.game_event(self.client)
-        self.pokoje.error_event(self.client)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            self.pokoje.name_input.update(event)
-            self.pokoje.id_input.update(event)
-            self.pokoje.join_event(event, self.client)
-            self.pokoje.create_event(event, self.client)
 
 
 if __name__ == "__main__":

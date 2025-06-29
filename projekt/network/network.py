@@ -37,17 +37,21 @@ class Client:
         @self.sio.on("start_game")
         def start_game(data):
             print("start game")
-            self.info = data
-            self.names = data["users"]
+            self.users = data["users"]
+            self.turn = data["turn"]
             self.start_game = True
+            self.ekran = 2
             self.state = data["state"]
+            for user in self.users:
+                if user["name"] == self.name:
+                    self.id = user["id"]
 
         @self.sio.on("new_state")
         def import_state(data):
             print("got new state")
             self.state_loaded = False
             self.turn = data["turn"]
-            self.mapa.player.gold = data["players"][self.name]
+            self.mapa.player.gold = data["users"][self.id]["gold"]
             self.mapa.import_state(data["state"])
             if self.turn % 2 == self.mapa.player.id and self.turn != 1:
                 self.mapa.zarabiaj()
@@ -61,6 +65,10 @@ class Client:
             else:
                 self.koniecGry.display("Przegrałeś", self.mapa.player.color)
             self.name = None
+
+        @self.sio.on("ustawienia")
+        def ustawienia(room):
+            self.room = room
 
     def start(self, url="http://192.168.50.205:5000"):
         def run():
@@ -79,33 +87,35 @@ class Client:
 
     def test(self):
         def run():
-            try:
-                self.sio.connect(
-                    "http://localhost:5000",
-                    transports=["websocket"],
-                )
-                self.sio.wait()
-            except socketio.exceptions.ConnectionError as e:
-                print(f"cant connect with a server, {e}")
+            while True:
+                try:
+                    self.sio.connect(
+                        "http://localhost:5000",
+                        transports=["websocket"],
+                    )
+                    break
+                except socketio.exceptions.ConnectionError as e:
+                    print(f"cant connect with a server, {e}")
 
         threading.Thread(target=run, daemon=True).start()
 
     def stop(self):
         self.sio.disconnect()
 
-    @staticmethod
-    def handle_join(data):
+    def handle_join(self, data):
         if data.get("joined") == False:
             print("wrong room id or else")
         else:
-            print("joined")
+            self.ekran = 1
+            self.room = data["room"]
 
-    @staticmethod
-    def handle_create(data):
+    def handle_create(self, data):
         if data.get("created") == False:
             print("something went wrong")
         else:
-            print(f"created room: {data.get('id')}")
+            print(f"created room: {data["room"]["room_id"]}")
+            self.ekran = 1
+            self.room = data["room"]
 
     def join_room(self, id, name):
         if self.connected:
@@ -120,10 +130,16 @@ class Client:
             print("new name:", self.name)
 
     def send_state(self, state):
-        player = {"name": self.name, "gold": self.mapa.player.gold}
         self.sio.emit(
-            "new_state", {"state": state, "nadawca": self.name, "player": player}
+            "new_state",
+            {"state": state, "nadawca": self.name, "gold": self.mapa.player.gold},
         )
 
     def send_result(self, result):
         self.sio.emit("end_game", {"result": result, "nadawca": self.name})
+
+    def leave(self):
+        self.sio.emit("leave", self.name)
+
+    def ustawienia(self, ustawienia):
+        self.sio.emit("settings", {"settings": ustawienia, "nadawca": self.name})

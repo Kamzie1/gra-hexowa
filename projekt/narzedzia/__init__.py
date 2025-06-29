@@ -1,6 +1,6 @@
 from .narzedzia import *
 from .input import Input
-from .przycisk import Przycisk
+from .przycisk import Przycisk, PrzyciskReady, Switch, ColorSwitch
 from .priority_queue import priority_queue
 from .error_log import Error_log
 from .display import TurnDisplay, Display

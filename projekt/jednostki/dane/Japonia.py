@@ -98,3 +98,23 @@ Japonia = {
         },
     ],
 }
+
+
+Japonia2 = Japonia
+Japonia2["jednostka"].append(
+    {
+        "nazwa": "Kolumbryna2",
+        "zdrowie": 55,
+        "morale": 90,
+        "ruch": 6,
+        "bronie": [Kolumbryna],
+        "wzrok": Lornetka,
+        "pancerz": 2,
+        "atak_points": 8,
+        "red": "kolubryna.png",
+        "blue": "kolubryna.png",
+        "id": 2,
+        "cost": 300,
+        "kategoria": "jednostka",
+    },
+)
