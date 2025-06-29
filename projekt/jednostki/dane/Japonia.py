@@ -4,7 +4,7 @@ from .inne import *
 # Dane frakcji nr. 1
 
 
-# dane jednostek w schemacie słownika, dostęp do danych: Frakcja['typ jednostki']['id']['informacja'] np. Japonia['jednostki'][0]['zdrowie'] da nam 60
+# dane jednostek w schemacie słownika, dostęp do danych: Frakcja['typ jednostki']['id']['informacja'] np. Japonia['jednostki'][0]['zdrowie'] da nam 70
 
 Japonia = {
     "jednostka": [
@@ -76,7 +76,7 @@ Japonia = {
             "morale": 90,
             "ruch": 0,
             "bronie": [Kolumbryna],
-            "wzrok": Wieża_Obserwacyjna,
+            "wzrok": Lornetka,
             "pancerz": 10,
             "atak_points": 16,
             "red": "rec2.png",

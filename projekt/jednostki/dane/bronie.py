@@ -7,5 +7,8 @@ Katana = {
 
 Yumonji_Jari_2 = {"atak": 12, "przebicie": 10, "koszt_ataku": 3, "range": 1}
 
-Kolumbryna = {"atak": 15, "przebicie": 12, "koszt_ataku": 4, "range": 3}
+Kolumbryna = {"atak": 15, "przebicie": 12, "koszt_ataku": 4, "range": 7}
+
+Yari = {"atak": 30, "przebicie": 5, "koszt_atku": 10, "range": 1}
+
 Wlocznia = {"atak": 8, "przebicie": 8, "koszt_ataku": 3, "range": 1}
