@@ -8,66 +8,39 @@ Miasto = {
     "morale": 90,
 }
 
-starting_state = {"jednostki": [], "budynki": []}
 
-mapa = [[0 for _ in range(30)] for _ in range(30)]
-
-
-def get_miasto(package, owner):
+def get_miasto_jednostka(client, x, y):
     return {
-        "pos": id_to_pos(package["x"], package["y"]),
-        "x": package["x"],
-        "y": package["y"],
-        "owner": owner,
-        "owner_id": package["id"],
-        "color": package["color"],
+        "pos": id_to_pos(x, y),
+        "x": x,
+        "y": y,
+        "owner": client["name"],
+        "owner_id": client["id"],
+        "color": client["color"],
         "jednostki": [Miasto],
     }
 
 
-def miasto_tile(x, y, miasto):
+def miasto_tile(x, y, user):
     return {
-        "owner": miasto["owner"],
-        "owner_id": miasto["owner_id"],
+        "owner": user["name"],
+        "owner_id": user["id"],
         "pos": id_to_pos(x, y),
-        "color": miasto["color"],
+        "color": user["color"],
         "id": 0,  # tile miasta
     }
 
 
-def mark(x, y):
+def get_budynek_miasto(user, positions, starting_state):
+    x = user["x"]
+    y = user["y"]
+    starting_state["budynki"].append(miasto_tile(x, y, user))
     sasiedzix, sasiedziy = get_sasiedzi(x, y)
-    mapa[x][y] = 1
-    for j in range(6):
-        if x + sasiedzix[j] < 0 or x + sasiedzix[j] > 29:
-            continue
-        if y + sasiedziy[j] < 0 or y + sasiedziy[j] > 29:
-            continue
-        mapa[x + sasiedzix[j]][y + sasiedziy[j]] = 1
-
-
-def generate_space(x, y):
-    sasiedzix, sasiedziy = get_sasiedzi(x, y)
-    mapa[x][y] = 1
-    for i in range(6):
-        if x + sasiedzix[i] < 0 or x + sasiedzix[i] > 29:
-            continue
-        if y + sasiedziy[i] < 0 or y + sasiedziy[i] > 29:
-            continue
-        mark(x + sasiedzix[i], y + sasiedziy[i])
-
-
-def get_budynek_miasto(miasto):
-    x = miasto["x"]
-    y = miasto["y"]
-    starting_state["budynki"].append(miasto_tile(x, y, miasto))
-    sasiedzix, sasiedziy = get_sasiedzi(x, y)
-    generate_space(x, y)
     for i in range(6):
         starting_state["budynki"].append(
-            miasto_tile(x + sasiedzix[i], y + sasiedziy[i], miasto)
+            miasto_tile(x + sasiedzix[i], y + sasiedziy[i], user)
         )
-        generate_space(x + sasiedzix[i], y + sasiedziy[i])
+        positions.append((x + sasiedzix[i], y + sasiedziy[i]))
 
 
 def get_wioska(x, y):
@@ -80,21 +53,71 @@ def get_wioska(x, y):
     }
 
 
-def generate_wioski(num):
+def generate_wioski(num, positions, starting_state):
+    space = 4**2
+    max_powtorzen = 1000
     for _ in range(num):
+        powtorzenie = 0
+        x = 0
+        y = 0
+        flag = False
         while True:
-            x = random.randint(0, 29)
-            y = random.randint(0, 29)
-            if mapa[x][y] == 0:
+            flag = True
+            x = 1 + random.randint(0, 27)
+            y = 1 + random.randint(0, 27)
+            powtorzenie += 1
+            if powtorzenie > max_powtorzen:
+                return
+            for pos in positions:
+                if odl(x, y, pos[0], pos[1]) < space:
+                    flag = False
+                    break
+            if flag:
                 break
+
+        positions.append((x, y))
         starting_state["budynki"].append(get_wioska(x, y))
-        generate_space(x, y)
 
 
-def create_state(package1, user1, package2, user2):
-    starting_state["jednostki"].append(get_miasto(package1, user1))
-    starting_state["jednostki"].append(get_miasto(package2, user2))
-    for miasto in starting_state["jednostki"]:
-        get_budynek_miasto(miasto)
-    generate_wioski(15)
+def odl(x, y, x1, y1):
+    return (x - x1) ** 2 + (y - y1) ** 2
+
+
+def get_miasto(user, positions):
+    space = 10**2
+    powtorzenie = 0
+    max_powtorzen = 1000
+    x = 0
+    y = 0
+    flag = False
+    while True:
+        flag = True
+        x = 4 + random.randint(0, 21)
+        y = 4 + random.randint(0, 21)
+        powtorzenie += 1
+        for pos in positions:
+            if odl(x, y, pos[0], pos[1]) < space:
+                flag = False
+                break
+        if powtorzenie > max_powtorzen:
+            flag = True
+            print("za mało miejsca")
+        if flag:
+            break
+
+    user["x"] = x
+    user["y"] = y
+    positions.append((x, y))
+    return get_miasto_jednostka(user, x, y)
+
+
+def create_state(users, ustawienia):
+    starting_state = {"jednostki": [], "budynki": []}
+    pos = []
+    for user in users:
+        print(user)
+        user["gold"] = 1000
+        starting_state["jednostki"].append(get_miasto(user, pos))
+        get_budynek_miasto(user, pos, starting_state)
+    generate_wioski(ustawienia["wioski"], pos, starting_state)
     return starting_state
