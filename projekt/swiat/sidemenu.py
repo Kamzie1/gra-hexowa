@@ -60,7 +60,7 @@ class SideMenu:
             if turn % len(users) == id:
                 for button in self.recruit_group:
                     if button.rect.collidepoint(mouse_pos):
-                        button.click()
+                        button.click(id)
 
     def draw(self, screen):
         self.fill()

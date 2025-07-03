@@ -4,4 +4,4 @@ from .resources import Resource
 from .sidemenu import SideMenu
 from .tile import Najechanie, Ruch, Klikniecie, Podswietlenie
 from .turn import Turn
-from .buttons import Button, SquadButtonDisplay
+from .buttons import Button, SquadButtonDisplay, Exit

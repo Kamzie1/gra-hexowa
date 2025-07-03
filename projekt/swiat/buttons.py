@@ -49,11 +49,11 @@ class Recruit(Button):
         self.x = x
         self.y = y
 
-    def click(self):
+    def click(self, id):
         info = {}
         info["color"] = self.player.color
         info["owner"] = self.player.name
-        info["owner_id"] = self.player.id
+        info["owner_id"] = id
         info["pos"] = (5000, 5000)
         info["jednostki"] = []
         jednostka = self.jednostka
@@ -78,6 +78,17 @@ class Surrender(Button):
 
     def click(self, client):
         client.send_result(client.name)
+
+
+class Exit(Button):
+    def __init__(self, width, height, color, pos, button_group, image=None):
+        super().__init__(width, height, color, pos, button_group, image)
+
+    def click(self, client):
+        client.ekran = 0
+        client.name = None
+        client.id = None
+        client.leave()
 
 
 class SquadButtonDisplay:

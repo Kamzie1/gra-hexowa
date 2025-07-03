@@ -48,6 +48,7 @@ class Pokoje:
                     or self.name_input.display == self.name_input.message
                 ):
                     return
+
                 client.create_room(self.name_input.display)
 
     def exit_event(self, event):
@@ -65,6 +66,9 @@ class Pokoje:
     def event_handler(self, client):
         self.error_event(client)
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
             self.exit_event(event)
             self.name_input.update(event)
             self.id_input.update(event)

@@ -5,14 +5,20 @@ from projekt.narzedzia import id_to_pos
 
 class Player:
     def __init__(self, user):
-        self.id = user["id"]
-        self.name = user["name"]
-        self._gold = user["gold"]
-        self.frakcja = get_fraction(user["fraction"])
-        self.recruit_pos = id_to_pos(user["x"], user["y"])
-        self.x = user["x"]
-        self.y = user["y"]
-        self.color = user["color"]
+        if user["fraction"] == "Spectator":
+            self.name = user["name"]
+            self.frakcja = get_fraction(user["fraction"])
+            self.color = user["color"]
+            self.id = -1
+        else:
+            self.id = user["id"]
+            self.name = user["name"]
+            self._gold = user["gold"]
+            self.frakcja = get_fraction(user["fraction"])
+            self.recruit_pos = id_to_pos(user["x"], user["y"])
+            self.x = user["x"]
+            self.y = user["y"]
+            self.color = user["color"]
 
     @property
     def gold(self):

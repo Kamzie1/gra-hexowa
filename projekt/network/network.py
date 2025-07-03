@@ -38,6 +38,7 @@ class Client:
         def start_game(data):
             print("start game")
             self.users = data["users"]
+            self.spectators = data["spectators"]
             self.turn = data["turn"]
             self.start_game = True
             self.ekran = 2
@@ -45,26 +46,50 @@ class Client:
             for user in self.users:
                 if user["name"] == self.name:
                     self.id = user["id"]
+            for user in self.spectators:
+                if user["name"] == self.name:
+                    self.ekran = 3
 
         @self.sio.on("new_state")
         def import_state(data):
             print("got new state")
+            print(data["state"]["jednostki"])
+            self.users = data["users"]
+            self.state = data["state"]
+            print(self.users)
+            self.spectators = data["spectators"]
+            for user in data["users"]:
+                if user["name"] == self.name:
+                    self.id = user["id"]
+                    self.mapa.player.id = self.id
+                    self.ekran = 2
+
+            for user in data["spectators"]:
+                if user["name"] == self.name:
+                    self.id = -1
+                    self.mapa.player.id = self.id
+                    self.ekran = 3
             self.state_loaded = False
             self.turn = data["turn"]
-            self.mapa.player.gold = data["users"][self.id]["gold"]
-            self.mapa.import_state(data["state"])
-            if self.turn % 2 == self.mapa.player.id and self.turn != 1:
-                self.mapa.zarabiaj()
-                self.mapa.heal()
+            if self.ekran == 2:
+                self.mapa.player.gold = data["users"][self.id]["gold"]
+                if self.turn % len(
+                    self.users
+                ) == self.mapa.player.id and self.turn >= len(self.users):
+                    self.mapa.zarabiaj()
+                    self.mapa.heal()
+            self.mapa.import_state(self.state, self.users)
+
             self.state_loaded = True
 
         @self.sio.on("end_game")
         def end_game(result):
+            self.ekran = 3
+            self.id = -1
             if result == self.name:
                 self.koniecGry.display("Wygrałeś", self.mapa.player.color)
             else:
                 self.koniecGry.display("Przegrałeś", self.mapa.player.color)
-            self.name = None
 
         @self.sio.on("ustawienia")
         def ustawienia(room):

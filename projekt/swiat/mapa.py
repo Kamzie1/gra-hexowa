@@ -12,11 +12,11 @@ from projekt.narzedzia import (
     clicked,
     id_to_pos,
 )
-from projekt.jednostki import Squad, Miasto, Wioska, get_fraction
+from projekt.jednostki import Squad, Miasto, Wioska, get_fraction, Japonia
 
 
 class Mapa:
-    def __init__(self, miasto_pos, player, users, state):
+    def __init__(self, miasto_pos, player, users, state, czywidzi):
         self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[1] + srodek[1])
         self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
@@ -28,10 +28,11 @@ class Mapa:
             [None for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
         self.widok = [
-            [-1 for _ in range(map_tile_height)] for _ in range(map_tile_width)
+            [czywidzi - 1 for _ in range(map_tile_height)]
+            for _ in range(map_tile_width)
         ]
         self.widziane = [
-            [False for _ in range(map_tile_height)] for _ in range(map_tile_width)
+            [czywidzi for _ in range(map_tile_height)] for _ in range(map_tile_width)
         ]
         self.load_tiles()
         self.move_group = pygame.sprite.Group()
@@ -39,6 +40,7 @@ class Mapa:
         self.correct_moves = None
         self.army_group = pygame.sprite.Group()
         self.widok_group = pygame.sprite.Group()
+        self.czywidzi = czywidzi
 
         self.player = player
         self.users = users
@@ -67,7 +69,7 @@ class Mapa:
             ).convert_alpha(),
             (tile_width / 2, tile_height / 2),
         )
-        self.import_state(state)
+        self.import_state(state, self.users)
         self.calculate_widok()
 
     @property
@@ -309,7 +311,8 @@ class Mapa:
 
     def calculate_widok(self):
         self.widok = [
-            [-1 for _ in range(map_tile_width)] for _ in range(map_tile_height)
+            [self.czywidzi - 1 for _ in range(map_tile_width)]
+            for _ in range(map_tile_height)
         ]
         for jednostka in self.army_group:
             if jednostka.owner_id == self.player.id and jednostka.tile is not None:
@@ -364,7 +367,7 @@ class Mapa:
         screen.blit(self.mapSurf, self.mapRect)  # rysuje mapędd
 
     def event(
-        self, mouse_pos, flag, turn, squadDisplay, squadButtonDisplay, attackDisplay
+        self, mouse_pos, flag, turn, squadDisplay, squadButtonDisplay, attackDisplay, id
     ):
         if attackDisplay.show:
             if attackDisplay.rect.collidepoint(mouse_pos):
@@ -385,7 +388,7 @@ class Mapa:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
                     attackDisplay.show = False
-                    flag.klikniecie_falg = self.widziane[tile.x][tile.y]
+                    flag.klikniecie_flag = self.widziane[tile.x][tile.y]
 
                     self.klikniecie.origin = tile.pos
 
@@ -393,8 +396,8 @@ class Mapa:
                         self.move_flag = tile.jednostka
                         if (
                             not self.move_flag is None
-                            and tile.jednostka.owner_id == self.player.id
-                            and turn % len(self.users) == self.player.id
+                            and tile.jednostka.owner_id == id
+                            and turn % len(self.users) == id
                         ):
                             self.correct_moves = self.possible_moves(
                                 tile.x, tile.y, self.move_flag
@@ -408,12 +411,12 @@ class Mapa:
                             if self.move_flag.tile is None:
                                 if tile.jednostka is None:
                                     self.recruit(tile)
-                                elif tile.jednostka.owner_id == self.player.id:
+                                elif tile.jednostka.owner_id == id:
                                     self.recruit_join(tile)
                             elif tile.jednostka is None:
                                 self.move(tile)
                             else:
-                                if tile.jednostka.owner_id == self.player.id:
+                                if tile.jednostka.owner_id == id:
                                     if not self.move_flag.tile == tile:
                                         try:
                                             self.join(
@@ -421,7 +424,7 @@ class Mapa:
                                             )
                                         except:
                                             print("to many people in this squad")
-                                elif tile.jednostka.owner_id != self.player.id:
+                                elif tile.jednostka.owner_id != id:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )
@@ -430,10 +433,13 @@ class Mapa:
                                             self.move_flag, tile.jednostka, distance
                                         )
                         else:
-                            if not tile.jednostka is None:
+                            if (
+                                not tile.jednostka is None
+                                and turn % len(self.users) == id
+                            ):
                                 if (
-                                    tile.jednostka.owner_id != self.player.id
-                                    and self.move_flag.owner_id == self.player.id
+                                    tile.jednostka.owner_id != id
+                                    and self.move_flag.owner_id == id
                                 ):
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
@@ -533,7 +539,7 @@ class Mapa:
                     return tile
         return None
 
-    def import_state(self, state):
+    def import_state(self, state, users):
         for jednostka in self.building_group:
             jednostka.kill()
 
@@ -547,13 +553,16 @@ class Mapa:
 
         for jednostka in state["jednostki"]:
             tile = self.get_tile(jednostka["pos"])
-            frakcja = get_fraction(self.users[jednostka["owner_id"]]["fraction"])
+            print(state["jednostki"])
+            print(users)
+            print(jednostka["owner_id"])
+            frakcja = get_fraction(users[jednostka["owner_id"]]["fraction"])
             s = Squad(self.army_group, jednostka, tile, frakcja)
             tile.jednostka = s
 
         for budynek in state["budynki"]:
             tile = self.get_tile(budynek["pos"])
-            frakcja = get_fraction(self.users[budynek["owner_id"]]["fraction"])
+            frakcja = Japonia
             if budynek["id"] == 0:
                 b = Miasto(
                     self.building_group,

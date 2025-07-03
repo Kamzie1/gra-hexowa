@@ -68,6 +68,17 @@ class Kolejka:
                     y += 350
             else:
                 self.playerCard.draw(client.name, self.content)
+
+        for user in client.room["spectators"]:
+            if not user["name"] == client.name:
+                self.drawOpponentDisplay(x, y, user)
+                x += 250
+                if x > self.w:
+                    x = 0
+                    y += 350
+            else:
+                self.playerCard.draw(client.name, self.content)
+
         self.content.blit(self.opponents, self.opponents_rect)
 
     def leave_event(self, client, mouse_pos):
@@ -81,6 +92,9 @@ class Kolejka:
     def event_handler(self, client):
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if self.ready.rect.collidepoint(
                     pozycja_myszy_na_surface(
@@ -143,7 +157,8 @@ class PlayerCard:
         self.surf.fill((200, 200, 200))
         self.rect = self.surf.get_frect(topleft=(0, 0))
         self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", 20)
-        self.frakcje = ["Japonia", "Japonia2"]
+
+        self.frakcje = ["Japonia", "Japonia2", "Spectator"]
         self.colors = ["red", "blue"]
 
         self.fraction = 0
@@ -154,7 +169,7 @@ class PlayerCard:
         self.colorsButton = ColorSwitch(50, 50, (260, 0), self.colors)
 
     def draw(self, name, screen):
-
+        self.surf.fill((200, 200, 200))
         self.fractionButton.draw(self.fraction, self.surf)
         self.colorsButton.draw(self.color, screen)
 
