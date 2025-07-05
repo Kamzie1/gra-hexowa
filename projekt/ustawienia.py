@@ -13,12 +13,6 @@ Title = "Gra"
 
 FPS = 60
 
-# mapa
-Mapa_width = 3416
-Mapa_height = 2457
-map_tile_width = 30
-map_tile_height = 30
-
 mapa_x_offset = srodek[0]
 mapa_y_offset = srodek[1]
 
@@ -30,8 +24,6 @@ plik_mapy = "mapa_test.tmx"
 
 # mini_mapa
 skala = 10
-mini_width = Mapa_width / skala
-mini_height = Mapa_height / skala
 
 mini_map_pos = (Width, 0)
 

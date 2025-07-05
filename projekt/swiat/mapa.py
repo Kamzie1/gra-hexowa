@@ -13,26 +13,29 @@ from projekt.narzedzia import (
     id_to_pos,
 )
 from projekt.jednostki import Squad, Miasto, Wioska, get_fraction, Japonia
+from .tileproperties import tileproperties
 
 
 class Mapa:
-    def __init__(self, miasto_pos, player, users, state, czywidzi):
+    def __init__(
+        self, miasto_pos, player, users, state, czywidzi, mapa, map_width, map_height
+    ):
+        self.width = map_width
+        self.height = map_height
         self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[1] + srodek[1])
         self.origin1 = None
-        self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
+        self.Mapa_width, self.Mapa_height = oblicz_pos(map_width, map_height)
+        self.mapSurf = pygame.Surface((self.Mapa_width, self.Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
-        self.tmx = load_pygame(join("Grafika/mapa", plik_mapy))
+        self.mapa = mapa
         self.tiles_group = pygame.sprite.Group()
         self.building_group = pygame.sprite.Group()
-        self.Tile_array = [
-            [None for _ in range(map_tile_height)] for _ in range(map_tile_width)
-        ]
+        self.Tile_array = [[None for _ in range(map_width)] for _ in range(map_height)]
         self.widok = [
-            [czywidzi - 1 for _ in range(map_tile_height)]
-            for _ in range(map_tile_width)
+            [czywidzi - 1 for _ in range(map_height)] for _ in range(map_width)
         ]
         self.widziane = [
-            [czywidzi for _ in range(map_tile_height)] for _ in range(map_tile_width)
+            [czywidzi for _ in range(map_height)] for _ in range(map_height)
         ]
         self.load_tiles()
         self.move_group = pygame.sprite.Group()
@@ -134,39 +137,40 @@ class Mapa:
         # sprawdza, czy nie wychodzisz poza mapę
         if original_origin[0] + offset[0] > mapa_x_offset:
             return False
-        if original_origin[0] + offset[0] + Mapa_width < Width - mapa_x_offset:
+        if original_origin[0] + offset[0] + self.Mapa_width < Width - mapa_x_offset:
             return False
         if original_origin[1] + offset[1] > mapa_y_offset:
             return False
-        if original_origin[1] + offset[1] + Mapa_height < Height - mapa_y_offset:
+        if original_origin[1] + offset[1] + self.Mapa_height < Height - mapa_y_offset:
             return False
         return True
 
     def load_tiles(self):
-        # loaduje z tmx tilesy i przypisuje je do grupy
-        for layer in self.tmx.visible_layers:
-            if hasattr(layer, "data"):
-                for x, y, gid in layer.iter_data():
-                    pos = oblicz_pos(x, y)
-                    props = self.tmx.get_tile_properties_by_gid(gid)
-                    image = self.tmx.get_tile_image_by_gid(gid)
-                    tile = Tile(
-                        surf=image,
-                        x=x,
-                        y=y,
-                        pos=pos,
-                        group=self.tiles_group,
-                        id=x + 30 * y,
-                        koszt_ruchu=props["koszt_ruchu"],
-                        widocznosc=props["widocznosc"],
-                        typ=props["id"],
-                    )
+        x = 0
+        y = 0
+        for row in self.mapa:
+            for ident in row:
+                pos = oblicz_pos(x, y)
+                props = tileproperties[ident - 1]
+                tile = Tile(
+                    x=x,
+                    y=y,
+                    pos=pos,
+                    group=self.tiles_group,
+                    id=x + 30 * y,
+                    koszt_ruchu=props["koszt_ruchu"],
+                    widocznosc=props["widocznosc"],
+                    typ=props["typ"],
+                )
 
-                    self.Tile_array[x][y] = tile
+                self.Tile_array[x][y] = tile
+                x += 1
+                x %= self.width
+            y += 1
 
     def BFS(self, x1, y1, x2, y2):
         tablica_odwiedzonych = [
-            [0 for _ in range(map_tile_width)] for _ in range(map_tile_height)
+            [0 for _ in range(self.width)] for _ in range(self.height)
         ]
         tablica_odwiedzonych[x1][y1] = 1
         queue = Queue()
@@ -175,9 +179,9 @@ class Mapa:
             x, y = queue.pop()
             sasiedzix, sasiedziy = get_sasiedzi(x, y)
             for i in range(6):
-                if x + sasiedzix[i] >= map_tile_width or x + sasiedzix[i] < 0:
+                if x + sasiedzix[i] >= self.width or x + sasiedzix[i] < 0:
                     continue
-                if y + sasiedziy[i] >= map_tile_height or y + sasiedziy[i] < 0:
+                if y + sasiedziy[i] >= self.height or y + sasiedziy[i] < 0:
                     continue
                 if tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] > 0:
                     continue
@@ -198,7 +202,7 @@ class Mapa:
 
     def possible_moves(self, x, y, jednostka):
         tablica_odwiedzonych = [
-            [-1 for _ in range(map_tile_width)] for _ in range(map_tile_height)
+            [-1 for _ in range(self.width)] for _ in range(self.height)
         ]
         tablica_odwiedzonych[x][y] = jednostka.ruch
         queue = priority_queue()
@@ -207,9 +211,9 @@ class Mapa:
             x, y, ruch = queue.pop()
             sasiedzix, sasiedziy = get_sasiedzi(x, y)
             for i in range(6):
-                if x + sasiedzix[i] >= map_tile_width or x + sasiedzix[i] < 0:
+                if x + sasiedzix[i] >= self.width or x + sasiedzix[i] < 0:
                     continue
-                if y + sasiedziy[i] >= map_tile_height or y + sasiedziy[i] < 0:
+                if y + sasiedziy[i] >= self.height or y + sasiedziy[i] < 0:
                     continue
                 if tablica_odwiedzonych[x + sasiedzix[i]][y + sasiedziy[i]] >= 0:
                     continue
@@ -277,9 +281,9 @@ class Mapa:
             x, y, wzrok = queue.pop()
             sasiedzix, sasiedziy = get_sasiedzi(x, y)
             for i in range(6):
-                if x + sasiedzix[i] >= map_tile_width or x + sasiedzix[i] < 0:
+                if x + sasiedzix[i] >= self.width or x + sasiedzix[i] < 0:
                     continue
-                if y + sasiedziy[i] >= map_tile_height or y + sasiedziy[i] < 0:
+                if y + sasiedziy[i] >= self.height or y + sasiedziy[i] < 0:
                     continue
                 if (
                     self.widok[x + sasiedzix[i]][y + sasiedziy[i]]
@@ -311,8 +315,7 @@ class Mapa:
 
     def calculate_widok(self):
         self.widok = [
-            [self.czywidzi - 1 for _ in range(map_tile_width)]
-            for _ in range(map_tile_height)
+            [self.czywidzi - 1 for _ in range(self.width)] for _ in range(self.height)
         ]
         for jednostka in self.army_group:
             if jednostka.owner_id == self.player.id and jednostka.tile is not None:

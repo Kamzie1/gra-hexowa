@@ -37,6 +37,9 @@ class Client:
         @self.sio.on("start_game")
         def start_game(data):
             print("start game")
+            self.map = data["mapa"]
+            self.width = data["ustawienia"]["width"]
+            self.height = data["ustawienia"]["height"]
             self.users = data["users"]
             self.spectators = data["spectators"]
             self.turn = data["turn"]

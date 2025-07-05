@@ -4,7 +4,9 @@ from os.path import join
 
 
 class Mini_map:
-    def __init__(self, miasto_pos):
+    def __init__(self, miasto_pos, Mapa_width, Mapa_height):
+        self.mini_width = Mapa_width / skala
+        self.mini_height = Mapa_height / skala
         self.surf = pygame.Surface((Mapa_width / skala, Mapa_height / skala))
         self.mapRect = self.surf.get_frect(topright=mini_map_pos)
 
@@ -31,7 +33,7 @@ class Mini_map:
             mouse_pos = pygame.mouse.get_pos()
             if self.mapRect.collidepoint(mouse_pos):
                 pos_y = mouse_pos[1] - mini_map_pos[1]
-                pos_x = mouse_pos[0] + mini_width - mini_map_pos[0]
+                pos_x = mouse_pos[0] + self.mini_width - mini_map_pos[0]
                 mapa_pos_y = pos_y * skala
                 mapa_pos_x = pos_x * skala
                 mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])

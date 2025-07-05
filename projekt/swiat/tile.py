@@ -7,7 +7,6 @@ from ..ustawienia import folder_grafiki, tile_height, tile_width
 class Tile(pygame.sprite.Sprite):
     def __init__(
         self,
-        surf,
         x,
         y,
         pos,
@@ -22,7 +21,9 @@ class Tile(pygame.sprite.Sprite):
         super().__init__(group)
         self.x = x
         self.y = y
-        self.image = surf
+        self.surf = pygame.image.load("Grafika/mapa/tile-set.png").convert_alpha()
+        self.image = pygame.Surface((tile_width, tile_height), pygame.SRCALPHA)
+        self.image.blit(self.surf, (-typ * tile_width, 0))
         self.rect = self.image.get_frect(center=pos)
         self.id = id
         self.budynek = budynek

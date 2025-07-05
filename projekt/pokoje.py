@@ -65,12 +65,13 @@ class Pokoje:
 
     def event_handler(self, client):
         self.error_event(client)
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             self.exit_event(event)
-            self.name_input.update(event)
-            self.id_input.update(event)
+            self.name_input.update(event, mouse_pos)
+            self.id_input.update(event, mouse_pos)
             self.join_event(event, client)
             self.create_event(event, client)

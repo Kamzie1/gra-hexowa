@@ -23,10 +23,19 @@ class Gra:
                 self.player = Player(user)
         # obiekty
         self.clock = pygame.time.Clock()
-        self.mini_mapa = Mini_map(self.player.recruit_pos)
         self.attackDisplay = AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
         self.mapa = Mapa(
-            self.player.recruit_pos, self.player, client.users, client.state, 0
+            self.player.recruit_pos,
+            self.player,
+            client.users,
+            client.state,
+            0,
+            client.map,
+            client.width,
+            client.height,
+        )
+        self.mini_mapa = Mini_map(
+            self.player.recruit_pos, self.mapa.Mapa_width, self.mapa.Mapa_height
         )
         self.resource = Resource()
         self.turn = Turn()
@@ -91,8 +100,6 @@ class Gra:
             self.client.koniecGry.draw(screen)
 
     def event_handler(self):
-        if self.mapa.Tile_array[self.player.x][self.player.y].jednostka is None:
-            self.client.send_result(self.client.name)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

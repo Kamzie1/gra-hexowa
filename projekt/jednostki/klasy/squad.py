@@ -114,10 +114,12 @@ class Squad(pygame.sprite.Sprite):
         representation = f"Oddział ({id}): {self.owner} | {self.ruch}"
         return representation
 
-    def zdrowie(self, id, value):
+    def zdrowie(self, id, value, client):
         try:
             self.wojownicy[id].zdrowie = value
         except ValueError:
+            if self.wojownicy[id].jednostka["nazwa"] == "Miasto":
+                client.send_result(self.wojownicy[id].owner)
             self.wojownicy.remove(self.wojownicy[id])
             if len(self.wojownicy) == 0:
                 self.kill()

@@ -38,13 +38,14 @@ class AttackDisplay:
 
         screen.blit(self.surf, self.rect)
 
-    def event(self, mouse_pos):
+    def event(self, mouse_pos, client):
         self.attackers_surfs.event(
             pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y)),
         )
         self.defenders_surfs.event(
             pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y)),
             self.attackers_surfs.selected,
+            client,
         )
 
 
@@ -198,7 +199,7 @@ class SurfDefend(SurfOddzialu):
             )
         screen.blit(self.surf, self.rect)
 
-    def event(self, mouse_pos, selected):
+    def event(self, mouse_pos, selected, client):
         flag = True
         if selected is None:
             return
@@ -208,6 +209,7 @@ class SurfDefend(SurfOddzialu):
                 surf.event(
                     selected,
                     pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y)),
+                    client,
                 )
                 if not surf.budynek is None:
                     flag = True
@@ -285,12 +287,14 @@ class WojownikSurfDefend(WojownikSurf):
         screen.blit(self.surf, self.rect)
         pygame.draw.rect(screen, color, self.rect, 1)
 
-    def event(self, selected, mouse_pos):
+    def event(self, selected, mouse_pos, client):
         if self.rect.collidepoint(mouse_pos):
             if selected.atak_points > 0:
                 selected.atak_points -= selected.bronie[0]["koszt_ataku"]
                 self.squad.zdrowie(
-                    self.poz, self.jednostka.zdrowie - selected.bronie[0]["atak"]
+                    self.poz,
+                    self.jednostka.zdrowie - selected.bronie[0]["atak"],
+                    client,
                 )
 
 

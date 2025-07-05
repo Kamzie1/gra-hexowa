@@ -1,5 +1,5 @@
 from .narzedzia import *
-from .input import Input
+from .input import Input, IntInput
 from .przycisk import Przycisk, PrzyciskReady, Switch, ColorSwitch
 from .priority_queue import priority_queue
 from .error_log import Error_log

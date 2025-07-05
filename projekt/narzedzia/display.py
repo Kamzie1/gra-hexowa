@@ -23,6 +23,10 @@ class TurnDisplay(Display):
         super().__init__(width, height, pos, font, font_size)
 
     def display(self, color, screen, turn, users):
-        text = f"{users[turn % len(users)]["name"]}"
-        content = f"{turn//len(users) +1}     " + text
+        if len(users) == 0:
+            text = "Koniec Gry"
+            content = f"{turn +1}     " + text
+        else:
+            text = f"{users[turn % len(users)]["name"]}"
+            content = f"{turn//len(users) +1}     " + text
         super().display(content, color, screen)

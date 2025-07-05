@@ -29,9 +29,9 @@ class Input:
         text_rect = text.get_rect(topleft=(5, 5))
         self.surf.blit(text, text_rect)
 
-    def update(self, event):
+    def update(self, event, mouse_pos):
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            if self.rect.collidepoint(pygame.mouse.get_pos()):
+            if self.rect.collidepoint(mouse_pos):
                 self.active = True
             else:
                 self.active = False
@@ -53,3 +53,31 @@ class Input:
         text_rect = text.get_rect(topleft=(5, 5))
         self.surf.blit(text, text_rect)
         screen.blit(self.surf, self.rect)
+
+
+class IntInput(Input):
+    def __init__(self, width, height, pos, color, font_color, message):
+        super().__init__(width, height, pos, color, font_color, message)
+
+    def draw(self, screen):
+        self.surf.fill(self.color)
+        if self.active:
+            pygame.draw.rect(self.surf, "black", self.surf.get_rect(), 2)
+        text = self.font.render(self.display, True, self.font_color)
+        text_rect = text.get_rect(topleft=(5, 5))
+        self.surf.blit(text, text_rect)
+        screen.blit(self.surf, self.rect)
+
+    def update(self, event, mouse_pos):
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            if self.rect.collidepoint(mouse_pos):
+                self.active = True
+            else:
+                self.active = False
+        elif event.type == pygame.KEYDOWN and self.active:
+            if event.key == pygame.K_BACKSPACE:
+                self.display = self.display[:-1]
+                if len(self.display) == 0:
+                    self.display = "0"
+            elif event.unicode.isdigit():
+                self.display += event.unicode

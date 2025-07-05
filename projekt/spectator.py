@@ -31,9 +31,18 @@ class Spectator:
                 self.player = Player(user)
         # obiekty
         self.clock = pygame.time.Clock()
-        self.mini_mapa = Mini_map(srodek)
         self.attackDisplay = AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
-        self.mapa = Mapa(srodek, self.player, client.users, client.state, 1)
+        self.mapa = Mapa(
+            srodek,
+            self.player,
+            client.users,
+            client.state,
+            1,
+            client.map,
+            client.width,
+            client.height,
+        )
+        self.mini_mapa = Mini_map(srodek, self.mapa.Mapa_width, self.mapa.Mapa_height)
         self.button_group = pygame.sprite.Group()
         self.exit = Exit(50, 50, "red", (5, 5), self.button_group)
         self.flag = Flag()

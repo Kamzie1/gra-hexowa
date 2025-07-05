@@ -6,8 +6,10 @@ from projekt.narzedzia import (
     Display,
     Switch,
     ColorSwitch,
+    IntInput,
 )
 from projekt.ustawienia import Width, Height, srodek
+import random
 
 
 class Kolejka:
@@ -26,10 +28,11 @@ class Kolejka:
         self.content_rect = self.content.get_frect(center=srodek)
         self.room_id = Display(400, 50, (srodek[0] - 200, 5), "consolas.ttf", 34)
         self.playerCard = PlayerCard()
+        self.ustawienia = Ustawienia()
 
         # surface
-        self.opponents = pygame.Surface((self.w + self.w / 3, self.h))
-        self.opponents_rect = self.opponents.get_frect(topleft=(self.w / 3 * 2, 0))
+        self.opponents = pygame.Surface((self.w - 30, self.h))
+        self.opponents_rect = self.opponents.get_frect(topleft=(self.w / 2 + 30, 0))
 
     def run(self, screen, client):
         self.event_handler(client)
@@ -40,6 +43,7 @@ class Kolejka:
         self.content.fill("white")
 
         self.displayPlayers(client)
+        self.ustawienia.draw(self.content, client.room)
 
         pygame.draw.line(
             self.content,
@@ -91,23 +95,33 @@ class Kolejka:
 
     def event_handler(self, client):
         mouse_pos = pygame.mouse.get_pos()
+        mouse_pos = pozycja_myszy_na_surface(
+            mouse_pos, (self.content_rect.x, self.content_rect.y)
+        )
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                if self.ready.rect.collidepoint(
-                    pozycja_myszy_na_surface(
-                        mouse_pos, (self.content_rect.x, self.content_rect.y)
-                    )
+            if self.ustawienia.rect.collidepoint(mouse_pos):
+                mouse_pos = pozycja_myszy_na_surface(
+                    mouse_pos, (self.ustawienia.rect.x, self.ustawienia.rect.y)
+                )
+                self.ustawienia.wioski.update(event, mouse_pos)
+                self.ustawienia.gold.update(event, mouse_pos)
+                if (
+                    event.type == pygame.MOUSEBUTTONUP
+                    and event.button == 1
+                    and self.ustawienia.mapaSwitch.rect.collidepoint(mouse_pos)
                 ):
+                    self.ustawienia.map_id += 1
+                    self.ustawienia.map_id %= len(self.ustawienia.maps)
+                client.ustawienia(self.load_ustawienia())
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if self.ready.rect.collidepoint(mouse_pos):
                     print("click")
                     self.ready.click()
                     client.ustawienia(self.load_ustawienia())
-                self.leave_event(client, mouse_pos)
-                mouse_pos = pozycja_myszy_na_surface(
-                    mouse_pos, (self.content_rect.x, self.content_rect.y)
-                )
+                self.leave_event(client, pygame.mouse.get_pos())
                 if self.playerCard.colorsButton.rect.collidepoint(mouse_pos):
                     self.playerCard.color += 1
                     self.playerCard.color %= len(self.playerCard.colors)
@@ -121,11 +135,13 @@ class Kolejka:
     def load_ustawienia(self):
         return {
             "ustawienia": {
-                "mapa": "mapa_test1",
-                "width": 30,
-                "height": 30,
+                "map_id": self.ustawienia.map_id,
+                "mapa": self.ustawienia.maps[self.ustawienia.map_id],
+                "width": self.ustawienia.size[self.ustawienia.map_id][0],
+                "height": self.ustawienia.size[self.ustawienia.map_id][1],
                 "rivers": 2,
-                "wioski": 15,
+                "wioski": int(self.ustawienia.wioski.display),
+                "gold": int(self.ustawienia.gold.display),
                 "space-between": 10,
                 "from-border": 5,
             },
@@ -182,3 +198,29 @@ class PlayerCard:
 
         if self.color is not None:
             pygame.draw.rect(screen, self.colors[self.color], self.rect, width=3)
+
+
+class Ustawienia:
+    def __init__(self):
+        self.surf = pygame.Surface((Width / 7, Height / 2))
+        self.rect = self.surf.get_frect(topright=(Width / 1.5, 0))
+        self.wioskiLabel = Display(Width / 8, 50, (0, 0), "consolas.ttf", 32)
+        self.wioski = IntInput(Width / 8, 50, (0, 60), "grey", "black", "15")
+        self.goldLabel = Display(Width / 8, 50, (0, 120), "consolas.ttf", 32)
+        self.gold = IntInput(Width / 8, 50, (0, 180), "grey", "black", "1000")
+        self.maps = ["mapa1(30x30)", "mapa2(10x10)", "mapa3(40x40)", "random"]
+        self.size = [(30, 30), (10, 10), (40, 40), (0, 0)]
+        self.map_id = 0
+        self.mapaSwitch = Switch(Width / 8, 50, (Width / 8, 360), self.maps)
+
+    def draw(self, screen, room):
+        self.map_id = room["ustawienia"]["map_id"]
+        self.wioski.display = str(room["ustawienia"]["wioski"])
+        self.gold.display = str(room["ustawienia"]["gold"])
+        self.surf.fill("white")
+        self.wioskiLabel.display("Wioski:", "black", self.surf)
+        self.wioski.draw(self.surf)
+        self.goldLabel.display("Złoto:", "black", self.surf)
+        self.gold.draw(self.surf)
+        self.mapaSwitch.draw(self.map_id, self.surf)
+        screen.blit(self.surf, self.rect)
