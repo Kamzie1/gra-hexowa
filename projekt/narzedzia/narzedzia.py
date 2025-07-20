@@ -69,3 +69,7 @@ def id_to_pos(x, y):
             y * tile_height / 4 * 3 + tile_height / 2,
         )
     return pos
+
+
+def calc_scaled_offset(offset, pos, skala):
+    return (pos[0] + offset[0] * skala, pos[1] + offset[1] * skala)

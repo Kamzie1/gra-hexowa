@@ -1,7 +1,15 @@
 import pygame
 from sys import exit
 from projekt.ustawienia import *  # plik z ustawieniami
-from projekt.swiat import Mapa, Mini_map, Resource, SideMenu, Turn, SquadButtonDisplay
+from projekt.swiat import (
+    Mapa,
+    Mini_map,
+    Resource,
+    SideMenu,
+    Turn,
+    SquadButtonDisplay,
+    Rotate,
+)
 from projekt.player import Player
 from projekt.narzedzia import (
     oblicz_pos,
@@ -56,8 +64,9 @@ class Gra:
         )
         self.squadDisplay = SquadDisplay(Width / 2, Height / 2, srodek, "black")
         self.DisplaySquadButton = SquadButtonDisplay(
-            80, 80, "blue", (srodek[0], Height - 50)
+            80, 80, "blue", (srodek[0] - 50, Height - 50)
         )
+        self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
 
     # metoda uruchamiająca grę
     def run(self):
@@ -76,6 +85,8 @@ class Gra:
             self.clock.tick(FPS)
 
     def update(self):
+        if self.squadDisplay.show:
+            self.squadDisplay.update(pygame.mouse.get_pos())
         self.mapa.update()
         self.mini_mapa.update(self.mapa)
 
@@ -96,6 +107,8 @@ class Gra:
             self.screen.blit(
                 self.DisplaySquadButton.image, self.DisplaySquadButton.rect
             )
+            if self.mapa.player.id == self.mapa.move_flag.owner_id:
+                self.screen.blit(self.rotateButton.image, self.rotateButton.rect)
         if self.attackDisplay.show:
             self.attackDisplay.display(self.screen)
 
@@ -129,6 +142,7 @@ class Gra:
                     self.squadDisplay,
                     self.DisplaySquadButton,
                     self.attackDisplay,
+                    self.rotateButton,
                 )
 
                 self.turn.event(mouse_pos, self.mapa, self.client)
@@ -138,6 +152,14 @@ class Gra:
                 self.DisplaySquadButton.event(
                     mouse_pos, self.squadDisplay, self.mapa.move_flag
                 )
+                self.rotateButton.event(
+                    self.mapa.move_flag, mouse_pos, self.mapa.player.id
+                )
+
+                if self.squadDisplay.show:
+                    self.squadDisplay.event(
+                        mouse_pos, self.mapa.move_flag, self.mapa.player.id, self.mapa
+                    )
 
 
 if __name__ == "__main__":

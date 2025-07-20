@@ -16,7 +16,7 @@ class Resource:
             50,
             50,
             "blue",
-            (10,0),
+            (10, 0),
             self.button_group,
         )
         Surrender(50, 50, "yellow", (70, 0), self.button_group)
@@ -30,7 +30,7 @@ class Resource:
         rect = image.get_frect(topleft=(150, (resource_height - font_size) / 2))
         self.surf.blit(image, rect)
         # number
-        display = f"{player.gold} "
+        display = f"{player.gold} (+{player.zloto_income})"
         text = self.font.render(display, True, font_color)
         text_rect = text.get_rect(topleft=pos)
         self.surf.blit(text, text_rect)

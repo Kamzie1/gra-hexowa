@@ -1,7 +1,7 @@
 import pygame
 from os.path import join
 from .miasto import Miasto
-from projekt.swiat.tile import Podswietlenie
+from .podswietlenie import Podswietlenie
 
 
 class Wioska(Miasto):

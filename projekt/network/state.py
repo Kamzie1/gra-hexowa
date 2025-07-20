@@ -6,6 +6,8 @@ Miasto = {
     "kategoria": "specjalne",
     "zdrowie": 500,
     "morale": 90,
+    "array_pos": 3,
+    "ruch": 0,
 }
 
 starting_state = {"jednostki": [], "budynki": []}

@@ -35,6 +35,8 @@ class Mapa:
 
         self.player = player
         self.opponent = opponent
+        self.mnoznik_zlota = 1
+        self.split = None
 
         self.najechanie = Najechanie(
             pygame.image.load(
@@ -251,8 +253,17 @@ class Mapa:
             self.move_group.draw(self.mapSurf)
 
     def event(
-        self, mouse_pos, flag, turn, id, squadDisplay, squadButtonDisplay, attackDisplay
+        self,
+        mouse_pos,
+        flag,
+        turn,
+        id,
+        squadDisplay,
+        squadButtonDisplay,
+        attackDisplay,
+        rotateButton,
     ):
+        failed = False
         if attackDisplay.show:
             if attackDisplay.rect.collidepoint(mouse_pos):
                 attackDisplay.event(mouse_pos)
@@ -264,6 +275,8 @@ class Mapa:
 
         if not self.move_flag is None:
             if squadButtonDisplay.rect.collidepoint(mouse_pos):
+                return
+            if rotateButton.rect.collidepoint(mouse_pos):
                 return
 
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, self.origin)
@@ -303,7 +316,12 @@ class Mapa:
                             else:
                                 if tile.jednostka.owner_id == self.player.id:
                                     if not self.move_flag.tile == tile:
-                                        self.join(tile.jednostka, self.move_flag, tile)
+                                        try:
+                                            self.join(
+                                                tile.jednostka, self.move_flag, tile
+                                            )
+                                        except:
+                                            pass
                                 elif tile.jednostka.owner_id == self.opponent.id:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
@@ -325,15 +343,28 @@ class Mapa:
                                         attackDisplay.update(
                                             self.move_flag, tile.jednostka, distance
                                         )
+                                    else:
+                                        failed = True
+                                else:
+                                    failed = True
+                            else:
+                                failed = True
                         flag.klikniecie_flag = False
+                        if self.split is not None and failed:
+                            self.move_flag.kill()
                         self.move_flag = None
                         squadDisplay.show = False
                         self.correct_moves = None
+                        self.split = None
                         for tile in self.move_group:
                             tile.kill()
 
     def move(self, tile):
-        self.move_flag.tile.jednostka = None
+        if self.split is None:
+            self.move_flag.tile.jednostka = None
+        else:
+            self.move_flag.tile.jednostka.wojownicy[self.split] = None
+            print(self.move_flag.tile.jednostka)
         self.move_flag.pos = tile.pos
         self.move_flag.tile = tile
         self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
@@ -343,11 +374,12 @@ class Mapa:
             tile.budynek.own(
                 self.move_flag.owner, self.move_flag.owner_id, self.move_flag.color
             )
+            self.calculate_income()
 
     def recruit(self, tile):
         try:
             self.player.gold -= self.player.frakcja["jednostka"][
-                self.move_flag.wojownicy[0].id
+                self.move_flag.wojownicy[3].id
             ]["cost"]
         except:
             print("not enough money")
@@ -360,16 +392,19 @@ class Mapa:
     def recruit_join(self, tile):
         try:
             self.player.gold -= self.player.frakcja["jednostka"][
-                self.move_flag.wojownicy[0].id
+                self.move_flag.wojownicy[3].id
             ]["cost"]
         except:
             print("not enough money")
         else:
-            self.join(tile.jednostka, self.move_flag, tile)
+            try:
+                self.join(tile.jednostka, self.move_flag, tile)
+            except:
+                pass
 
     def join(self, squad1, squad2, tile):
         if not self.validate_join(squad1, squad2):
-            return
+            raise ValueError
 
         squad2.ruch = self.correct_moves[tile.x][tile.y]
 
@@ -380,7 +415,15 @@ class Mapa:
         squad2.kill()
 
     def validate_join(self, squad1, squad2):
-        if len(squad1.wojownicy) + len(squad2.wojownicy) > 5:
+        none_count = 0
+        not_none_count = 0
+        for wojownik in squad1.wojownicy:
+            if wojownik is None:
+                none_count += 1
+        for wojownik in squad2.wojownicy:
+            if wojownik is not None:
+                not_none_count += 1
+        if 7 - none_count + not_none_count > 5:
             return False
         return True
 
@@ -464,10 +507,20 @@ class Mapa:
 
             tile.budynek = b
 
+        self.calculate_income()
+
     def zarabiaj(self):
         for budynek in self.building_group:
             if isinstance(budynek, Miasto):
-                budynek.zarabiaj(self.player)
+                budynek.zarabiaj(self.player, self.mnoznik_zlota)
+            else:
+                print("to nie budynek")
+
+    def calculate_income(self):
+        self.player.zloto_income = 0
+        for budynek in self.building_group:
+            if isinstance(budynek, Miasto) and budynek.owner_id == self.player.id:
+                self.player.zloto_income += budynek.earn["gold"] * self.mnoznik_zlota
             else:
                 print("to nie budynek")
 

@@ -11,6 +11,7 @@ class Player:
         self.x = x
         self.y = y
         self.color = color
+        self.zloto_income = 7 * self.frakcja["budynek"][0]["earn"]["gold"]
 
     @property
     def gold(self):

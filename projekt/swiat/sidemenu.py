@@ -6,7 +6,14 @@ from projekt.ustawienia import (
     rec_panel_pos,
 )
 from projekt.narzedzia import pozycja_myszy_na_surface
-from .buttons import Recruit, TextButton, RekrutacjaShowButton, AkcjeShowButton
+from .buttons import (
+    Recruit,
+    TextButton,
+    RekrutacjaShowButton,
+    AkcjeShowButton,
+    Rozkaz,
+    Upgrade,
+)
 import pygame
 from os.path import join
 
@@ -20,7 +27,7 @@ class SideMenu:
         self.rekrutacja = PoleRekrutacji(
             menu_width, menu_height, mapa, mapa.player, (0, 60)
         )
-        self.akcje = Pole(menu_width, menu_height, mapa, mapa.player, (0, 60))
+        self.akcje = PoleAkcji(menu_width, menu_height, mapa, mapa.player, (0, 60))
         self.type = 0  # 0 to rekrutacja, 1 to akcje
 
         self.button_group = pygame.sprite.Group()
@@ -74,7 +81,7 @@ class SideMenu:
         self.rekrutacja = PoleRekrutacji(
             menu_width, menu_height, self.mapa, player, (0, 60)
         )
-        self.akcje = Pole(menu_width, menu_height, self.mapa, player, (0, 60))
+        self.akcje = PoleAkcji(menu_width, menu_height, self.mapa, player, (0, 60))
 
         self.rekrutacjaButton = RekrutacjaShowButton(
             (menu_width - 10) / 2,
@@ -190,3 +197,14 @@ class PoleRekrutacji(Pole):
             if x > menu_width - 25:
                 x = 5
                 y += 50
+
+
+class PoleAkcji(Pole):
+    def __init__(self, w, h, mapa, player, pos):
+        super().__init__(w, h, mapa, player, pos)
+
+    def setup(self):
+        Rozkaz(40, 40, "red", (5, 5), "zloto_rozkaz", self.button_group, self.player)
+        Upgrade(
+            40, 40, "red", (100, 5), "zloto_upgrade", self.button_group, self.player, 1
+        )

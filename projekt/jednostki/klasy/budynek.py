@@ -1,5 +1,6 @@
 import pygame
 from os.path import join
+from .podswietlenie import Podswietlenie
 
 
 class Budynek(pygame.sprite.Sprite):

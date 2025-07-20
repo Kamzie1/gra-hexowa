@@ -9,14 +9,25 @@ class Positions(Enum):
     RIGHT = (28, 0)
     TOP = (0, -27)
     BOTTOM = (0, 27)
-    TOPLEFT = (-14, -13)
-    TOPRIGHT = (14, -13)
-    BOTTOMLEFT = (-14, 13)
-    BOTTOMRIGHT = (14, 13)
+    TOPLEFT = (-14, -17)
+    TOPRIGHT = (14, -17)
+    BOTTOMLEFT = (-14, 17)
+    BOTTOMRIGHT = (14, 17)
     CENTERLEFT = (-14, 0)
     CENTERRIGHT = (14, 0)
-    CENTERTOP = (0, -13)
-    CENTERBOTTOM = (0, 13)
+    CENTERTOP = (0, -17)
+    CENTERBOTTOM = (0, 17)
+
+
+Hex_positions = [
+    Positions.TOPLEFT.value,
+    Positions.TOPRIGHT.value,
+    Positions.LEFT.value,
+    Positions.CENTER.value,
+    Positions.RIGHT.value,
+    Positions.BOTTOMLEFT.value,
+    Positions.BOTTOMRIGHT.value,
+]
 
 
 class Squad(pygame.sprite.Sprite):
@@ -27,13 +38,16 @@ class Squad(pygame.sprite.Sprite):
         self.color = info["color"]
         self.pos = tuple(info["pos"])
         self.tile = tile
-        self.wojownicy = []
+        self.wojownicy = [None for _ in range(7)]
         self.load_data(info, frakcja)
+        self.hex_positions = Hex_positions
 
     @property
     def ruch(self):
         min_ruch = 100
         for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
             if wojownik.ruch < min_ruch:
                 min_ruch = wojownik.ruch
 
@@ -43,38 +57,26 @@ class Squad(pygame.sprite.Sprite):
     def ruch(self, value):
         diff = self.ruch - value
         for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
             wojownik.ruch -= diff
 
     @property
     def range(self):
         max_range = -1
         for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
             if wojownik.bronie[0]["range"] > max_range:
                 max_range = wojownik.bronie[0]["range"]
         return max_range
 
     def draw(self, screen):
-        match (len(self.wojownicy)):
-            case 1:
-                self.wojownicy[0].draw(self.pos, Positions.CENTER.value, screen)
-            case 2:
-                self.wojownicy[0].draw(self.pos, Positions.CENTERLEFT.value, screen)
-                self.wojownicy[1].draw(self.pos, Positions.CENTERRIGHT.value, screen)
-            case 3:
-                self.wojownicy[0].draw(self.pos, Positions.LEFT.value, screen)
-                self.wojownicy[2].draw(self.pos, Positions.RIGHT.value, screen)
-                self.wojownicy[1].draw(self.pos, Positions.CENTERBOTTOM.value, screen)
-            case 4:
-                self.wojownicy[1].draw(self.pos, Positions.TOPLEFT.value, screen)
-                self.wojownicy[0].draw(self.pos, Positions.TOPRIGHT.value, screen)
-                self.wojownicy[2].draw(self.pos, Positions.BOTTOMLEFT.value, screen)
-                self.wojownicy[3].draw(self.pos, Positions.BOTTOMRIGHT.value, screen)
-            case 5:
-                self.wojownicy[1].draw(self.pos, Positions.TOP.value, screen)
-                self.wojownicy[0].draw(self.pos, Positions.LEFT.value, screen)
-                self.wojownicy[2].draw(self.pos, Positions.CENTER.value, screen)
-                self.wojownicy[3].draw(self.pos, Positions.RIGHT.value, screen)
-                self.wojownicy[4].draw(self.pos, Positions.BOTTOM.value, screen)
+        i = 0
+        for wojownik in self.wojownicy:
+            if wojownik is not None:
+                wojownik.draw(self.pos, self.hex_positions[i], screen)
+            i += 1
 
     def get_data(self):
         info = {}
@@ -84,7 +86,8 @@ class Squad(pygame.sprite.Sprite):
         info["pos"] = self.pos
         info["jednostki"] = []
         for wojownik in self.wojownicy:
-            info["jednostki"].append(wojownik.get_data())
+            if wojownik is not None:
+                info["jednostki"].append(wojownik.get_data())
         return info
 
     def load_data(self, info, frakcja):
@@ -96,11 +99,27 @@ class Squad(pygame.sprite.Sprite):
                 self.color,
                 jednostka["zdrowie"],
                 jednostka["morale"],
+                jednostka["ruch"],
+                jednostka["array_pos"],
             )
-            self.wojownicy.append(w)
+            self.wojownicy[jednostka["array_pos"]] = w
 
     def __add__(self, other):
-        self.wojownicy = self.wojownicy + other.wojownicy
+        wojownicy = []
+        for wojownik in self.wojownicy:
+            if wojownik is not None:
+                wojownik.pos = len(wojownicy)
+                wojownicy.append(wojownik)
+
+        for wojownik in other.wojownicy:
+            if wojownik is not None:
+                wojownik.pos = len(wojownicy)
+                wojownicy.append(wojownik)
+
+        while len(wojownicy) != 7:
+            wojownicy.append(None)
+
+        self.wojownicy = wojownicy
 
     def display(self, id):
         representation = f"Oddział ({id}): {self.owner} | {self.ruch}"
@@ -117,4 +136,6 @@ class Squad(pygame.sprite.Sprite):
 
     def heal(self, value):
         for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
             wojownik.zdrowie += value

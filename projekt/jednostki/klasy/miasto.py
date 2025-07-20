@@ -1,6 +1,6 @@
 import pygame
 from os.path import join
-from projekt.swiat.tile import Podswietlenie
+from .podswietlenie import Podswietlenie
 
 
 class Miasto(pygame.sprite.Sprite):
@@ -63,9 +63,9 @@ class Miasto(pygame.sprite.Sprite):
         self.koszt_ataku = budynek["koszt_ataku"]
         self.id = id"""
 
-    def zarabiaj(self, player):
+    def zarabiaj(self, player, mnoznik_zlota):
         if self.owner_id == player.id:
-            player.gold += self.earn["gold"]
+            player.gold += self.earn["gold"] * mnoznik_zlota
 
     def own(self, owner, owner_id, color):
         return

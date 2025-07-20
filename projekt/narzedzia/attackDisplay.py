@@ -106,6 +106,8 @@ class SurfAttack(SurfOddzialu):
         surfaces = []
         i = 1
         for wojownik in self.squad.wojownicy:
+            if wojownik is None:
+                continue
             surfaces.append(
                 WojownikSurfAttack(
                     self.width,
@@ -113,7 +115,7 @@ class SurfAttack(SurfOddzialu):
                     i - 1,
                     wojownik,
                     (5, 50 + i * int(self.width / 15)),
-                    i,
+                    wojownik.pos,
                     self.squad.color,
                 )
             )
@@ -166,6 +168,8 @@ class SurfDefend(SurfOddzialu):
         i = 1
         if not self.squad is None:
             for wojownik in self.squad.wojownicy:
+                if wojownik is None:
+                    continue
                 self.surfs.append(
                     WojownikSurfDefend(
                         self.width,
@@ -173,7 +177,7 @@ class SurfDefend(SurfOddzialu):
                         i - 1,
                         wojownik,
                         (self.width - 5, 50 + i * int(self.width / 15)),
-                        i,
+                        wojownik.pos,
                         self.squad.color,
                     )
                 )
@@ -290,7 +294,8 @@ class WojownikSurfDefend(WojownikSurf):
             if selected.atak_points > 0:
                 selected.atak_points -= selected.bronie[0]["koszt_ataku"]
                 self.squad.zdrowie(
-                    self.poz, self.jednostka.zdrowie - selected.bronie[0]["atak"]
+                    self.jednostka.pos,
+                    self.jednostka.zdrowie - selected.bronie[0]["atak"],
                 )
 
 
