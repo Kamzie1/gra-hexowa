@@ -19,28 +19,30 @@ from projekt.narzedzia import (
     AttackDisplay,
 )
 from projekt.flag import Flag
-from projekt.jednostki import get_fraction
 from projekt.network import Client
+from .assetMenager import AssetManager
 
 
 class Gra:
     def __init__(self, client):
-        name = client.names[0]
-        name2 = client.names[1]
-        x = client.info[name]["x"]
-        y = client.info[name]["y"]
-        frakcja = get_fraction(client.info[name]["frakcja"])
-        num = client.info[name]["id"]
-        pos = oblicz_pos(x, y)
-        x2 = client.info[name2]["x"]
-        y2 = client.info[name2]["y"]
-        frakcja2 = get_fraction(client.info[name2]["frakcja"])
-        num2 = client.info[name2]["id"]
-        pos2 = oblicz_pos(x2, y2)
         # pygame
         pygame.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         pygame.display.set_caption(Title)
+        AssetManager.preload_assets()
+        # client
+        name = client.names[0]
+        name2 = client.names[1]
+        x = client.info[name]["x"]
+        y = client.info[name]["y"]
+        frakcja = AssetManager.frakcja[client.info[name]["frakcja"]]
+        num = client.info[name]["id"]
+        pos = oblicz_pos(x, y)
+        x2 = client.info[name2]["x"]
+        y2 = client.info[name2]["y"]
+        frakcja2 = AssetManager.frakcja[client.info[name2]["frakcja"]]
+        num2 = client.info[name2]["id"]
+        pos2 = oblicz_pos(x2, y2)
         # obiekty
         self.clock = pygame.time.Clock()
         self.mini_mapa = Mini_map(pos)

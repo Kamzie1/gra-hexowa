@@ -1,10 +1,11 @@
 import pygame
-from ..ustawienia import Width, Height
+from projekt.ustawienia import Width, Height
+from projekt.assetMenager import AssetManager
 
 
 class Turn:
     def __init__(self):
-        self.image = pygame.image.load("Grafika/turn.png").convert_alpha()
+        self.image = AssetManager.get_asset("turn")
         self.surf = pygame.Surface((100, 100), pygame.SRCALPHA)
         self.surf.fill((0, 0, 0, 100))
         self.rect = self.image.get_frect(topleft=(0, 0))

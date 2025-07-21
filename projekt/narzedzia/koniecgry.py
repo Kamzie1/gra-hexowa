@@ -1,5 +1,6 @@
 import pygame
 from projekt.ustawienia import srodek
+from projekt.assetMenager import AssetManager
 
 
 class KoniecGry:
@@ -9,7 +10,7 @@ class KoniecGry:
         self.rect = self.surf.get_rect(topleft=(0, 0))
         self.show = False
         self.result = ""
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", 100)
+        self.font = AssetManager.get_font("consolas", 100)
 
     def display(self, result, color):
         self.show = True

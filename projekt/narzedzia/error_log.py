@@ -1,4 +1,5 @@
 import pygame
+from projekt.assetMenager import AssetManager
 
 
 class Error_log:
@@ -7,7 +8,7 @@ class Error_log:
         self.surf.fill(color)
         self.color = color
         self.rect = self.surf.get_frect(topleft=pos)
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", 24)
+        self.font = AssetManager.get_font("consolas", 24)
         self.error = ""
         self.font_color = "red"
 

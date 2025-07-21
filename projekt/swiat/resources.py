@@ -3,6 +3,7 @@ from projekt.narzedzia import pozycja_myszy_na_surface
 from os.path import join
 import pygame
 from .buttons import Menu, Surrender
+from projekt.assetMenager import AssetManager
 
 
 class Resource:
@@ -10,7 +11,7 @@ class Resource:
         self.surf = pygame.Surface((resource_width, resource_height), pygame.SRCALPHA)
         self.fill()
         self.rect = self.surf.get_frect(topleft=resource_pos)
-        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
+        self.font = AssetManager.get_font("consolas", 24)
         self.button_group = pygame.sprite.Group()
         Menu(
             50,
@@ -26,7 +27,7 @@ class Resource:
 
     def display_gold(self, player, pos):
         # icon
-        image = pygame.image.load(join("grafika", "złoto.png"))
+        image = AssetManager.get_asset("złoto")
         rect = image.get_frect(topleft=(150, (resource_height - font_size) / 2))
         self.surf.blit(image, rect)
         # number

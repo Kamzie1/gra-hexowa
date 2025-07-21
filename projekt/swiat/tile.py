@@ -1,7 +1,8 @@
 import pygame
-from ..narzedzia import pozycja_myszy_na_surface, clicked
+from projekt.narzedzia import pozycja_myszy_na_surface, clicked
 from os.path import join
-from ..ustawienia import folder_grafiki, tile_height, tile_width
+from projekt.ustawienia import folder_grafiki, tile_height, tile_width
+from projekt.assetMenager import AssetManager
 
 
 class Tile(pygame.sprite.Sprite):
@@ -75,9 +76,9 @@ class Ruch(pygame.sprite.Sprite):
     def __init__(self, groups, surf, pos, ruch):
         super().__init__(groups)
         self._origin = pos
-        self.image = surf
+        self.image = surf.copy()
         self.rect = self.image.get_frect(center=self.origin)
-        font = pygame.font.Font(join("Grafika/fonts", "consolas.ttf"), 16)
+        font = AssetManager.get_font("consolas", 16)
         display = f"{ruch}"
         text = font.render(display, True, "black")
         text_rect = text.get_rect(center=(tile_width / 2, tile_height / 2))

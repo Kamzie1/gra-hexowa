@@ -34,11 +34,11 @@ class Client:
         self.import_state()
 
     def uruchom_gre(self):
-        package1 = {"x": 6, "y": 6, "frakcja": "japonia", "color": "red", "id": 0}
+        package1 = {"x": 6, "y": 6, "frakcja": "Japonia", "color": "red", "id": 0}
         package2 = {
             "x": 2,
             "y": 2,
-            "frakcja": "japonia",
+            "frakcja": "Japonia",
             "color": "blue",
             "id": 1,
         }

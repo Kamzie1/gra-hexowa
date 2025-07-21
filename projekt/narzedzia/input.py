@@ -1,6 +1,7 @@
 import pygame
 from projekt.ustawienia import folder_grafiki, font
 from os.path import join
+from projekt.assetMenager import AssetManager
 
 
 class Input:
@@ -10,7 +11,7 @@ class Input:
         self.rect = self.surf.get_frect(topleft=pos)
         self.surf.fill(color)
         self.color = color
-        self.font = pygame.font.Font(join("Grafika/fonts", font), 24)
+        self.font = AssetManager.get_font("consolas", 24)
         self.font_color = font_color
         self.message = message
         self._display = message

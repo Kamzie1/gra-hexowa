@@ -1,6 +1,7 @@
 import pygame
 from os.path import join
 from .podswietlenie import Podswietlenie
+from projekt.assetMenager import AssetManager
 
 
 class Miasto(pygame.sprite.Sprite):
@@ -12,10 +13,8 @@ class Miasto(pygame.sprite.Sprite):
         self.pos = tuple(info["pos"])
         self.tile = tile
         self.budynek = frakcja["budynek"][info["id"]]
-        self.image = pygame.image.load(
-            join("Grafika/budynki-grafika", self.budynek[info["color"]])
-        ).convert_alpha()
         self.nazwa = self.budynek["nazwa"]
+        self.image = AssetManager.get_asset(self.nazwa)
         self.rect = self.image.get_frect(center=self.pos)
 
         self.heal = self.budynek["heal"]
@@ -23,7 +22,7 @@ class Miasto(pygame.sprite.Sprite):
         self.id = info["id"]
         self.podswietlenie_group = pygame.sprite.Group()
         Podswietlenie(
-            f"{self.color}_podswietlenie.png",
+            f"{self.color}_podswietlenie",
             tile.pos,
             self.podswietlenie_group,
         )

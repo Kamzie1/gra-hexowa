@@ -12,6 +12,7 @@ from projekt.narzedzia import (
     clicked,
 )
 from projekt.jednostki import Squad, Miasto, Wioska
+from projekt.assetMenager import AssetManager
 
 
 class Mapa:
@@ -39,27 +40,13 @@ class Mapa:
         self.split = None
 
         self.najechanie = Najechanie(
-            pygame.image.load(
-                join("Grafika/tile-grafika/efekty hexów", "white_podswietlenie.png")
-            ).convert_alpha(),
+            AssetManager.get_asset("white_podswietlenie"),
             (tile_width / 2, tile_height / 2),
-            pygame.image.load(
-                join(
-                    "Grafika/tile-grafika/efekty hexów",
-                    f"{player.color}_podswietlenie.png",
-                )
-            ).convert_alpha(),
-            pygame.image.load(
-                join(
-                    "Grafika/tile-grafika/efekty hexów",
-                    f"{opponent.color}_podswietlenie.png",
-                )
-            ).convert_alpha(),
+            AssetManager.get_asset(f"{player.color}_podswietlenie"),
+            AssetManager.get_asset(f"{opponent.color}_podswietlenie"),
         )
         self.klikniecie = Klikniecie(
-            pygame.image.load(
-                join("Grafika/tile-grafika/efekty hexów", "hex-klikniecie (2).png")
-            ).convert_alpha(),
+            AssetManager.get_asset("hex-klikniecie (2)"),
             (tile_width / 2, tile_height / 2),
         )
         self.import_state(state)
@@ -241,12 +228,7 @@ class Mapa:
                         ):
                             Ruch(
                                 self.move_group,
-                                pygame.image.load(
-                                    join(
-                                        f"{folder_grafiki}/tile-grafika/efekty hexów",
-                                        "hex-klikniecie (2).png",
-                                    )
-                                ).convert_alpha(),
+                                AssetManager.get_asset("hex-klikniecie (2)"),
                                 (tile.pos),
                                 self.correct_moves[tile.x][tile.y],
                             )

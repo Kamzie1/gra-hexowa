@@ -1,6 +1,7 @@
 import pygame
 from projekt.ustawienia import folder_grafiki, font
 from os.path import join
+from projekt.assetMenager import AssetManager
 
 
 class Przycisk:
@@ -11,7 +12,7 @@ class Przycisk:
         self.pos = pos
         self.rect = self.surf.get_frect(topleft=self.pos)
         self.display = tekst
-        self.font = pygame.font.Font(join("Grafika/fonts", font), 24)
+        self.font = AssetManager.get_font("consolas", 24)
         self.font_color = font_color
 
     def draw(self, screen):

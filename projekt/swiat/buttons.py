@@ -2,6 +2,7 @@ from projekt.jednostki import Squad
 import pygame
 from os.path import join
 from projekt.dane import Akcje
+from projekt.assetMenager import AssetManager
 
 
 class Button(pygame.sprite.Sprite):
@@ -12,14 +13,14 @@ class Button(pygame.sprite.Sprite):
         color,
         pos,
         button_group,
-        image=None,
+        image_name=None,
     ) -> None:
         super().__init__(button_group)
-        if image is None:
+        if image_name is None:
             self.image = pygame.Surface((width, height))
             self.image.fill(color)
         else:
-            self.image = pygame.image.load(f"Grafika/{image}")
+            self.image = AssetManager.get_asset(image_name)
         self.pos = pos
         self.rect = self.image.get_frect(topleft=self.pos)
 
@@ -43,7 +44,7 @@ class TextButton(pygame.sprite.Sprite):
         super().__init__(button_group)
         self.image = pygame.Surface((width, height))
         self.image.fill(color)
-        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
+        self.font = AssetManager.get_font("consolas", 24)
         text_surf = self.font.render(tekst, True, font_color)
         text_rect = text_surf.get_rect(center=(width / 2, height / 2))
         self.image.blit(text_surf, text_rect)
@@ -127,8 +128,8 @@ class Recruit(Button):
         self.mapa = mapa
         self.x = x
         self.y = y
-        self.font = pygame.font.Font(join("Grafika/fonts", "consolas.ttf"), 10)
-        self.gold_icon = pygame.image.load(join("Grafika", "złoto.png"))
+        self.font = AssetManager.get_font("consolas", 10)
+        self.gold_icon = AssetManager.get_asset("złoto")
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
         self.gold_rect = self.scaled_gold_icon.get_frect(
             topleft=(pos[0] + 45, pos[1] + 5)
@@ -165,8 +166,8 @@ class Rozkaz(Button):
         super().__init__(width, height, color, pos, button_group, image)
         self.player = player
         self.type = type
-        self.font = pygame.font.Font(join("Grafika/fonts", "consolas.ttf"), 10)
-        self.gold_icon = pygame.image.load(join("Grafika", "złoto.png"))
+        self.font = AssetManager.get_font("consolas", 10)
+        self.gold_icon = AssetManager.get_asset("złoto")
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
         self.gold_rect = self.scaled_gold_icon.get_frect(
             topleft=(pos[0] + 45, pos[1] + 5)
@@ -191,9 +192,9 @@ class Upgrade(Button):
         super().__init__(width, height, color, pos, button_group, image)
         self.player = player
         self.type = type
-        self.font = pygame.font.Font(join("Grafika/fonts", "consolas.ttf"), 10)
-        self.level_font = pygame.font.Font(join("Grafika/fonts", "consolas.ttf"), 16)
-        self.gold_icon = pygame.image.load(join("Grafika", "złoto.png"))
+        self.font = AssetManager.get_font("consolas", 10)
+        self.level_font = AssetManager.get_font("consolas", 16)
+        self.gold_icon = AssetManager.get_asset("złoto")
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
         self.gold_rect = self.scaled_gold_icon.get_frect(
             topleft=(pos[0] + 45, pos[1] + 5)
@@ -235,7 +236,7 @@ class Upgrade(Button):
 
 class Menu(Button):
     def __init__(self, width, height, color, pos, button_group) -> None:
-        super().__init__(width, height, color, pos, button_group, "menu.png")
+        super().__init__(width, height, color, pos, button_group, "menu")
 
     def click(self, flag):
         flag.show = not flag.show
