@@ -42,7 +42,6 @@ class Mapa(metaclass=Singleton):
         self.army_group = pygame.sprite.Group()
         self.podswietlenie_group = pygame.sprite.Group()
 
-        self.mnoznik_zlota = 1
         self.split = None
 
         self.najechanie = Najechanie(
@@ -499,7 +498,12 @@ class Mapa(metaclass=Singleton):
     def zarabiaj(self):
         for budynek in self.building_group:
             if isinstance(budynek, Miasto):
-                budynek.zarabiaj(Client().player, self.mnoznik_zlota)
+                budynek.zarabiaj(
+                    Client().player,
+                    AssetManager.get_mnoznik(
+                        "zloto_upgrade", Client().player.akcje["zloto_upgrade"]
+                    ),
+                )
             else:
                 print("to nie budynek")
 
@@ -507,8 +511,11 @@ class Mapa(metaclass=Singleton):
         Client().player.zloto_income = 0
         for budynek in self.building_group:
             if isinstance(budynek, Miasto) and budynek.owner_id == Client().player.id:
-                Client().player.zloto_income += (
-                    budynek.earn["gold"] * self.mnoznik_zlota
+                Client().player.zloto_income += int(
+                    budynek.earn["gold"]
+                    * AssetManager.get_mnoznik(
+                        "zloto_upgrade", Client().player.akcje["zloto_upgrade"]
+                    )
                 )
             else:
                 print("to nie budynek")

@@ -1,7 +1,6 @@
 from projekt.jednostki import Squad
 import pygame
 from os.path import join
-from projekt.dane import Akcje
 from projekt.assetMenager import AssetManager
 from .squadDisplay import SquadDisplay
 from .mapa import Mapa
@@ -153,19 +152,16 @@ class Recruit(Button):
 
 
 class Rozkaz(Button):
-    def __init__(
-        self, width, height, color, pos, type, button_group, player, image=None
-    ):
+    def __init__(self, width, height, color, pos, typ, button_group, image=None):
         super().__init__(width, height, color, pos, button_group, image)
-        self.player = player
-        self.type = type
+        self.typ = typ
         self.font = AssetManager.get_font("consolas", 10)
         self.gold_icon = AssetManager.get_asset("złoto")
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
         self.gold_rect = self.scaled_gold_icon.get_frect(
             topleft=(pos[0] + 45, pos[1] + 5)
         )
-        self.display = f"{Akcje[type]["koszt"]["gold"]}"
+        self.display = f"{AssetManager.get_koszt(self.typ)["gold"]}"
         self.text = self.font.render(self.display, True, "white")
         self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
 
@@ -179,12 +175,9 @@ class Rozkaz(Button):
 
 
 class Upgrade(Button):
-    def __init__(
-        self, width, height, color, pos, type, button_group, player, level, image=None
-    ):
+    def __init__(self, width, height, color, pos, typ, button_group, image=None):
         super().__init__(width, height, color, pos, button_group, image)
-        self.player = player
-        self.type = type
+        self.typ = typ
         self.font = AssetManager.get_font("consolas", 10)
         self.level_font = AssetManager.get_font("consolas", 16)
         self.gold_icon = AssetManager.get_asset("złoto")
@@ -192,8 +185,8 @@ class Upgrade(Button):
         self.gold_rect = self.scaled_gold_icon.get_frect(
             topleft=(pos[0] + 45, pos[1] + 5)
         )
-        self.level = level
-        self.display = f"{Akcje[self.type][self.level -1]["koszt"]["gold"]}"
+        self.level = Client().player.akcje[typ]
+        self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
         self.text = self.font.render(self.display, True, "white")
         self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
 
@@ -204,7 +197,11 @@ class Upgrade(Button):
     @level.setter
     def level(self, value):
         self._level = value
-        self.display = f"{Akcje[self.type][self._level -1]["koszt"]["gold"]}"
+        Client().player.akcje[self.typ] = value
+        if self.level == 4:
+            self.display = "maks."
+        else:
+            self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
         self.text = self.font.render(self.display, True, "white")
         self.text_rect = self.text.get_rect(
             topleft=(self.pos[0] + 60, self.pos[1] + 10)
@@ -213,16 +210,23 @@ class Upgrade(Button):
         self.level_rect = self.level_surf.get_rect(
             bottomleft=(self.pos[0] + 30, self.pos[1] + 20)
         )
+        Mapa().calculate_income()
 
     def click(self):
-        print(self.level)
-        if self.level < 3:
-            print(self.level, " je")
-            self.level = self.level + 1
+        if self.level < 4:
+            try:
+                Client().player.gold -= AssetManager.get_koszt(
+                    self.typ, self.level + 1
+                )["gold"]
+            except:
+                print("not enough money")
+            else:
+                self.level = self.level + 1
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-        screen.blit(self.scaled_gold_icon, self.gold_rect)
+        if self.level != 4:
+            screen.blit(self.scaled_gold_icon, self.gold_rect)
         screen.blit(self.level_surf, self.level_rect)
         screen.blit(self.text, self.text_rect)
 

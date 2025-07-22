@@ -30,6 +30,12 @@ class Client(metaclass=Singleton):
             "pos": oblicz_pos(self.info[name]["x"], self.info[name]["y"]),
             "color": self.info[name]["color"],
             "id": id,
+            "akcje": self.load_akcje(),
+        }
+
+    def load_akcje(self):
+        return {
+            "zloto_upgrade": 1,
         }
 
     def import_state(self):

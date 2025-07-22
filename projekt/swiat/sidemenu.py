@@ -71,7 +71,7 @@ class SideMenu(metaclass=Singleton):
                     return
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, (0, 60))
             if self.type:
-                self.akcje.event(mouse_pos, Client().turn, Client().id)
+                self.akcje.event(mouse_pos, Client().turn, Client().player.id)
             else:
                 self.rekrutacja.event(mouse_pos, Client().turn, Client().player.id)
 
@@ -199,7 +199,5 @@ class PoleAkcji(Pole):
         super().__init__(w, h, player, pos)
 
     def setup(self):
-        Rozkaz(40, 40, "red", (5, 5), "zloto_rozkaz", self.button_group, self.player)
-        Upgrade(
-            40, 40, "red", (100, 5), "zloto_upgrade", self.button_group, self.player, 1
-        )
+        Rozkaz(40, 40, "red", (5, 5), "zloto_rozkaz", self.button_group)
+        Upgrade(40, 40, "red", (100, 5), "zloto_upgrade", self.button_group)

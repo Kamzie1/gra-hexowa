@@ -27,6 +27,7 @@ class AssetManager:
         AssetManager.load_fonts()
         for frakcja in AssetManager.frakcja:
             AssetManager.load_fraction(frakcja)
+        AssetManager.load_akcje()
 
     @staticmethod
     def load_common_assets():
@@ -113,6 +114,13 @@ class AssetManager:
             ).convert_alpha()
 
     @staticmethod
+    def load_akcje():
+        with open(
+            join("projekt", "dane", "dane_akcje.yaml"), "r", encoding="utf-8"
+        ) as f:
+            AssetManager.akcje = yaml.safe_load(f)
+
+    @staticmethod
     def get_asset(name):
         return AssetManager.images[name]
 
@@ -123,3 +131,15 @@ class AssetManager:
     @staticmethod
     def get_font(name, size):
         return AssetManager.fonts[name][size]
+
+    @staticmethod
+    def get_koszt(name, level=None):
+        if level is None:
+            return AssetManager.akcje[name]["koszt"]
+        return AssetManager.akcje[name][level - 1]["koszt"]
+
+    @staticmethod
+    def get_mnoznik(name, level=None):
+        if level is None:
+            return AssetManager.akcje[name]["mnoznik"]
+        return AssetManager.akcje[name][level - 1]["mnoznik"]

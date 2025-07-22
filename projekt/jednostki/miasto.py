@@ -64,7 +64,7 @@ class Miasto(pygame.sprite.Sprite):
 
     def zarabiaj(self, player, mnoznik_zlota):
         if self.owner_id == player.id:
-            player.gold += self.earn["gold"] * mnoznik_zlota
+            player.gold += int(self.earn["gold"] * mnoznik_zlota)
 
     def own(self, owner, owner_id, color):
         return

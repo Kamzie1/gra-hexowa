@@ -12,6 +12,7 @@ class Player:
         self.y = data["y"]
         self.color = data["color"]
         self.zloto_income = 7 * self.frakcja["budynek"][0]["earn"]["gold"]
+        self.akcje = data["akcje"]
 
     @property
     def gold(self):
