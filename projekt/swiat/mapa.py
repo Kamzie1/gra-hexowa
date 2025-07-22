@@ -13,11 +13,19 @@ from projekt.narzedzia import (
 )
 from projekt.jednostki import Squad, Miasto, Wioska
 from projekt.assetMenager import AssetManager
+from projekt.narzedzia import Singleton, AttackDisplay
+from projekt.network import Client
+from .squadDisplay import SquadDisplay
 
 
-class Mapa:
-    def __init__(self, miasto_pos, player, opponent, state):
-        self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[1] + srodek[1])
+class Mapa(metaclass=Singleton):
+    def __init__(self):
+        if hasattr(self, "_initialized"):
+            return
+        self._origin = (
+            -Client().player.pos[0] + srodek[0],
+            -Client().player.pos[1] + srodek[1],
+        )
         self.origin1 = None
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
@@ -34,22 +42,20 @@ class Mapa:
         self.army_group = pygame.sprite.Group()
         self.podswietlenie_group = pygame.sprite.Group()
 
-        self.player = player
-        self.opponent = opponent
         self.mnoznik_zlota = 1
         self.split = None
 
         self.najechanie = Najechanie(
             AssetManager.get_asset("white_podswietlenie"),
             (tile_width / 2, tile_height / 2),
-            AssetManager.get_asset(f"{player.color}_podswietlenie"),
-            AssetManager.get_asset(f"{opponent.color}_podswietlenie"),
+            AssetManager.get_asset(f"{Client().player.color}_podswietlenie"),
+            AssetManager.get_asset(f"{Client().opponent.color}_podswietlenie"),
         )
         self.klikniecie = Klikniecie(
             AssetManager.get_asset("hex-klikniecie (2)"),
             (tile_width / 2, tile_height / 2),
         )
-        self.import_state(state)
+        self.import_state(Client().state)
 
     @property
     def origin(self):
@@ -66,7 +72,11 @@ class Mapa:
         self.update_based_border(mouse_pos)
         self.update_based_mouse(mouse_pos)
         self.najechanie.update(
-            mouse_pos, self.Tile_array, self.origin, self.player.id, self.opponent.id
+            mouse_pos,
+            self.Tile_array,
+            self.origin,
+            Client().player.id,
+            Client().opponent.id,
         )
 
     def update_based_mouse(self, mouse_pos):
@@ -238,21 +248,17 @@ class Mapa:
         self,
         mouse_pos,
         flag,
-        turn,
-        id,
-        squadDisplay,
         squadButtonDisplay,
-        attackDisplay,
         rotateButton,
     ):
         failed = False
-        if attackDisplay.show:
-            if attackDisplay.rect.collidepoint(mouse_pos):
-                attackDisplay.event(mouse_pos)
+        if AttackDisplay().show:
+            if AttackDisplay().rect.collidepoint(mouse_pos):
+                AttackDisplay().event(mouse_pos)
                 return
 
-        if squadDisplay.show:
-            if squadDisplay.rect.collidepoint(mouse_pos):
+        if SquadDisplay().show:
+            if SquadDisplay().rect.collidepoint(mouse_pos):
                 return
 
         if not self.move_flag is None:
@@ -262,11 +268,10 @@ class Mapa:
                 return
 
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, self.origin)
-
         for tiles in self.Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
-                    attackDisplay.show = False
+                    AttackDisplay().show = False
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
 
@@ -274,8 +279,8 @@ class Mapa:
                         self.move_flag = tile.jednostka
                         if (
                             not self.move_flag is None
-                            and tile.jednostka.owner_id == id
-                            and turn % 2 == id
+                            and tile.jednostka.owner_id == Client().player.id
+                            and Client().turn % 2 == Client().player.id
                         ):
                             self.correct_moves = self.possible_moves(
                                 tile.x, tile.y, self.move_flag
@@ -289,14 +294,14 @@ class Mapa:
                             if self.move_flag.tile is None:
                                 if tile.jednostka is None:
                                     self.recruit(tile)
-                                elif tile.jednostka.owner_id == self.player.id:
+                                elif tile.jednostka.owner_id == Client().player.id:
                                     self.recruit_join(tile)
-                                elif tile.jednostka.owner_id == self.opponent.id:
+                                elif tile.jednostka.owner_id == Client().opponent.id:
                                     pass
                             elif tile.jednostka is None:
                                 self.move(tile)
                             else:
-                                if tile.jednostka.owner_id == self.player.id:
+                                if tile.jednostka.owner_id == Client().player.id:
                                     if not self.move_flag.tile == tile:
                                         try:
                                             self.join(
@@ -304,25 +309,25 @@ class Mapa:
                                             )
                                         except:
                                             pass
-                                elif tile.jednostka.owner_id == self.opponent.id:
+                                elif tile.jednostka.owner_id == Client().opponent.id:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )
                                     if distance:
-                                        attackDisplay.update(
+                                        AttackDisplay().update(
                                             self.move_flag, tile.jednostka, distance
                                         )
                         else:
                             if not tile.jednostka is None:
                                 if (
-                                    tile.jednostka.owner_id == self.opponent.id
-                                    and self.move_flag.owner_id == self.player.id
+                                    tile.jednostka.owner_id == Client().opponent.id
+                                    and self.move_flag.owner_id == Client().player.id
                                 ):
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )
                                     if distance:
-                                        attackDisplay.update(
+                                        AttackDisplay().update(
                                             self.move_flag, tile.jednostka, distance
                                         )
                                     else:
@@ -335,7 +340,7 @@ class Mapa:
                         if self.split is not None and failed:
                             self.move_flag.kill()
                         self.move_flag = None
-                        squadDisplay.show = False
+                        SquadDisplay().show = False
                         self.correct_moves = None
                         self.split = None
                         for tile in self.move_group:
@@ -360,7 +365,7 @@ class Mapa:
 
     def recruit(self, tile):
         try:
-            self.player.gold -= self.player.frakcja["jednostka"][
+            Client().player.gold -= Client().player.frakcja["jednostka"][
                 self.move_flag.wojownicy[3].id
             ]["cost"]
         except:
@@ -373,7 +378,7 @@ class Mapa:
 
     def recruit_join(self, tile):
         try:
-            self.player.gold -= self.player.frakcja["jednostka"][
+            Client().player.gold -= Client().player.frakcja["jednostka"][
                 self.move_flag.wojownicy[3].id
             ]["cost"]
         except:
@@ -459,19 +464,19 @@ class Mapa:
 
         for jednostka in state["jednostki"]:
             tile = self.get_tile(jednostka["pos"])
-            if jednostka["owner_id"] == self.player.id:
-                frakcja = self.player.frakcja
+            if jednostka["owner_id"] == Client().player.id:
+                frakcja = Client().player.frakcja
             else:
-                frakcja = self.opponent.frakcja
+                frakcja = Client().opponent.frakcja
             s = Squad(self.army_group, jednostka, tile, frakcja)
             tile.jednostka = s
 
         for budynek in state["budynki"]:
             tile = self.get_tile(budynek["pos"])
-            if budynek["owner_id"] == self.player.id:
-                frakcja = self.player.frakcja
+            if budynek["owner_id"] == Client().player.id:
+                frakcja = Client().player.frakcja
             else:
-                frakcja = self.opponent.frakcja
+                frakcja = Client().opponent.frakcja
             if budynek["id"] == 0:
                 b = Miasto(
                     self.building_group,
@@ -494,22 +499,24 @@ class Mapa:
     def zarabiaj(self):
         for budynek in self.building_group:
             if isinstance(budynek, Miasto):
-                budynek.zarabiaj(self.player, self.mnoznik_zlota)
+                budynek.zarabiaj(Client().player, self.mnoznik_zlota)
             else:
                 print("to nie budynek")
 
     def calculate_income(self):
-        self.player.zloto_income = 0
+        Client().player.zloto_income = 0
         for budynek in self.building_group:
-            if isinstance(budynek, Miasto) and budynek.owner_id == self.player.id:
-                self.player.zloto_income += budynek.earn["gold"] * self.mnoznik_zlota
+            if isinstance(budynek, Miasto) and budynek.owner_id == Client().player.id:
+                Client().player.zloto_income += (
+                    budynek.earn["gold"] * self.mnoznik_zlota
+                )
             else:
                 print("to nie budynek")
 
     def heal(self):
         for budynek in self.building_group:
             if isinstance(budynek, Miasto):
-                if budynek.owner_id == self.player.id:
+                if budynek.owner_id == Client().player.id:
                     tile = budynek.tile
                     if (
                         not tile.jednostka is None

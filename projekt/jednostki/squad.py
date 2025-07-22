@@ -43,6 +43,14 @@ class Squad(pygame.sprite.Sprite):
         self.hex_positions = Hex_positions
 
     @property
+    def length(self):
+        l = 0
+        for wojownik in self.wojownicy:
+            if wojownik is not None:
+                l += 1
+        return l
+
+    @property
     def ruch(self):
         min_ruch = 100
         for wojownik in self.wojownicy:
@@ -129,8 +137,8 @@ class Squad(pygame.sprite.Sprite):
         try:
             self.wojownicy[id].zdrowie = value
         except ValueError:
-            self.wojownicy.remove(self.wojownicy[id])
-            if len(self.wojownicy) == 0:
+            self.wojownicy[id] = None
+            if self.length == 0:
                 self.kill()
                 self.tile.jednostka = None
 

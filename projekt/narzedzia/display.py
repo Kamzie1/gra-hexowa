@@ -24,7 +24,7 @@ class TurnDisplay(Display):
     def __init__(self, width, height, pos, font, font_size):
         super().__init__(width, height, pos, font, font_size)
 
-    def display(self, color, screen, turn, player, opponent):
+    def display(self, color, screen, player, opponent, turn):
         if turn % 2 == 0:
             if player.id == 0:
                 text = f"{player.name}"

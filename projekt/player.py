@@ -2,15 +2,15 @@ import pygame
 
 
 class Player:
-    def __init__(self, Frakcja, pos, x, y, id, name, color):
-        self.id = id
-        self.name = name
-        self._gold = 100000
-        self.frakcja = Frakcja
-        self.recruit_pos = pos
-        self.x = x
-        self.y = y
-        self.color = color
+    def __init__(self, data):
+        self.id = data["id"]
+        self.name = data["name"]
+        self._gold = 10000
+        self.frakcja = data["frakcja"]
+        self.pos = data["pos"]
+        self.x = data["x"]
+        self.y = data["y"]
+        self.color = data["color"]
         self.zloto_income = 7 * self.frakcja["budynek"][0]["earn"]["gold"]
 
     @property

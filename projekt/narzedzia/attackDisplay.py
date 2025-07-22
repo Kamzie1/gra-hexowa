@@ -1,10 +1,13 @@
 import pygame
 from .narzedzia import pozycja_myszy_na_surface, oslab_kolor
 from projekt.assetMenager import AssetManager
+from .singleton import Singleton
 
 
-class AttackDisplay:
+class AttackDisplay(metaclass=Singleton):
     def __init__(self, width, height, pos, color):
+        if hasattr(self, "_initialized"):
+            return
         self.width = width
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))

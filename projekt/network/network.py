@@ -1,9 +1,13 @@
 from .state import create_state
+from projekt.narzedzia import Singleton, KoniecGry, oblicz_pos
+from projekt.player import Player
+from projekt.assetMenager import AssetManager
 
 
-class Client:
+class Client(metaclass=Singleton):
     def __init__(self):
-        self.state_loaded = True
+        if hasattr(self, "_initialized"):
+            return
         self.turn = 0
 
     def start_game(self, data):
@@ -12,22 +16,31 @@ class Client:
         self.names = data["users"]
         self.start_game = True
         self.state = data["state"]
+        self.player = Player(self.load_player(0))
+        self.opponent = Player(self.load_player(1))
+
+    def load_player(self, id):
+        name = self.names[id]
+        return {
+            "name": name,
+            "x": self.info[name]["x"],
+            "y": self.info[name]["y"],
+            "frakcja": AssetManager.frakcja[self.info[name]["frakcja"]],
+            "num": self.info[name]["id"],
+            "pos": oblicz_pos(self.info[name]["x"], self.info[name]["y"]),
+            "color": self.info[name]["color"],
+            "id": id,
+        }
 
     def import_state(self):
         print("got new state")
-        self.state_loaded = False
         self.turn += 1
-        self.mapa.import_state(self.state)
-        bufor = self.mapa.player
-        self.mapa.player = self.mapa.opponent
-        self.mapa.opponent = bufor
+        bufor = self.player
+        self.player = self.opponent
+        self.opponent = bufor
 
-        self.user = self.mapa.player.name
-        self.id = self.mapa.player.id
-        if self.turn % 2 == self.mapa.player.id and self.turn != 1:
-            self.mapa.zarabiaj()
-            self.mapa.heal()
-        self.state_loaded = True
+        self.user = self.player.name
+        self.id = self.player.id
 
     def send_state(self, state):
         self.state = state
@@ -51,9 +64,9 @@ class Client:
             "state": starting_state,
         }
 
-    def end_game(self, result, koniecGry):
+    def end_game(self, result):
         match (result):
             case -1:
-                koniecGry.display("Przegrałeś", self.mapa.player.color)
+                KoniecGry().display("Przegrałeś", self.player.color)
             case 1:
-                koniecGry.display("Wygrałeś", self.mapa.player.color)
+                KoniecGry().display("Wygrałeś", self.player.color)

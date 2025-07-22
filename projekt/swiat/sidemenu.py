@@ -16,18 +16,22 @@ from .buttons import (
 )
 import pygame
 from os.path import join
+from .mapa import Mapa
+from projekt.narzedzia import Singleton
+from projekt.network import Client
 
 
-class SideMenu:
-    def __init__(self, mapa):
+class SideMenu(metaclass=Singleton):
+    def __init__(self):
+        if hasattr(self, "_initialized"):
+            return
         self.surf = pygame.Surface((menu_width, menu_height), pygame.SRCALPHA)
         self.surf.fill(menu_color)
         self.rect = self.surf.get_frect(topleft=menu_pos)
-        self.mapa = mapa
         self.rekrutacja = PoleRekrutacji(
-            menu_width, menu_height, mapa, mapa.player, (0, 60)
+            menu_width, menu_height, Client().player, (0, 60)
         )
-        self.akcje = PoleAkcji(menu_width, menu_height, mapa, mapa.player, (0, 60))
+        self.akcje = PoleAkcji(menu_width, menu_height, Client().player, (0, 60))
         self.type = 0  # 0 to rekrutacja, 1 to akcje
 
         self.button_group = pygame.sprite.Group()
@@ -40,7 +44,7 @@ class SideMenu:
             "Rekrutuj",
             "consolas.ttf",
             28,
-            mapa.player.color,
+            Client().player.color,
         )
         self.akcjeButton = AkcjeShowButton(
             (menu_width - 10) / 2,
@@ -51,13 +55,13 @@ class SideMenu:
             "Akcje",
             "consolas.ttf",
             28,
-            mapa.player.color,
+            Client().player.color,
         )
 
     def fill(self):
         self.surf.fill(menu_color)
 
-    def event(self, mouse_pos, flag, turn, id):
+    def event(self, mouse_pos, flag):
         if self.rect.collidepoint(mouse_pos) and flag.show:
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
             flag.klikniecie_flag = False
@@ -67,9 +71,9 @@ class SideMenu:
                     return
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, (0, 60))
             if self.type:
-                self.akcje.event(mouse_pos, turn, id)
+                self.akcje.event(mouse_pos, Client().turn, Client().id)
             else:
-                self.rekrutacja.event(mouse_pos, turn, id)
+                self.rekrutacja.event(mouse_pos, Client().turn, Client().player.id)
 
     def swap(self, player):
         for button in self.button_group:
@@ -78,10 +82,8 @@ class SideMenu:
 
         self.surf.fill((50, 50, 50, 70))
 
-        self.rekrutacja = PoleRekrutacji(
-            menu_width, menu_height, self.mapa, player, (0, 60)
-        )
-        self.akcje = PoleAkcji(menu_width, menu_height, self.mapa, player, (0, 60))
+        self.rekrutacja = PoleRekrutacji(menu_width, menu_height, player, (0, 60))
+        self.akcje = PoleAkcji(menu_width, menu_height, player, (0, 60))
 
         self.rekrutacjaButton = RekrutacjaShowButton(
             (menu_width - 10) / 2,
@@ -144,11 +146,10 @@ class SideMenu:
 
 
 class Pole:
-    def __init__(self, w, h, mapa, player, pos):
+    def __init__(self, w, h, player, pos):
         self.surf = pygame.Surface((w, h), pygame.SRCALPHA)
         self.rect = self.surf.get_frect(topleft=pos)
         self.player = player
-        self.mapa = mapa
         self.button_group = pygame.sprite.Group()
         self.setup()
 
@@ -169,9 +170,9 @@ class Pole:
 
 
 class PoleRekrutacji(Pole):
-    def __init__(self, w, h, mapa, player, pos):
-        self.group = mapa.army_group
-        super().__init__(w, h, mapa, player, pos)
+    def __init__(self, w, h, player, pos):
+        self.group = Mapa().army_group
+        super().__init__(w, h, player, pos)
 
     def setup(self):
         x, y = 5, 5
@@ -184,13 +185,7 @@ class PoleRekrutacji(Pole):
                 (x, y),
                 jednostka,
                 id,
-                self.group,
                 self.button_group,
-                self.player.recruit_pos,
-                self.player,
-                self.mapa,
-                self.player.x,
-                self.player.y,
             )
             x += 95
             id += 1
@@ -200,8 +195,8 @@ class PoleRekrutacji(Pole):
 
 
 class PoleAkcji(Pole):
-    def __init__(self, w, h, mapa, player, pos):
-        super().__init__(w, h, mapa, player, pos)
+    def __init__(self, w, h, player, pos):
+        super().__init__(w, h, player, pos)
 
     def setup(self):
         Rozkaz(40, 40, "red", (5, 5), "zloto_rozkaz", self.button_group, self.player)

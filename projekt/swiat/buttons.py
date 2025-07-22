@@ -3,6 +3,9 @@ import pygame
 from os.path import join
 from projekt.dane import Akcje
 from projekt.assetMenager import AssetManager
+from .squadDisplay import SquadDisplay
+from .mapa import Mapa
+from projekt.network import Client
 
 
 class Button(pygame.sprite.Sprite):
@@ -111,23 +114,11 @@ class Recruit(Button):
         pos,
         jednostka,
         id,
-        group,
         button_group,
-        recruit_pos,
-        player,
-        mapa,
-        x,
-        y,
     ) -> None:
         super().__init__(width, height, color, pos, button_group)
-        self.group = group
-        self.recruit_pos = recruit_pos
         self.jednostka = jednostka
         self.id = id
-        self.player = player
-        self.mapa = mapa
-        self.x = x
-        self.y = y
         self.font = AssetManager.get_font("consolas", 10)
         self.gold_icon = AssetManager.get_asset("złoto")
         self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
@@ -140,18 +131,20 @@ class Recruit(Button):
 
     def click(self):
         info = {}
-        info["color"] = self.player.color
-        info["owner"] = self.player.name
-        info["owner_id"] = self.player.id
+        info["color"] = Client().player.color
+        info["owner"] = Client().player.name
+        info["owner_id"] = Client().player.id
         info["pos"] = (5000, 5000)
         info["jednostki"] = []
         jednostka = self.jednostka
         jednostka["array_pos"] = 3
         info["jednostki"].append(jednostka)
-        self.mapa.move_flag = Squad(self.group, info, None, self.player.frakcja)
+        Mapa().move_flag = Squad(Mapa().army_group, info, None, Client().player.frakcja)
         r = Recruit_sample(4)
-        self.mapa.correct_moves = self.mapa.possible_moves(self.x, self.y, r)
-        self.mapa.move_group.empty()
+        Mapa().correct_moves = Mapa().possible_moves(
+            Client().player.x, Client().player.y, r
+        )
+        Mapa().move_group.empty()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -246,8 +239,8 @@ class Surrender(Button):
     def __init__(self, width, height, color, pos, button_group, image=None):
         super().__init__(width, height, color, pos, button_group, image)
 
-    def click(self, client, koniecGry):
-        client.end_game(-1, koniecGry)
+    def click(self):
+        Client().end_game(-1)
 
 
 class SquadButtonDisplay:
@@ -258,14 +251,14 @@ class SquadButtonDisplay:
         self.rect = self.image.get_frect(midbottom=self.pos)
         self.tekst = tekst
 
-    def event(self, mouse_pos, squadDisplay, move_flag):
+    def event(self, mouse_pos, move_flag):
         if move_flag is None:
             return
         if self.rect.collidepoint(mouse_pos):
-            self.click(squadDisplay)
+            self.click()
 
-    def click(self, squadDisplay):
-        squadDisplay.show = not squadDisplay.show
+    def click(self):
+        SquadDisplay().show = not SquadDisplay().show
 
 
 class Rotate(SquadButtonDisplay):

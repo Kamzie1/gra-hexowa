@@ -1,13 +1,17 @@
 import pygame
 from os.path import join
-from .narzedzia import oslab_kolor, calc_scaled_offset, pozycja_myszy_na_surface
+from projekt.narzedzia import oslab_kolor, calc_scaled_offset, pozycja_myszy_na_surface
 from projekt.jednostki import Hex_positions, Squad
-from .przycisk import Przycisk
+from projekt.narzedzia import Przycisk
 from projekt.assetMenager import AssetManager
+from projekt.narzedzia import Singleton
+from projekt.network import Client
 
 
-class SquadDisplay:
+class SquadDisplay(metaclass=Singleton):
     def __init__(self, width, height, pos, color):
+        if hasattr(self, "_initialized"):
+            return
         self.width = width
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))
@@ -205,7 +209,7 @@ class SquadDisplay:
         jednostka["array_pos"] = self.selected.wojownik.pos
         jednostka["ruch"] = self.selected.wojownik.ruch
         info["jednostki"].append(jednostka)
-        mapa.move_flag = Squad(mapa.army_group, info, None, mapa.player.frakcja)
+        mapa.move_flag = Squad(mapa.army_group, info, None, Client().player.frakcja)
         mapa.move_flag.tile = squad.tile
         mapa.correct_moves = mapa.possible_moves(
             squad.tile.x, squad.tile.y, mapa.move_flag

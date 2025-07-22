@@ -1,10 +1,13 @@
 import pygame
 from projekt.ustawienia import srodek
 from projekt.assetMenager import AssetManager
+from .singleton import Singleton
 
 
-class KoniecGry:
+class KoniecGry(metaclass=Singleton):
     def __init__(self, width, height):
+        if hasattr(self, "_initialized"):
+            return
         self.surf = pygame.Surface((width, height), pygame.SRCALPHA)
         self.surf.fill((0, 0, 0, 100))
         self.rect = self.surf.get_rect(topleft=(0, 0))
