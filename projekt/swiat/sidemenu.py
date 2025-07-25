@@ -201,3 +201,4 @@ class PoleAkcji(Pole):
     def setup(self):
         Rozkaz(40, 40, "red", (5, 5), "zloto_rozkaz", self.button_group)
         Upgrade(40, 40, "red", (100, 5), "zloto_upgrade", self.button_group)
+        Rozkaz(40, 40, "blue", (5, 50), "movement_rozkaz", self.button_group)

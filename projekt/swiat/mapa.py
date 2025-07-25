@@ -183,7 +183,12 @@ class Mapa(metaclass=Singleton):
         ]
         tablica_odwiedzonych[x][y] = jednostka.ruch
         queue = priority_queue()
-        queue.append((x, y, jednostka.ruch))
+        if jednostka.ruch == jednostka.max_ruch:
+            queue.append(
+                (x, y, jednostka.ruch + Client().player.akcje["movement_rozkaz"])
+            )
+        else:
+            queue.append((x, y, jednostka.ruch))
         while not queue.empty():
             x, y, ruch = queue.pop()
             sasiedzix, sasiedziy = get_sasiedzi(x, y)
@@ -495,18 +500,6 @@ class Mapa(metaclass=Singleton):
 
         self.calculate_income()
 
-    def zarabiaj(self):
-        for budynek in self.building_group:
-            if isinstance(budynek, Miasto):
-                budynek.zarabiaj(
-                    Client().player,
-                    AssetManager.get_mnoznik(
-                        "zloto_upgrade", Client().player.akcje["zloto_upgrade"]
-                    ),
-                )
-            else:
-                print("to nie budynek")
-
     def calculate_income(self):
         Client().player.zloto_income = 0
         for budynek in self.building_group:
@@ -516,9 +509,10 @@ class Mapa(metaclass=Singleton):
                     * AssetManager.get_mnoznik(
                         "zloto_upgrade", Client().player.akcje["zloto_upgrade"]
                     )
+                    * Client().player.akcje["zloto_rozkaz"]
                 )
             else:
-                print("to nie budynek")
+                pass
 
     def heal(self):
         for budynek in self.building_group:
@@ -531,7 +525,7 @@ class Mapa(metaclass=Singleton):
                     ):
                         tile.jednostka.heal(budynek.heal)
             else:
-                print("to nie budynek")
+                pass
 
     def __str__(self):
         for layer in self.tmx.layers:

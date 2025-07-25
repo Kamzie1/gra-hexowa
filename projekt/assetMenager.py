@@ -143,3 +143,9 @@ class AssetManager:
         if level is None:
             return AssetManager.akcje[name]["mnoznik"]
         return AssetManager.akcje[name][level - 1]["mnoznik"]
+
+    @staticmethod
+    def get_akcje(name, other):
+        if other is None:
+            return AssetManager.akcje[name]
+        return AssetManager.akcje[name][other]

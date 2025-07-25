@@ -1,4 +1,6 @@
 import pygame
+from projekt.akcjeMenager import AkcjeMenager
+from projekt.assetMenager import AssetManager
 
 
 class Player:
@@ -12,7 +14,11 @@ class Player:
         self.y = data["y"]
         self.color = data["color"]
         self.zloto_income = 7 * self.frakcja["budynek"][0]["earn"]["gold"]
-        self.akcje = data["akcje"]
+        self.akcjeMenager = AkcjeMenager(data["akcje"])
+
+    @property
+    def akcje(self):
+        return self.akcjeMenager.buffs
 
     @property
     def gold(self):

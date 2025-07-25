@@ -61,6 +61,17 @@ class Squad(pygame.sprite.Sprite):
 
         return min_ruch
 
+    @property
+    def max_ruch(self):
+        min_ruch = 100
+        for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
+            if wojownik.jednostka["ruch"] < min_ruch:
+                min_ruch = wojownik.jednostka["ruch"]
+
+        return min_ruch
+
     @ruch.setter
     def ruch(self, value):
         diff = self.ruch - value
