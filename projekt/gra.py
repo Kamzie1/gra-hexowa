@@ -35,7 +35,7 @@ class Gra:
         self.clock = pygame.time.Clock()
         Mini_map()
         AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
-        Mapa()
+        Mapa("mapa1(30x30)")
         Resource()
         Turn()
         SideMenu()

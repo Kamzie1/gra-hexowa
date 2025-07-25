@@ -36,6 +36,7 @@ class Client(metaclass=Singleton):
     def load_akcje(self):
         return {
             "zloto_upgrade": 1,
+            "mury_upgrade": 1,
             "zloto_rozkaz_cooldown": False,
             "zloto_rozkaz": 1,
             "movement_rozkaz_cooldown": False,

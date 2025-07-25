@@ -19,7 +19,7 @@ from .squadDisplay import SquadDisplay
 
 
 class Mapa(metaclass=Singleton):
-    def __init__(self):
+    def __init__(self, mapa):
         if hasattr(self, "_initialized"):
             return
         self._origin = (
@@ -27,6 +27,9 @@ class Mapa(metaclass=Singleton):
             -Client().player.pos[1] + srodek[1],
         )
         self.origin1 = None
+        self.width = 30
+        self.height = 30
+        self.mapa = AssetManager.maps[mapa]
         self.mapSurf = pygame.Surface((Mapa_width, Mapa_height))
         self.mapRect = self.mapSurf.get_frect(topleft=self.origin)
         self.tmx = load_pygame(join("Grafika/mapa", plik_mapy))
@@ -74,8 +77,6 @@ class Mapa(metaclass=Singleton):
             mouse_pos,
             self.Tile_array,
             self.origin,
-            Client().player.id,
-            Client().opponent.id,
         )
 
     def update_based_mouse(self, mouse_pos):
@@ -125,25 +126,28 @@ class Mapa(metaclass=Singleton):
         return True
 
     def load_tiles(self):
-        # loaduje z tmx tilesy i przypisuje je do grupy
-        for layer in self.tmx.visible_layers:
-            if hasattr(layer, "data"):
-                for x, y, gid in layer.iter_data():
-                    pos = oblicz_pos(x, y)
-                    props = self.tmx.get_tile_properties_by_gid(gid)
-                    image = self.tmx.get_tile_image_by_gid(gid)
-                    tile = Tile(
-                        surf=image,
-                        x=x,
-                        y=y,
-                        pos=pos,
-                        group=self.tiles_group,
-                        id=x + 30 * y,
-                        koszt_ruchu=props["koszt_ruchu"],
-                        typ=props["id"],
-                    )
+        x = 0
+        y = 0
+        for row in self.mapa:
+            for ident in row:
+                pos = oblicz_pos(x, y)
+                props = AssetManager.get_tiles_property(ident - 1)
+                tile = Tile(
+                    x=x,
+                    y=y,
+                    pos=pos,
+                    group=self.tiles_group,
+                    id=x + 30 * y,
+                    koszt_ruchu=props["koszt_ruchu"],
+                    typ=props["typ"],
+                    image=props["image"],
+                    obrona=props["obrona"],
+                )
 
-                    self.Tile_array[x][y] = tile
+                self.Tile_array[x][y] = tile
+                x += 1
+                x %= self.width
+            y += 1
 
     def BFS(self, x1, y1, x2, y2):
         tablica_odwiedzonych = [
@@ -227,9 +231,7 @@ class Mapa(metaclass=Singleton):
         for budynek in self.building_group:
             budynek.draw(self.mapSurf)
         self.podswietlenie_group.draw(self.mapSurf)
-        self.mapSurf.blit(
-            self.najechanie.surf[self.najechanie.flag], self.najechanie.rect
-        )
+        self.najechanie.draw(self.mapSurf)
         if flag.klikniecie_flag:
             self.mapSurf.blit(self.klikniecie.image, self.klikniecie.rect)
         if not self.move_flag is None:
@@ -488,6 +490,14 @@ class Mapa(metaclass=Singleton):
                     tile,
                     frakcja,
                 )
+                if b.owner_id == Client().player.id:
+                    tile.obrona = AssetManager.get_mnoznik(
+                        "mury_upgrade", Client().player.akcje["mury_upgrade"]
+                    )
+                else:
+                    tile.obrona = AssetManager.get_mnoznik(
+                        "mury_upgrade", Client().opponent.akcje["mury_upgrade"]
+                    )
             else:
                 b = Wioska(
                     self.building_group,
@@ -495,10 +505,22 @@ class Mapa(metaclass=Singleton):
                     tile,
                     frakcja,
                 )
-
+                tile.obrona = b.budynek["obrona"]
+            tile.koszt_ruchu = b.budynek["ruch"]
             tile.budynek = b
 
         self.calculate_income()
+
+    def refresh(self):
+        for budynek in self.building_group:
+            if budynek.owner_id == Client().player.id:
+                budynek.tile.obrona = AssetManager.get_mnoznik(
+                    "mury_upgrade", Client().player.akcje["mury_upgrade"]
+                )
+            else:
+                budynek.tile.obrona = AssetManager.get_mnoznik(
+                    "mury_upgrade", Client().opponent.akcje["mury_upgrade"]
+                )
 
     def calculate_income(self):
         Client().player.zloto_income = 0

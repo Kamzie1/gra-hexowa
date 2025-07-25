@@ -85,6 +85,8 @@ Japonia:
       heal: 10
       id: 0
       kategoria: "budynek"
+      ruch : 7
+      obrona : 0.7
 
     - nazwa: "Wioska"
       image: "miasto.png"
@@ -93,4 +95,6 @@ Japonia:
       heal: 10
       id: 1
       kategoria: "budynek"
+      ruch : 3
+      obrona: 0.65
 

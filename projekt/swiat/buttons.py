@@ -141,7 +141,7 @@ class Recruit(Button):
         jednostka["array_pos"] = 3
         info["jednostki"].append(jednostka)
         Mapa().move_flag = Squad(Mapa().army_group, info, None, Client().player.frakcja)
-        r = Recruit_sample(4)
+        r = Recruit_sample(7)
         Mapa().correct_moves = Mapa().possible_moves(
             Client().player.x, Client().player.y, r
         )
@@ -221,10 +221,7 @@ class Upgrade(Button):
     def level(self, value):
         self._level = value
         Client().player.akcje[self.typ] = value
-        if self.level == 4:
-            self.display = "maks."
-        else:
-            self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
+        self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
         self.text = self.font.render(self.display, True, "white")
         self.text_rect = self.text.get_rect(
             topleft=(self.pos[0] + 60, self.pos[1] + 10)
@@ -245,10 +242,11 @@ class Upgrade(Button):
                 print("not enough money")
             else:
                 self.level = self.level + 1
+                Mapa().refresh()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-        if self.level != 4:
+        if self.level != len(AssetManager.get_akcje(self.typ)) - 1:
             screen.blit(self.scaled_gold_icon, self.gold_rect)
         screen.blit(self.level_surf, self.level_rect)
         screen.blit(self.text, self.text_rect)
