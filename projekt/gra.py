@@ -73,6 +73,9 @@ class Gra:
             Client().end_game(1)
         if SquadDisplay().show:
             SquadDisplay().update(pygame.mouse.get_pos())
+
+        if AttackDisplay().show:
+            AttackDisplay().hover(pygame.mouse.get_pos())
         Mapa().update()
         Mini_map().update()
 

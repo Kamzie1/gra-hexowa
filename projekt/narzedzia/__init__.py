@@ -8,3 +8,5 @@ from .attackDisplay import AttackDisplay
 from .koniecgry import KoniecGry
 from .queue import Queue
 from .singleton import Singleton
+from .switch import Switch
+from .pozycja import Pozycja

@@ -24,6 +24,7 @@ def get_miasto(package, owner):
         "owner_id": package["id"],
         "color": package["color"],
         "jednostki": [Miasto],
+        "strategy": 0,
     }
 
 
