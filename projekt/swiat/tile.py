@@ -7,12 +7,23 @@ from projekt.assetMenager import AssetManager
 
 class Tile(pygame.sprite.Sprite):
     def __init__(
-        self, surf, x, y, pos, group, id, koszt_ruchu, typ, budynek=None, jednostka=None
+        self,
+        x,
+        y,
+        pos,
+        group,
+        id,
+        koszt_ruchu,
+        typ,
+        image,
+        obrona,
+        budynek=None,
+        jednostka=None,
     ) -> None:
         super().__init__(group)
         self.x = x
         self.y = y
-        self.image = surf
+        self.image = image
         self.rect = self.image.get_frect(center=pos)
         self.id = id
         self.budynek = budynek
@@ -20,6 +31,7 @@ class Tile(pygame.sprite.Sprite):
         self.pos = pos
         self.koszt_ruchu = koszt_ruchu
         self.typ = typ
+        self.obrona = obrona
 
 
 class Najechanie:
@@ -27,7 +39,7 @@ class Najechanie:
         self._origin = pos
         self.surf = [base, red, blue]
         self.rect = self.surf[0].get_frect(center=self.origin)
-
+        self.display = "0"
         self.flag = -1
 
     @property
@@ -39,7 +51,7 @@ class Najechanie:
         self._origin = value
         self.rect = self.surf[0].get_frect(center=self.origin)
 
-    def update(self, mouse_pos, Tile_array, origin, player_id, opponent_id):
+    def update(self, mouse_pos, Tile_array, origin):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
 
         for tiles in Tile_array:
@@ -52,6 +64,15 @@ class Najechanie:
                         self.flag = 1
                     elif tile.jednostka.owner_id == 1:
                         self.flag = 2
+                    self.display = str(int(tile.obrona * 100)) + "%"
+
+    def draw(self, screen):
+        surf = self.surf[self.flag]
+        font = AssetManager.get_font("consolas", 24)
+        text = font.render(self.display, True, "black")
+        text_rect = text.get_rect(center=self.origin)
+        screen.blit(text, text_rect)
+        screen.blit(surf, self.rect)
 
 
 class Klikniecie:

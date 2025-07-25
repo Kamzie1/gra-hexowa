@@ -13,8 +13,8 @@ class Miasto(pygame.sprite.Sprite):
         self.pos = tuple(info["pos"])
         self.tile = tile
         self.budynek = frakcja["budynek"][info["id"]]
-        self.nazwa = self.budynek["nazwa"]
-        self.image = AssetManager.get_asset(self.nazwa)
+        self.name = self.budynek["nazwa"]
+        self.image = AssetManager.get_asset(self.name)
         self.rect = self.image.get_frect(center=self.pos)
 
         self.heal = self.budynek["heal"]
@@ -61,10 +61,6 @@ class Miasto(pygame.sprite.Sprite):
         self.atak = budynek["atak"]
         self.koszt_ataku = budynek["koszt_ataku"]
         self.id = id"""
-
-    def zarabiaj(self, player, mnoznik_zlota):
-        if self.owner_id == player.id:
-            player.gold += int(self.earn["gold"] * mnoznik_zlota)
 
     def own(self, owner, owner_id, color):
         return

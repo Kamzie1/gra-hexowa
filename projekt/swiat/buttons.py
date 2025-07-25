@@ -5,6 +5,7 @@ from projekt.assetMenager import AssetManager
 from .squadDisplay import SquadDisplay
 from .mapa import Mapa
 from projekt.network import Client
+from projekt.akcjeMenager import AkcjeMenager
 
 
 class Button(pygame.sprite.Sprite):
@@ -102,6 +103,7 @@ class RekrutacjaShowButton(TextButton):
 class Recruit_sample:
     def __init__(self, ruch):
         self.ruch = ruch
+        self.max_ruch = ruch
 
 
 class Recruit(Button):
@@ -139,7 +141,7 @@ class Recruit(Button):
         jednostka["array_pos"] = 3
         info["jednostki"].append(jednostka)
         Mapa().move_flag = Squad(Mapa().army_group, info, None, Client().player.frakcja)
-        r = Recruit_sample(4)
+        r = Recruit_sample(7)
         Mapa().correct_moves = Mapa().possible_moves(
             Client().player.x, Client().player.y, r
         )
@@ -164,11 +166,32 @@ class Rozkaz(Button):
         self.display = f"{AssetManager.get_koszt(self.typ)["gold"]}"
         self.text = self.font.render(self.display, True, "white")
         self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
+        self.color = color
 
     def click(self):
-        pass
+        cooldown = self.typ + "_cooldown"
+        if not Client().player.akcje[cooldown]:
+            try:
+                Client().player.gold -= AssetManager.get_akcje(self.typ, "koszt")[
+                    "gold"
+                ]
+            except:
+                print("not enough money")
+            else:
+                Client().player.akcjeMenager.applybuff(self.typ)
+                Client().player.akcje[self.typ] += AssetManager.get_akcje(
+                    self.typ, "mnoznik"
+                )
+                Client().player.akcje[self.typ + "_cooldown"] = True
+
+                print(Client().player.akcje)
+                Mapa().calculate_income()
 
     def draw(self, screen):
+        if Client().player.akcje[self.typ + "_cooldown"]:
+            self.image.fill((100, 100, 100))
+        else:
+            self.image.fill(self.color)
         screen.blit(self.image, self.rect)
         screen.blit(self.scaled_gold_icon, self.gold_rect)
         screen.blit(self.text, self.text_rect)
@@ -198,10 +221,7 @@ class Upgrade(Button):
     def level(self, value):
         self._level = value
         Client().player.akcje[self.typ] = value
-        if self.level == 4:
-            self.display = "maks."
-        else:
-            self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
+        self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
         self.text = self.font.render(self.display, True, "white")
         self.text_rect = self.text.get_rect(
             topleft=(self.pos[0] + 60, self.pos[1] + 10)
@@ -222,10 +242,11 @@ class Upgrade(Button):
                 print("not enough money")
             else:
                 self.level = self.level + 1
+                Mapa().refresh()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-        if self.level != 4:
+        if self.level != len(AssetManager.get_akcje(self.typ)) - 1:
             screen.blit(self.scaled_gold_icon, self.gold_rect)
         screen.blit(self.level_surf, self.level_rect)
         screen.blit(self.text, self.text_rect)

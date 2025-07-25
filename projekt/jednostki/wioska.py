@@ -15,7 +15,7 @@ class Wioska(Miasto):
         self.color = new_color
         self.podswietlenie_group.empty()
         Podswietlenie(
-            f"{self.color}_podswietlenie.png",
+            f"{self.color}_podswietlenie",
             self.pos,
             self.podswietlenie_group,
         )

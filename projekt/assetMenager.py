@@ -5,7 +5,8 @@ import yaml
 
 class AssetManager:
     assets = ["turn", "złoto", "menu", "armor"]
-    map_assets = ["tile-set.png"]
+    maps = {}
+    mapy = ["mapa1(30x30)"]
     efekty_heksow = [
         "blue_podswietlenie",
         "red_podswietlenie",
@@ -18,6 +19,7 @@ class AssetManager:
     font_assets = ["consolas"]
     fonts = {}
     images = {}
+    tiles = {}
 
     @staticmethod
     def preload_assets():
@@ -25,6 +27,8 @@ class AssetManager:
         AssetManager.load_common_assets()
         AssetManager.load_heks_effects()
         AssetManager.load_fonts()
+        AssetManager.load_hex()
+        AssetManager.load_mapy()
         for frakcja in AssetManager.frakcja:
             AssetManager.load_fraction(frakcja)
         AssetManager.load_akcje()
@@ -114,11 +118,29 @@ class AssetManager:
             ).convert_alpha()
 
     @staticmethod
+    def load_hex():
+        with open(join("projekt", "dane", "dane_hex.yaml"), "r", encoding="utf-8") as f:
+            AssetManager.tiles = yaml.safe_load(f)
+
+        for tile in AssetManager.tiles["tileproperties"]:
+            tile["image"] = pygame.image.load(
+                join("Grafika", "tile-grafika", "hexy", tile["image"] + ".png")
+            ).convert_alpha()
+
+    @staticmethod
     def load_akcje():
         with open(
             join("projekt", "dane", "dane_akcje.yaml"), "r", encoding="utf-8"
         ) as f:
             AssetManager.akcje = yaml.safe_load(f)
+
+    @staticmethod
+    def load_mapy():
+        for mapa in AssetManager.mapy:
+            with open(
+                join("projekt", "dane", "mapy", mapa + ".yaml"), "r", encoding="utf-8"
+            ) as f:
+                AssetManager.maps[mapa] = yaml.safe_load(f)
 
     @staticmethod
     def get_asset(name):
@@ -143,3 +165,13 @@ class AssetManager:
         if level is None:
             return AssetManager.akcje[name]["mnoznik"]
         return AssetManager.akcje[name][level - 1]["mnoznik"]
+
+    @staticmethod
+    def get_akcje(name, other=None):
+        if other is None:
+            return AssetManager.akcje[name]
+        return AssetManager.akcje[name][other]
+
+    @staticmethod
+    def get_tiles_property(id):
+        return AssetManager.tiles["tileproperties"][id]

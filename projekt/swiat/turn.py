@@ -24,8 +24,9 @@ class Turn(metaclass=Singleton):
             new_state = Mapa().load_state()
             Mapa().import_state(new_state)
             Client().send_state(new_state)
+            Client().player.akcjeMenager.turn()
             if Client().turn % 2 == Client().player.id and Client().turn != 1:
-                Mapa().zarabiaj()
+                Client().player.gold += Client().player.zloto_income
                 Mapa().heal()
 
     def draw(self, screen):
