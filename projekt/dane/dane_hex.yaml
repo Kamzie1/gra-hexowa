@@ -21,7 +21,7 @@ tileproperties :
     
   - koszt_ruchu: 4
     widocznosc: 4
-    image : grass+
+    image : grass
     typ: 3
     obrona : 0.6
     

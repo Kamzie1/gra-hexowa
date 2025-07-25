@@ -29,3 +29,9 @@ Wlocznia :
     koszt_ataku: 3 
     range: 1
 
+
+Rusznica : 
+    atak: 40
+    przebicie: 8
+    koszt_ataku: 10
+    range: 3
