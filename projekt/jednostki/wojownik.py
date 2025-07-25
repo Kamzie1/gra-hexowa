@@ -1,6 +1,7 @@
 import pygame
 from os.path import join
 from projekt.ustawienia import folder_grafiki
+from projekt.assetMenager import AssetManager
 
 
 # klasa wojownik, podstawowa klasa reprezentująca mechanikę każdej jednostki, czyli jej ruch i atak, dziedziczy od specjalnej klasy Sprite od pygame pozwalajacej na lepszą kontrolę w pygame
@@ -21,9 +22,7 @@ class Wojownik:
         self.jednostka = jednostka
         self.id = id
 
-        self.image = pygame.image.load(
-            join(f"{folder_grafiki}/jednostki-grafika", jednostka[color])
-        ).convert_alpha()
+        self.image = AssetManager.get_unit(self.name, color)
 
     @property
     def zdrowie(self):

@@ -2,6 +2,7 @@ import pygame
 from os.path import join
 from .miasto import Miasto
 from .podswietlenie import Podswietlenie
+from projekt.assetMenager import AssetManager
 
 
 class Wioska(Miasto):
@@ -18,6 +19,4 @@ class Wioska(Miasto):
             self.pos,
             self.podswietlenie_group,
         )
-        self.image = pygame.image.load(
-            join("Grafika/budynki-grafika", self.budynek[self.color])
-        ).convert_alpha()
+        self.image = AssetManager.get_asset(self.name)

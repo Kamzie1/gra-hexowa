@@ -1,6 +1,7 @@
 import pygame
 from os.path import join
 from .podswietlenie import Podswietlenie
+from projekt.assetMenager import AssetManager
 
 
 class Budynek(pygame.sprite.Sprite):
@@ -12,9 +13,7 @@ class Budynek(pygame.sprite.Sprite):
         self.pos = tuple(info["pos"])
         self.tile = tile
         self.budynek = frakcja["budynek"][info["id"]]
-        self.image = pygame.image.load(
-            join("Grafika/budynki-grafika", self.budynek[info["color"]])
-        ).convert_alpha()
+        self.image = AssetManager.get_unit(self.budynek["nazwa"], self.color)
         self.nazwa = self.budynek["nazwa"]
         self.rect = self.image.get_frect(center=self.pos)
 

@@ -9,61 +9,43 @@ from projekt.swiat import (
     Turn,
     SquadButtonDisplay,
     Rotate,
+    SquadDisplay,
 )
 from projekt.player import Player
 from projekt.narzedzia import (
     oblicz_pos,
     TurnDisplay,
-    SquadDisplay,
     KoniecGry,
     AttackDisplay,
 )
 from projekt.flag import Flag
-from projekt.jednostki import get_fraction
 from projekt.network import Client
+from .assetMenager import AssetManager
 
 
 class Gra:
-    def __init__(self, client):
-        name = client.names[0]
-        name2 = client.names[1]
-        x = client.info[name]["x"]
-        y = client.info[name]["y"]
-        frakcja = get_fraction(client.info[name]["frakcja"])
-        num = client.info[name]["id"]
-        pos = oblicz_pos(x, y)
-        x2 = client.info[name2]["x"]
-        y2 = client.info[name2]["y"]
-        frakcja2 = get_fraction(client.info[name2]["frakcja"])
-        num2 = client.info[name2]["id"]
-        pos2 = oblicz_pos(x2, y2)
+    def __init__(self):
         # pygame
         pygame.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         pygame.display.set_caption(Title)
+        AssetManager.preload_assets()
+        Client().start_game(Client().uruchom_gre())
         # obiekty
         self.clock = pygame.time.Clock()
-        self.mini_mapa = Mini_map(pos)
-        self.player = Player(frakcja, pos, x, y, num, name, client.info[name]["color"])
-        self.opponent = Player(
-            frakcja2, pos2, x2, y2, num2, name2, client.info[name2]["color"]
-        )
-        self.attackDisplay = AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
-        self.mapa = Mapa(pos, self.player, self.opponent, client.state)
-        self.resource = Resource()
-        self.turn = Turn()
-        self.menu = SideMenu(self.mapa)
+        Mini_map()
+        AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
+        Mapa()
+        Resource()
+        Turn()
+        SideMenu()
         self.flag = Flag()
-        self.koniecGry = KoniecGry(Width, Height)
-        self.client = client
-        client.mapa = self.mapa
-        client.user = self.player.name
-        client.id = self.player.id
-        self.turn_display = TurnDisplay(
+        KoniecGry(Width, Height)
+        self.turn_Display = TurnDisplay(
             300, 34, (srodek[0] - 25, 0), "consolas.ttf", 20
         )
-        self.squadDisplay = SquadDisplay(Width / 2, Height / 2, srodek, "black")
-        self.DisplaySquadButton = SquadButtonDisplay(
+        SquadDisplay(Width / 2, Height / 2, srodek, "black")
+        self.squadButtonDisplay = SquadButtonDisplay(
             80, 80, "blue", (srodek[0] - 50, Height - 50)
         )
         self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
@@ -71,100 +53,89 @@ class Gra:
     # metoda uruchamiająca grę
     def run(self):
         while True:
-            if not self.client.state_loaded:
-                self.clock.tick(FPS)
-                continue
+            self.update()  # mouse hover
 
-            self.event_handler()
+            self.event_handler()  # event (kliknięcie)
 
-            self.update()
-            self.draw()  # rysuje wszystkie elementy
+            self.draw()  # rysowanie
 
             pygame.display.update()
 
             self.clock.tick(FPS)
 
     def update(self):
-        if self.squadDisplay.show:
-            self.squadDisplay.update(pygame.mouse.get_pos())
-        self.mapa.update()
-        self.mini_mapa.update(self.mapa)
+        if Mapa().Tile_array[Client().player.x][Client().player.y].jednostka is None:
+            Client().end_game(-1)
+        if (
+            Mapa().Tile_array[Client().opponent.x][Client().opponent.y].jednostka
+            is None
+        ):
+            Client().end_game(1)
+        if SquadDisplay().show:
+            SquadDisplay().update(pygame.mouse.get_pos())
+        Mapa().update()
+        Mini_map().update()
 
     def draw(self):
         self.screen.fill("black")
-        self.mapa.draw(self.screen, self.flag)
+        Mapa().draw(self.screen, self.flag)
         if self.flag.show:
-            self.menu.draw(self.screen)
-        self.resource.draw(self.screen, self.mapa.player)
-        self.turn_display.display(
-            "grey", self.screen, self.client.turn, self.player, self.opponent
+            SideMenu().draw(self.screen)
+        Resource().draw(self.screen)
+        self.turn_Display.display(
+            "grey", self.screen, Client().player, Client().opponent, Client().turn
         )
-        self.mini_mapa.draw(self.screen, self.mapa.origin, self.mapa.Tile_array)
-        for jednostka in self.mapa.army_group:
-            jednostka.draw(self.mapa.mapSurf)
+        Mini_map().draw(self.screen)
+        for jednostka in Mapa().army_group:
+            jednostka.draw(Mapa().mapSurf)
 
-        if not self.mapa.move_flag is None:
+        if not Mapa().move_flag is None:
             self.screen.blit(
-                self.DisplaySquadButton.image, self.DisplaySquadButton.rect
+                self.squadButtonDisplay.image, self.squadButtonDisplay.rect
             )
-            if self.mapa.player.id == self.mapa.move_flag.owner_id:
+            if Client().player.id == Mapa().move_flag.owner_id:
                 self.screen.blit(self.rotateButton.image, self.rotateButton.rect)
-        if self.attackDisplay.show:
-            self.attackDisplay.display(self.screen)
+        if AttackDisplay().show:
+            AttackDisplay().display(self.screen)
 
-        self.turn.draw(self.screen)
+        Turn().draw(self.screen)
 
-        if self.squadDisplay.show and not self.mapa.move_flag is None:
-            self.squadDisplay.display(self.mapa.move_flag, self.screen)
-        if self.koniecGry.show:
-            self.koniecGry.draw(self.screen)
+        if SquadDisplay().show and not Mapa().move_flag is None:
+            SquadDisplay().display(Mapa().move_flag, self.screen)
+        if KoniecGry().show:
+            KoniecGry().draw(self.screen)
 
     def event_handler(self):
-        if self.mapa.Tile_array[self.player.x][self.player.y].jednostka is None:
-            self.client.end_game(-1, self.koniecGry)
-        if self.mapa.Tile_array[self.opponent.x][self.opponent.y].jednostka is None:
-            self.client.end_game(1, self.koniecGry)
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                mouse_pos = pygame.mouse.get_pos()
-                if self.koniecGry.show:
+                if KoniecGry().show:
                     pygame.quit()
                     exit()
 
-                self.mapa.event(
+                Mapa().event(
                     mouse_pos,
                     self.flag,
-                    self.client.turn,
-                    self.client.id,
-                    self.squadDisplay,
-                    self.DisplaySquadButton,
-                    self.attackDisplay,
+                    self.squadButtonDisplay,
                     self.rotateButton,
                 )
 
-                self.turn.event(mouse_pos, self.mapa, self.client)
-                self.menu.swap(self.mapa.player)
-                self.resource.event(mouse_pos, self.flag, self.client, self.koniecGry)
-                self.menu.event(mouse_pos, self.flag, self.client.turn, self.client.id)
-                self.DisplaySquadButton.event(
-                    mouse_pos, self.squadDisplay, self.mapa.move_flag
-                )
-                self.rotateButton.event(
-                    self.mapa.move_flag, mouse_pos, self.mapa.player.id
-                )
+                Turn().event(mouse_pos)
+                SideMenu().swap(Client().player)
+                Resource().event(mouse_pos, self.flag)
+                SideMenu().event(mouse_pos, self.flag)
+                self.squadButtonDisplay.event(mouse_pos, Mapa().move_flag)
+                self.rotateButton.event(Mapa().move_flag, mouse_pos, Client().player.id)
 
-                if self.squadDisplay.show:
-                    self.squadDisplay.event(
-                        mouse_pos, self.mapa.move_flag, self.mapa.player.id, self.mapa
+                if SquadDisplay().show:
+                    SquadDisplay().event(
+                        mouse_pos, Mapa().move_flag, Client().player.id, Mapa()
                     )
 
 
 if __name__ == "__main__":
-
-    client = Client()
-    client.start_game(client.uruchom_gre())
-    gra = Gra(client)
+    gra = Gra()
     gra.run()

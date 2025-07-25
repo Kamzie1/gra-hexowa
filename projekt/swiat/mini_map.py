@@ -1,14 +1,22 @@
 import pygame
 from projekt.ustawienia import *
 from os.path import join
+from projekt.narzedzia import Singleton
+from .mapa import Mapa
+from projekt.network import Client
 
 
-class Mini_map:
-    def __init__(self, miasto_pos):
+class Mini_map(metaclass=Singleton):
+    def __init__(self):
+        if hasattr(self, "_initialized"):
+            return
         self.surf = pygame.Surface((Mapa_width / skala, Mapa_height / skala))
         self.mapRect = self.surf.get_frect(topright=mini_map_pos)
 
-        self._origin = (-miasto_pos[0] + srodek[0], -miasto_pos[0] + srodek[1])
+        self._origin = (
+            -Client().player.pos[0] + srodek[0],
+            -Client().player.pos[0] + srodek[1],
+        )
         self.rectsurf = pygame.Surface(
             (mini_map_mouse_rect_width, mini_map_mouse_rect_height)
         )
@@ -26,7 +34,7 @@ class Mini_map:
     def refresh(self):
         self.surf.fill("black")
 
-    def update(self, mapa):
+    def update(self):
         if pygame.mouse.get_pressed()[0]:
             mouse_pos = pygame.mouse.get_pos()
             if self.mapRect.collidepoint(mouse_pos):
@@ -34,16 +42,16 @@ class Mini_map:
                 pos_x = mouse_pos[0] + mini_width - mini_map_pos[0]
                 mapa_pos_y = pos_y * skala
                 mapa_pos_x = pos_x * skala
-                mapa.origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])
-                mapa.mapRect = mapa.mapSurf.get_frect(topleft=mapa.origin)
+                Mapa().origin = (-mapa_pos_x + srodek[0], -mapa_pos_y + srodek[1])
+                Mapa().mapRect = Mapa().mapSurf.get_frect(topleft=Mapa().origin)
 
-    def draw(self, screen, origin, Tile_array):
+    def draw(self, screen):
         self.refresh()
         self.origin = (
-            -origin[0] / skala,
-            -origin[1] / skala,
+            -Mapa().origin[0] / skala,
+            -Mapa().origin[1] / skala,
         )
-        for tiles in Tile_array:
+        for tiles in Mapa().Tile_array:
             for tile in tiles:
                 self.rysuj(tile)
                 if not tile.budynek is None:

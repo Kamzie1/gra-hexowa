@@ -1,5 +1,6 @@
 import pygame
 from os.path import join
+from projekt.assetMenager import AssetManager
 
 
 class Display:
@@ -7,7 +8,7 @@ class Display:
         self.surf = pygame.Surface((width, height), pygame.SRCALPHA)
         self.surf.fill((0, 0, 0, 0))
         self.rect = self.surf.get_rect(topleft=pos)
-        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
+        self.font = AssetManager.get_font("consolas", 26)
 
     def display(self, content, color, screen):
 
@@ -23,7 +24,7 @@ class TurnDisplay(Display):
     def __init__(self, width, height, pos, font, font_size):
         super().__init__(width, height, pos, font, font_size)
 
-    def display(self, color, screen, turn, player, opponent):
+    def display(self, color, screen, player, opponent, turn):
         if turn % 2 == 0:
             if player.id == 0:
                 text = f"{player.name}"

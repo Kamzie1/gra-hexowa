@@ -3,14 +3,20 @@ from projekt.narzedzia import pozycja_myszy_na_surface
 from os.path import join
 import pygame
 from .buttons import Menu, Surrender
+from projekt.assetMenager import AssetManager
+from projekt.narzedzia import Singleton, KoniecGry
+from projekt.network import Client
+from .mapa import Mapa
 
 
-class Resource:
+class Resource(metaclass=Singleton):
     def __init__(self):
+        if hasattr(self, "_initialized"):
+            return
         self.surf = pygame.Surface((resource_width, resource_height), pygame.SRCALPHA)
         self.fill()
         self.rect = self.surf.get_frect(topleft=resource_pos)
-        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
+        self.font = AssetManager.get_font("consolas", 24)
         self.button_group = pygame.sprite.Group()
         Menu(
             50,
@@ -26,7 +32,7 @@ class Resource:
 
     def display_gold(self, player, pos):
         # icon
-        image = pygame.image.load(join("grafika", "złoto.png"))
+        image = AssetManager.get_asset("złoto")
         rect = image.get_frect(topleft=(150, (resource_height - font_size) / 2))
         self.surf.blit(image, rect)
         # number
@@ -35,7 +41,7 @@ class Resource:
         text_rect = text.get_rect(topleft=pos)
         self.surf.blit(text, text_rect)
 
-    def event(self, mouse_pos, flag, client, koniecGry):
+    def event(self, mouse_pos, flag):
         if self.rect.collidepoint(mouse_pos):
             flag.klikniecie_flag = False
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, resource_pos)
@@ -44,10 +50,10 @@ class Resource:
                     if isinstance(button, Menu):
                         button.click(flag)
                     else:
-                        button.click(client, koniecGry)
+                        button.click()
 
-    def draw(self, screen, player):
+    def draw(self, screen):
         self.fill()
-        self.display_gold(player, (200, (resource_height - font_size) / 2))
+        self.display_gold(Client().player, (200, (resource_height - font_size) / 2))
         self.button_group.draw(self.surf)
         screen.blit(self.surf, self.rect)

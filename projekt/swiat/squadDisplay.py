@@ -1,21 +1,24 @@
 import pygame
 from os.path import join
-from .narzedzia import oslab_kolor, calc_scaled_offset, pozycja_myszy_na_surface
+from projekt.narzedzia import oslab_kolor, calc_scaled_offset, pozycja_myszy_na_surface
 from projekt.jednostki import Hex_positions, Squad
-from .przycisk import Przycisk
+from projekt.narzedzia import Przycisk
+from projekt.assetMenager import AssetManager
+from projekt.narzedzia import Singleton
+from projekt.network import Client
 
 
-class SquadDisplay:
+class SquadDisplay(metaclass=Singleton):
     def __init__(self, width, height, pos, color):
+        if hasattr(self, "_initialized"):
+            return
         self.width = width
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))
         self.rect = self.surf.get_frect(center=pos)
         self.pos = pos
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 30))
-        self.wojownik_font = pygame.font.Font(
-            "Grafika/fonts/consolas.ttf", int(self.width / 40)
-        )
+        self.font = AssetManager.get_font("consolas", 26)
+        self.wojownik_font = AssetManager.get_font("consolas", 20)
         self.font_color = color
         self.show = False
         self.skala = 4
@@ -176,7 +179,7 @@ class SquadDisplay:
                 pozycja.color = "white"
 
         if self.split.rect.collidepoint(mouse_pos) and squad.owner_id == id:
-            self.split(mapa, squad)
+            self.split_formation(mapa, squad)
 
         if not if_selected:
             self.selected = None
@@ -194,7 +197,7 @@ class SquadDisplay:
         self.selected.wojownik = pozycja.wojownik
         pozycja.wojownik = bufor
 
-    def split(self, mapa, squad):
+    def split_formation(self, mapa, squad):
         mapa.split = self.selected.id
         info = {}
         info["color"] = squad.color
@@ -206,7 +209,7 @@ class SquadDisplay:
         jednostka["array_pos"] = self.selected.wojownik.pos
         jednostka["ruch"] = self.selected.wojownik.ruch
         info["jednostki"].append(jednostka)
-        mapa.move_flag = Squad(mapa.army_group, info, None, mapa.player.frakcja)
+        mapa.move_flag = Squad(mapa.army_group, info, None, Client().player.frakcja)
         mapa.move_flag.tile = squad.tile
         mapa.correct_moves = mapa.possible_moves(
             squad.tile.x, squad.tile.y, mapa.move_flag
@@ -245,9 +248,7 @@ class Pozycja(pygame.sprite.Sprite):
         pygame.draw.rect(screen, "black", self.rect, width=1)
         if self.wojownik is None:
             return
-        surf = pygame.image.load(
-            f"Grafika/jednostki-grafika/{self.wojownik.jednostka[color]}"
-        ).convert_alpha()
+        surf = AssetManager.get_unit(self.wojownik.name, color)
         rect = surf.get_frect(center=self.pos)
         screen.blit(surf, rect)
         self.display_health(screen)

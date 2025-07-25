@@ -1,14 +1,18 @@
 import pygame
 from .narzedzia import pozycja_myszy_na_surface, oslab_kolor
+from projekt.assetMenager import AssetManager
+from .singleton import Singleton
 
 
-class AttackDisplay:
+class AttackDisplay(metaclass=Singleton):
     def __init__(self, width, height, pos, color):
+        if hasattr(self, "_initialized"):
+            return
         self.width = width
         self.height = height
         self.surf = pygame.Surface((self.width, self.height))
         self.rect = self.surf.get_frect(center=pos)
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 30))
+        self.font = AssetManager.get_font("consolas", 26)
         self.font_color = color
         self.show = False
 
@@ -58,7 +62,7 @@ class SurfOddzialu:
         self.squad = squad
         self.surfs = []
         self.create_surf()
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 15))
+        self.font = AssetManager.get_font("consolas", 26)
         self.font_color = "black"
 
     def create_surf(self):
@@ -230,7 +234,7 @@ class WojownikSurf:
         )
         self.rect = self.surf.get_frect(topleft=pos)
         self.jednostka = jednostka
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", int(self.width / 35))
+        self.font = AssetManager.get_font("consolas", 26)
         self.font_color = "black"
         self.color = color
 
