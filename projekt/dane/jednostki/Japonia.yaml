@@ -27,7 +27,7 @@ Japonia:
       pancerz: 3
       atak_points: 9
       red: włócznik.png
-      blue: włócznik.png
+      blue: włócznik_blue.png
       cost: 200
       id: 1
       kategoria: jednostka
