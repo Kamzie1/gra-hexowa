@@ -321,7 +321,13 @@ class Mapa(metaclass=Singleton):
                                     )
                                     if distance:
                                         AttackDisplay().update(
-                                            self.move_flag, tile.jednostka, distance
+                                            self.move_flag,
+                                            tile.jednostka,
+                                            distance,
+                                            self.move_flag.tile.x,
+                                            self.move_flag.tile.y,
+                                            tile.x,
+                                            tile.y,
                                         )
                         else:
                             if not tile.jednostka is None:
@@ -334,7 +340,13 @@ class Mapa(metaclass=Singleton):
                                     )
                                     if distance:
                                         AttackDisplay().update(
-                                            self.move_flag, tile.jednostka, distance
+                                            self.move_flag,
+                                            tile.jednostka,
+                                            distance,
+                                            self.move_flag.tile.x,
+                                            self.move_flag.tile.y,
+                                            tile.x,
+                                            tile.y,
                                         )
                                     else:
                                         failed = True
@@ -416,7 +428,7 @@ class Mapa(metaclass=Singleton):
         for wojownik in squad2.wojownicy:
             if wojownik is not None:
                 not_none_count += 1
-        if 7 - none_count + not_none_count > 5:
+        if 7 - none_count + not_none_count > 7:
             return False
         return True
 

@@ -2,7 +2,7 @@ import pygame
 from os.path import join
 from projekt.narzedzia import oslab_kolor, calc_scaled_offset, pozycja_myszy_na_surface
 from projekt.jednostki import Hex_positions, Squad
-from projekt.narzedzia import Przycisk
+from projekt.narzedzia import Przycisk, Switch, Pozycja
 from projekt.assetMenager import AssetManager
 from projekt.narzedzia import Singleton
 from projekt.network import Client
@@ -34,6 +34,13 @@ class SquadDisplay(metaclass=Singleton):
             "Rozdziel",
             "white",
         )
+        self.strategy = 0
+        self.strategies = [
+            "strategia: najsłabszy",
+            "strategia: najsilniejszy",
+            "strategia: lord",
+        ]
+        self.switchStrategy = Switch(300, 32, (self.width - 5, 5), self.strategies)
 
     def set_up(self):
         self.set_positions()
@@ -47,6 +54,7 @@ class SquadDisplay(metaclass=Singleton):
     def display(self, squad, screen):
         self.surf.fill("white")
         self.display_formation(squad)
+        self.switchStrategy.draw(squad.strategy, self.surf)
         screen.blit(self.surf, self.rect)
         pygame.draw.rect(screen, squad.color, self.rect, 4)
 
@@ -166,10 +174,13 @@ class SquadDisplay(metaclass=Singleton):
     def event(self, mouse_pos, squad, id, mapa):
         if_selected = False
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
+        if self.switchStrategy.rect.collidepoint(mouse_pos):
+            squad.strategy += 1
+            squad.strategy %= len(self.strategies)
         for pozycja in self.positions_group:
             if pozycja.rect.collidepoint(mouse_pos):
                 if self.selected is not None and self.selected.wojownik is not None:
-                    if squad.owner_id != id or self.selected.wojownik.name == "Miasto":
+                    if squad.owner_id != id or self.selected.wojownik.name == "Fort":
                         return
                     self.swap(pozycja, squad)
                 self.selected = pozycja
@@ -216,54 +227,3 @@ class SquadDisplay(metaclass=Singleton):
         )
         mapa.move_group.empty()
         self.show = False
-
-
-class Pozycja(pygame.sprite.Sprite):
-    def __init__(self, offset, start, width, height, group, skala, id):
-        super().__init__(group)
-        self.surf = pygame.Surface((width, height))
-        self.color = "white"
-        self.surf.fill(self.color)
-        self.pos = calc_scaled_offset(offset, start, skala * 1.5)
-        self.rect = self.surf.get_frect(center=self.pos)
-        self.wojownik = None
-        self.id = id
-        self.healthbar = pygame.Surface((10, 60))
-        self.healthbar.fill("white")
-        self.healthbar_rect = self.healthbar.get_frect(
-            center=(self.pos[0] - 45, self.pos[1])
-        )
-
-    def hover(self, mouse_pos):
-        if self.color == (200, 200, 200):
-            return
-        if self.rect.collidepoint(mouse_pos):
-            self.color = (220, 220, 220)
-        else:
-            self.color = "white"
-
-    def display(self, screen, color):
-        self.surf.fill(self.color)
-        screen.blit(self.surf, self.rect)
-        pygame.draw.rect(screen, "black", self.rect, width=1)
-        if self.wojownik is None:
-            return
-        surf = AssetManager.get_unit(self.wojownik.name, color)
-        rect = surf.get_frect(center=self.pos)
-        screen.blit(surf, rect)
-        self.display_health(screen)
-
-    def display_health(self, screen):
-        if self.wojownik is None:
-            return
-        procent = self.wojownik.zdrowie / self.wojownik.jednostka["zdrowie"]
-        screen.blit(self.healthbar, self.healthbar_rect)
-        health = pygame.Surface((10, 60 * procent))
-        if procent < 0.25:
-            health.fill("red")
-        else:
-            health.fill("green")
-        screen.blit(
-            health, health.get_frect(bottomleft=(self.pos[0] - 50, self.pos[1] + 30))
-        )
-        pygame.draw.rect(screen, "black", self.healthbar_rect, width=1)
