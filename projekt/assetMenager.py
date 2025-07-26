@@ -72,10 +72,16 @@ class AssetManager:
             join("projekt", "dane", "jednostki", "bronie.yaml"), "r", encoding="utf-8"
         ) as f:
             AssetManager.bronie = yaml.safe_load(f)
-        with open(
-            join("projekt", "dane", "jednostki", "Japonia.yaml"), "r", encoding="utf-8"
-        ) as f:
-            AssetManager.frakcja = yaml.safe_load(f)
+
+        AssetManager.frakcja = {}
+        fractions = ["Japonia", "Prusy"]
+        for fraction in fractions:
+            with open(
+                join("projekt", "dane", "jednostki", f"{fraction}.yaml"),
+                "r",
+                encoding="utf-8",
+            ) as f:
+                AssetManager.frakcja[fraction] = yaml.safe_load(f)
 
         for frakcja in AssetManager.frakcja:
             for unit in AssetManager.frakcja[frakcja]["jednostka"]:

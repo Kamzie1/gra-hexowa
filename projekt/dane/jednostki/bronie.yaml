@@ -35,3 +35,9 @@ Rusznica :
     przebicie: 8
     koszt_ataku: 10
     range: 3
+
+Kopia :
+    atak: 20
+    przebicie: 8
+    koszt_ataku: 5
+    range: 1

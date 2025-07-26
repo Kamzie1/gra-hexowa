@@ -62,7 +62,7 @@ class Client(metaclass=Singleton):
         package2 = {
             "x": 2,
             "y": 2,
-            "frakcja": "Japonia",
+            "frakcja": "Prusy",
             "color": "blue",
             "id": 1,
         }

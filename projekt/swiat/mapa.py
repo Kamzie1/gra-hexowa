@@ -328,6 +328,7 @@ class Mapa(metaclass=Singleton):
                                             self.move_flag.tile.y,
                                             tile.x,
                                             tile.y,
+                                            tile.obrona,
                                         )
                         else:
                             if not tile.jednostka is None:
@@ -347,6 +348,7 @@ class Mapa(metaclass=Singleton):
                                             self.move_flag.tile.y,
                                             tile.x,
                                             tile.y,
+                                            tile.obrona,
                                         )
                                     else:
                                         failed = True
