@@ -7,6 +7,7 @@ from projekt.assetMenager import AssetManager
 from projekt.narzedzia import Singleton, KoniecGry
 from projekt.network import Client
 from .mapa import Mapa
+from .mouseDisplay import MouseDisplay
 
 
 class Resource(metaclass=Singleton):
@@ -18,17 +19,18 @@ class Resource(metaclass=Singleton):
         self.rect = self.surf.get_frect(topleft=resource_pos)
         self.font = AssetManager.get_font("consolas", 24)
         self.button_group = pygame.sprite.Group()
-        Menu(
-            50,
-            50,
-            "blue",
-            (10, 0),
-            self.button_group,
-        )
-        Surrender(50, 50, "yellow", (70, 0), self.button_group)
+        Menu(50, 50, "blue", (10, 0), self.button_group, "schowaj sidepanel")
+        Surrender(50, 50, "yellow", (70, 0), self.button_group, "poddaj się")
 
     def fill(self):
         self.surf.fill(resource_color)
+
+    def update(self):
+        mouse_pos = pygame.mouse.get_pos()
+        for button in self.button_group:
+            if button.rect.collidepoint(mouse_pos):
+                button.hover()
+                MouseDisplay().update(mouse_pos, button.description)
 
     def display_gold(self, player, pos):
         # icon

@@ -26,5 +26,13 @@ class AnimationMenager:
     @staticmethod
     def draw_text(animation, screen):
         text = AssetManager.get_font("consolas", 26).render(animation[2], True, "red")
+        if animation[0] < 4:
+            text.set_alpha(240)
+        if animation[0] > 36:
+            text.set_alpha(240)
+        if animation[0] < 12:
+            text.set_alpha(200)
+        if animation[0] > 28:
+            text.set_alpha(200)
         text_rect = text.get_frect(center=animation[3])
         screen.blit(text, text_rect)

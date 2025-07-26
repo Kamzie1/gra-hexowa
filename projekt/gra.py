@@ -10,6 +10,7 @@ from projekt.swiat import (
     SquadButtonDisplay,
     Rotate,
     SquadDisplay,
+    MouseDisplay,
 )
 from projekt.player import Player
 from projekt.narzedzia import (
@@ -65,6 +66,10 @@ class Gra:
             self.clock.tick(FPS)
 
     def update(self):
+        mouse_pos = pygame.mouse.get_pos()
+        MouseDisplay().show = False
+        SideMenu().update(self.flag)
+        Resource().update()
         if Mapa().Tile_array[Client().player.x][Client().player.y].jednostka is None:
             Client().end_game(-1)
         if (
@@ -75,8 +80,16 @@ class Gra:
         if SquadDisplay().show:
             SquadDisplay().update(pygame.mouse.get_pos())
 
+        if Mapa().move_flag is not None:
+            if self.squadButtonDisplay.rect.collidepoint(mouse_pos):
+                MouseDisplay().update(mouse_pos, "Statystyki oddziału")
+
+            if self.rotateButton.rect.collidepoint(mouse_pos):
+                MouseDisplay().update(mouse_pos, "Obróć oddział")
+
         if AttackDisplay().show:
             AttackDisplay().hover(pygame.mouse.get_pos())
+
         Mapa().update()
         Mini_map().update()
         AnimationMenager.update()
@@ -109,6 +122,7 @@ class Gra:
             SquadDisplay().display(Mapa().move_flag, self.screen)
         if KoniecGry().show:
             KoniecGry().draw(self.screen)
+        MouseDisplay().draw(self.screen)
 
     def event_handler(self):
         mouse_pos = pygame.mouse.get_pos()

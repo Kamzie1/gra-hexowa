@@ -16,6 +16,7 @@ class Button(pygame.sprite.Sprite):
         color,
         pos,
         button_group,
+        description,
         image_name=None,
     ) -> None:
         super().__init__(button_group)
@@ -26,9 +27,17 @@ class Button(pygame.sprite.Sprite):
             self.image = AssetManager.get_asset(image_name)
         self.pos = pos
         self.rect = self.image.get_frect(topleft=self.pos)
+        self.description = description
+        self.color = color
 
     def click(self, *args):
         pass
+
+    def hover(self):
+        pass
+
+    def draw(self):
+        self.image.fill(self.color)
 
 
 class TextButton(pygame.sprite.Sprite):
@@ -116,8 +125,9 @@ class Recruit(Button):
         jednostka,
         id,
         button_group,
+        description,
     ) -> None:
-        super().__init__(width, height, color, pos, button_group)
+        super().__init__(width, height, color, pos, button_group, description)
         self.jednostka = jednostka
         self.id = id
         self.font = AssetManager.get_font("consolas", 10)
@@ -155,8 +165,10 @@ class Recruit(Button):
 
 
 class Rozkaz(Button):
-    def __init__(self, width, height, color, pos, typ, button_group, image=None):
-        super().__init__(width, height, color, pos, button_group, image)
+    def __init__(
+        self, width, height, color, pos, typ, button_group, description, image=None
+    ):
+        super().__init__(width, height, color, pos, button_group, description, image)
         self.typ = typ
         self.font = AssetManager.get_font("consolas", 10)
         self.gold_icon = AssetManager.get_asset("złoto")
@@ -199,8 +211,10 @@ class Rozkaz(Button):
 
 
 class Upgrade(Button):
-    def __init__(self, width, height, color, pos, typ, button_group, image=None):
-        super().__init__(width, height, color, pos, button_group, image)
+    def __init__(
+        self, width, height, color, pos, typ, button_group, description, image=None
+    ):
+        super().__init__(width, height, color, pos, button_group, description, image)
         self.typ = typ
         self.font = AssetManager.get_font("consolas", 10)
         self.level_font = AssetManager.get_font("consolas", 16)
@@ -254,16 +268,18 @@ class Upgrade(Button):
 
 
 class Menu(Button):
-    def __init__(self, width, height, color, pos, button_group) -> None:
-        super().__init__(width, height, color, pos, button_group, "menu")
+    def __init__(self, width, height, color, pos, button_group, description) -> None:
+        super().__init__(width, height, color, pos, button_group, description, "menu")
 
     def click(self, flag):
         flag.show = not flag.show
 
 
 class Surrender(Button):
-    def __init__(self, width, height, color, pos, button_group, image=None):
-        super().__init__(width, height, color, pos, button_group, image)
+    def __init__(
+        self, width, height, color, pos, button_group, description, image=None
+    ):
+        super().__init__(width, height, color, pos, button_group, description, image)
 
     def click(self):
         Client().end_game(-1)
