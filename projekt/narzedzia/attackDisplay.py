@@ -4,6 +4,7 @@ from projekt.assetMenager import AssetManager
 from .pozycja import AttackPosition
 from .narzedzia import pozycja_myszy_na_surface
 import random
+from projekt.animationMenager import AnimationMenager
 
 
 class AttackDisplay(metaclass=Singleton):
@@ -21,6 +22,7 @@ class AttackDisplay(metaclass=Singleton):
         self.font = AssetManager.get_font("consolas", 26)
         self.font_color = color
         self.show = False
+        self.defender = None
 
     def update(self, attacker, defender, distance, x1, y1, x2, y2, defense):
         self.show = True
@@ -80,7 +82,10 @@ class AttackDisplay(metaclass=Singleton):
         if defense_buff > 0:
             rzut -= defense_buff
         if rzut > self.defense * 100:
-            return attacker.bronie[0]["atak"]
+            atak = random.randint(
+                attacker.bronie[0]["atak"][0], attacker.bronie[0]["atak"][1]
+            )
+            return atak
         return 0
 
 
@@ -182,6 +187,13 @@ class OddzialDefend(Oddzial):
         super().__init__(width, height, squad, id, sasiedzi)
         self.rect = self.surf.get_frect(topright=(width * 2, 0))
 
+    def draw(self, screen):
+        self.surf.fill("white")
+        for pozycja in self.pozycje_group:
+            pozycja.display(self.surf, self.squad.color)
+        AnimationMenager.display(self.surf)
+        screen.blit(self.surf, self.rect)
+
     def event(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
@@ -196,3 +208,10 @@ class OddzialDefend(Oddzial):
                     self.squad.zdrowie(pozycja.id, pozycja.wojownik.zdrowie - damage)
                     pozycja.wojownik = self.squad.wojownicy[pozycja.id]
                     AttackDisplay().ifselected = True
+                    animation = (
+                        40,
+                        0,
+                        str(damage),
+                        (pozycja.pos[0] + 70, pozycja.pos[1] - 30),
+                    )
+                    AnimationMenager.animations.append(animation)

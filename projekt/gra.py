@@ -21,6 +21,7 @@ from projekt.narzedzia import (
 from projekt.flag import Flag
 from projekt.network import Client
 from .assetMenager import AssetManager
+from .animationMenager import AnimationMenager
 
 
 class Gra:
@@ -78,6 +79,7 @@ class Gra:
             AttackDisplay().hover(pygame.mouse.get_pos())
         Mapa().update()
         Mini_map().update()
+        AnimationMenager.update()
 
     def draw(self):
         self.screen.fill("black")

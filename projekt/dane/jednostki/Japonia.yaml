@@ -54,7 +54,7 @@
         - Kolumbryna
       wzrok: Lornetka
       pancerz: 2
-      atak_points: 8
+      atak_points: 10
       red: kolubryna.png
       blue: kolubryna.png
       cost: 300
@@ -100,7 +100,7 @@
         - Kolumbryna
       wzrok: Lornetka
       pancerz: 10
-      atak_points: 16
+      atak_points: 20
       red: rec2.png
       blue: rec2.png
       id: 0

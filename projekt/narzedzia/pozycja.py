@@ -64,3 +64,23 @@ class AttackPosition(Pozycja):
         self.healthbar_rect = self.healthbar.get_frect(
             center=(self.pos[0] - 45, self.pos[1])
         )
+
+    def display(self, screen, color):
+        self.surf.fill(self.color)
+        screen.blit(self.surf, self.rect)
+        pygame.draw.rect(screen, "black", self.rect, width=1)
+        if self.wojownik is None:
+            return
+        surf = AssetManager.get_unit(self.wojownik.name, color)
+        rect = surf.get_frect(center=self.pos)
+        screen.blit(surf, rect)
+        self.display_health(screen)
+        self.display_attacks(screen)
+
+    def display_attacks(self, screen):
+        display = str(
+            int(self.wojownik.atak_points / self.wojownik.bronie[0]["koszt_ataku"])
+        )
+        text = AssetManager.get_font("consolas", 20).render(display, True, "black")
+        text_rect = text.get_frect(center=(self.pos[0] + 30, self.pos[1] - 30))
+        screen.blit(text, text_rect)
