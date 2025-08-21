@@ -23,6 +23,7 @@ class AttackDisplay(metaclass=Singleton):
         self.font_color = color
         self.show = False
         self.defender = None
+        self.turn = "Pierwsza Linia"
 
     def update(self, attacker, defender, distance, x1, y1, x2, y2, defense):
         self.show = True
@@ -47,7 +48,7 @@ class AttackDisplay(metaclass=Singleton):
         print(attack_angle)
 
         self.attacker = OddzialAttack(
-            self.width / 2, self.height, attacker, id, AttackDisplay.sasiedzi
+            self.width / 2, self.height, attacker, id, AttackDisplay.sasiedzi, distance
         )
         self.defender = OddzialDefend(
             self.width / 2,
@@ -55,6 +56,7 @@ class AttackDisplay(metaclass=Singleton):
             defender,
             6 - id,
             AttackDisplay.sasiedzi,
+            distance,
         )
 
     def display(self, screen):
@@ -90,8 +92,9 @@ class AttackDisplay(metaclass=Singleton):
 
 
 class Oddzial:
-    def __init__(self, width, height, squad, id, sasiedzi):
+    def __init__(self, width, height, squad, id, sasiedzi, distance):
         self.surf = pygame.Surface((width, height))
+        self.distance = distance
         self.surf.fill("white")
         self.rect = self.surf.get_frect(topleft=(0, 0))
         self.squad = squad
@@ -126,11 +129,48 @@ class Oddzial:
                 pozycja.line = 2
                 if self.squad.wojownicy[self.secondline[i]] is not None:
                     pozycja.id = self.squad.wojownicy[self.secondline[i]].pos
+                    if (
+                        int(
+                            pozycja.wojownik.atak_points
+                            / pozycja.wojownik.bronie[0]["koszt_ataku"]
+                        )
+                        > 0
+                        and pozycja.wojownik.bronie[0]["range"] >= self.distance
+                    ):
+                        pozycja.active = True
+                        print(
+                            "distrnace:",
+                            self.distance,
+                            pozycja.wojownik.bronie[0]["range"],
+                        )
+                    else:
+                        pozycja.active = False
+                else:
+                    pozycja.active = False
+
             else:
                 pozycja.wojownik = self.squad.wojownicy[self.firstline[i - 3]]
                 pozycja.line = 1
                 if self.squad.wojownicy[self.firstline[i - 3]] is not None:
                     pozycja.id = self.squad.wojownicy[self.firstline[i - 3]].pos
+                    if (
+                        int(
+                            pozycja.wojownik.atak_points
+                            / pozycja.wojownik.bronie[0]["koszt_ataku"]
+                        )
+                        > 0
+                        and self.distance <= pozycja.wojownik.bronie[0]["range"]
+                    ):
+                        pozycja.active = True
+                        print(
+                            "distrnace:",
+                            self.distance,
+                            pozycja.wojownik.bronie[0]["range"],
+                        )
+                    else:
+                        pozycja.active = False
+                else:
+                    pozycja.active = False
             i += 1
 
     def draw(self, screen):
@@ -143,9 +183,10 @@ class Oddzial:
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
         for pozycja in self.pozycje_group:
             if pozycja.rect.collidepoint(mouse_pos):
-                AttackDisplay().selected = pozycja
-                pozycja.color = (200, 200, 200)
-                AttackDisplay().ifselected = True
+                if pozycja.active:
+                    AttackDisplay().selected = pozycja
+                    pozycja.color = (200, 200, 200)
+                    AttackDisplay().ifselected = True
             else:
                 pozycja.color = "white"
         if not AttackDisplay().ifselected:
@@ -156,11 +197,12 @@ class Oddzial:
     def hover(self, mouse_pos):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
         for pozycja in self.pozycje_group:
-            pozycja.hover(mouse_pos)
+            if pozycja.active:
+                pozycja.hover(mouse_pos)
 
 
 class OddzialAttack(Oddzial):
-    def __init__(self, width, height, squad, id, sasiedzi):
+    def __init__(self, width, height, squad, id, sasiedzi, distance):
         self.pozycje = [
             (width / 5 * 1, height / 5 * 2),
             (width / 5 * 1, height / 5 * 3),
@@ -170,11 +212,11 @@ class OddzialAttack(Oddzial):
             (width / 5 * 3, height / 5 * 3.3),
             (width / 5 * 3, height / 5 * 4),
         ]
-        super().__init__(width, height, squad, id, sasiedzi)
+        super().__init__(width, height, squad, id, sasiedzi, distance)
 
 
 class OddzialDefend(Oddzial):
-    def __init__(self, width, height, squad, id, sasiedzi):
+    def __init__(self, width, height, squad, id, sasiedzi, distance):
         self.pozycje = [
             (width / 5 * 4, height / 5 * 2),
             (width / 5 * 4, height / 5 * 3),
@@ -184,7 +226,7 @@ class OddzialDefend(Oddzial):
             (width / 5 * 2, height / 5 * 3.3),
             (width / 5 * 2, height / 5 * 4),
         ]
-        super().__init__(width, height, squad, id, sasiedzi)
+        super().__init__(width, height, squad, id, sasiedzi, distance)
         self.rect = self.surf.get_frect(topright=(width * 2, 0))
 
     def draw(self, screen):
@@ -215,3 +257,12 @@ class OddzialDefend(Oddzial):
                         (pozycja.pos[0] + 70, pozycja.pos[1] - 30),
                     )
                     AnimationMenager.animations.append(animation)
+                    if (
+                        int(
+                            AttackDisplay().selected.wojownik.atak_points
+                            / AttackDisplay().selected.wojownik.bronie[0]["koszt_ataku"]
+                        )
+                        <= 0
+                    ):
+                        AttackDisplay().selected.active = False
+                        AttackDisplay().ifselected = False

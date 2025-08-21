@@ -115,7 +115,7 @@
       id: 0
       kategoria: budynek
       ruch : 7
-      obrona : 0.7
+      obrona : 0.6
 
     - nazwa: Wioska
       image: miasto.png
@@ -125,5 +125,5 @@
       id: 1
       kategoria: budynek
       ruch : 3
-      obrona: 0.65
+      obrona: 0.45
 

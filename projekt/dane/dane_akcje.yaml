@@ -36,19 +36,19 @@ zloto_upgrade:
 mury_upgrade:
   - koszt:
       gold: 0
-    mnoznik: 0.7
+    mnoznik: 0.6
 
   - koszt:
       gold: 100
-    mnoznik: 0.75
+    mnoznik: 0.65
 
   - koszt:
       gold: 150
-    mnoznik: 0.8
+    mnoznik: 0.7
 
   - koszt:
       gold: maks.
-    mnoznik: 0.8
+    mnoznik: 0.7
 
 
 
