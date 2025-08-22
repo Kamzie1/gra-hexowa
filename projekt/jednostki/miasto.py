@@ -1,6 +1,7 @@
 import pygame
 from os.path import join
-from projekt.swiat.tile import Podswietlenie
+from .podswietlenie import Podswietlenie
+from projekt.assetMenager import AssetManager
 
 
 class Miasto(pygame.sprite.Sprite):
@@ -12,19 +13,17 @@ class Miasto(pygame.sprite.Sprite):
         self.pos = tuple(info["pos"])
         self.tile = tile
         self.budynek = frakcja["budynek"][info["id"]]
-        self.image = pygame.image.load(
-            join("Grafika/budynki-grafika", self.budynek[info["color"]])
-        ).convert_alpha()
-        self.nazwa = self.budynek["nazwa"]
+        self.name = self.budynek["nazwa"]
+        self.image = AssetManager.get_asset(self.name)
         self.rect = self.image.get_frect(center=self.pos)
 
         self.heal = self.budynek["heal"]
         self.earn = self.budynek["earn"]
         self.id = info["id"]
-        self.koszt_ruchu = self.budynek["koszt_ruchu"]
+        self.koszt_ruchu = self.budynek["ruch"]
         self.podswietlenie_group = pygame.sprite.Group()
         Podswietlenie(
-            f"{self.color}_podswietlenie.png",
+            f"{self.color}_podswietlenie",
             tile.pos,
             self.podswietlenie_group,
         )
@@ -63,10 +62,6 @@ class Miasto(pygame.sprite.Sprite):
         self.atak = budynek["atak"]
         self.koszt_ataku = budynek["koszt_ataku"]
         self.id = id"""
-
-    def zarabiaj(self, player):
-        if self.owner_id == player.id:
-            player.gold += self.earn["gold"]
 
     def own(self, owner, owner_id, color):
         return

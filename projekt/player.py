@@ -1,24 +1,24 @@
 import pygame
-from projekt.jednostki import get_fraction
-from projekt.narzedzia import id_to_pos
+from projekt.akcjeMenager import AkcjeMenager
+from projekt.assetMenager import AssetManager
 
 
 class Player:
-    def __init__(self, user):
-        if user["fraction"] == "Spectator":
-            self.name = user["name"]
-            self.frakcja = get_fraction(user["fraction"])
-            self.color = user["color"]
-            self.id = -1
-        else:
-            self.id = user["id"]
-            self.name = user["name"]
-            self._gold = user["gold"]
-            self.frakcja = get_fraction(user["fraction"])
-            self.recruit_pos = id_to_pos(user["x"], user["y"])
-            self.x = user["x"]
-            self.y = user["y"]
-            self.color = user["color"]
+    def __init__(self, data):
+        self.id = data["id"]
+        self.name = data["name"]
+        self._gold = data["gold"]
+        self.frakcja = data["frakcja"]
+        self.pos = data["pos"]
+        self.x = data["x"]
+        self.y = data["y"]
+        self.color = data["color"]
+        self.zloto_income = 7 * self.frakcja["budynek"][0]["earn"]["gold"]
+        self.akcjeMenager = AkcjeMenager(data["akcje"])
+
+    @property
+    def akcje(self):
+        return self.akcjeMenager.buffs
 
     @property
     def gold(self):

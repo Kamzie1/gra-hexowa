@@ -1,0 +1,52 @@
+  jednostka:
+    - nazwa: Ciężki Kopijnik
+      zdrowie: 70
+      morale: 70
+      ruch: 18
+      bronie:
+        - Kopia
+      wzrok: Oczy
+      pancerz: 8
+      atak_points: 10
+      red: Ciezki_kopijnik.png
+      blue: Ciezki_kopijnik blue.png
+      cost: 300
+      id: 0
+      kategoria: jednostka
+
+  specjalne:
+    - nazwa: Fort
+      zdrowie: 500
+      morale: 90
+      ruch: 0
+      bronie:
+        - Kolumbryna
+      wzrok: Lornetka
+      pancerz: 10
+      atak_points: 20
+      red: rec2.png
+      blue: rec2.png
+      id: 0
+      kategoria: specjalne
+
+  budynek:
+    - nazwa: Miasto
+      image: miasto.png
+      earn:
+        gold: 30
+      heal: 10
+      id: 0
+      kategoria: budynek
+      ruch : 7
+      obrona : 0.6
+
+    - nazwa: Wioska
+      image: miasto.png
+      earn:
+        gold: 30
+      heal: 10
+      id: 1
+      kategoria: budynek
+      ruch : 3
+      obrona: 0.45
+

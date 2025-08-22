@@ -1,47 +1,214 @@
-from ..ustawienia import *
-from ..jednostki import *
-from ..narzedzia import pozycja_myszy_na_surface
-from .buttons import Recruit
+from projekt.ustawienia import (
+    menu_color,
+    menu_height,
+    menu_width,
+    menu_pos,
+    rec_panel_pos,
+)
+from projekt.narzedzia import pozycja_myszy_na_surface
+from .buttons import (
+    Recruit,
+    TextButton,
+    RekrutacjaShowButton,
+    AkcjeShowButton,
+    Rozkaz,
+    Upgrade,
+)
 import pygame
 from os.path import join
+from .mapa import Mapa
+from projekt.narzedzia import Singleton
+from projekt.network import Client
+from .mouseDisplay import MouseDisplay
+from projekt.flag import Flag
 
 
-class SideMenu:
-    def __init__(self, player, mapa):
+class SideMenu(metaclass=Singleton):
+    def __init__(self):
+        if hasattr(self, "_initialized"):
+            return
         self.surf = pygame.Surface((menu_width, menu_height), pygame.SRCALPHA)
         self.surf.fill(menu_color)
         self.rect = self.surf.get_frect(topleft=menu_pos)
-        self.player = player
-        self.group = mapa.army_group
+        self.rekrutacja = PoleRekrutacji(
+            menu_width, menu_height, Client().player, (0, 60)
+        )
+        self.akcje = PoleAkcji(menu_width, menu_height, Client().player, (0, 60))
+        self.type = 0  # 0 to rekrutacja, 1 to akcje
+
         self.button_group = pygame.sprite.Group()
-        self.recruit_group = pygame.sprite.Group()
-        self.mapa = mapa
+        self.rekrutacjaButton = RekrutacjaShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (0, 10),
+            self.button_group,
+            "Rekrutuj",
+            "consolas.ttf",
+            28,
+            Client().player.color,
+        )
+        self.akcjeButton = AkcjeShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (menu_width / 2 + 5, 10),
+            self.button_group,
+            "Akcje",
+            "consolas.ttf",
+            28,
+            Client().player.color,
+        )
 
-        self.recruit_surface = pygame.Surface((menu_width - 20, 300), pygame.SRCALPHA)
-        self.recruit_surface.fill((50, 50, 50, 70))
-        self.recruit_rec = self.recruit_surface.get_frect(topleft=rec_panel_pos)
-        self.font = pygame.font.Font(join("Grafika/fonts", font), font_size)
-        self.res_font = pygame.font.Font(join("Grafika/fonts", font), 10)
+    def fill(self):
+        self.surf.fill(menu_color)
 
-        self.gold_icon = pygame.image.load(join("Grafika", "złoto.png"))
-        self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
+    def update(self):
+        mouse_pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(mouse_pos) and Flag().show:
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, (0, 60))
+            if self.type:
+                self.akcje.update(mouse_pos)
+            else:
+                self.rekrutacja.update(mouse_pos)
 
-        display = "Rekrutuj"
-        text = self.font.render(display, True, "white")
-        text_rect = text.get_rect(topleft=(5, 5))
-        self.recruit_surface.blit(text, text_rect)
+    def event(self, mouse_pos):
+        if self.rect.collidepoint(mouse_pos) and Flag().show:
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
+            Flag().klikniecie_flag = False
+            for button in self.button_group:
+                if button.rect.collidepoint(mouse_pos):
+                    self.type = button.click()
+                    return
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, (0, 60))
+            if self.type:
+                self.akcje.event(
+                    mouse_pos, Client().turn, len(Client().users), Client().player.id
+                )
+            else:
+                self.rekrutacja.event(
+                    mouse_pos, Client().turn, len(Client().users), Client().player.id
+                )
 
-        x, y = 5, 40
+    def swap(self, player):
+        for button in self.button_group:
+            button.kill()
+        self.button_group.empty()
+
+        self.surf.fill((50, 50, 50, 70))
+
+        self.rekrutacja = PoleRekrutacji(menu_width, menu_height, player, (0, 60))
+        self.akcje = PoleAkcji(menu_width, menu_height, player, (0, 60))
+
+        self.rekrutacjaButton = RekrutacjaShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (0, 10),
+            self.button_group,
+            "Rekrutuj",
+            "consolas.ttf",
+            28,
+            player.color,
+        )
+        self.akcjeButton = AkcjeShowButton(
+            (menu_width - 10) / 2,
+            40,
+            (20, 20, 20),
+            (menu_width / 2 + 5, 10),
+            self.button_group,
+            "Akcje",
+            "consolas.ttf",
+            28,
+            player.color,
+        )
+
+    def draw(self, screen):
+        self.surf.fill(menu_color)
+        self.button_group.draw(self.surf)
+        if self.type:
+            self.akcje.draw(self.surf)
+            pygame.draw.line(
+                self.surf, (230, 230, 230), (0, 50), (menu_width / 2 + 5, 50)
+            )
+            pygame.draw.line(
+                self.surf,
+                (230, 230, 230),
+                (menu_width / 2 + 5, 50),
+                (menu_width / 2 + 5, 10),
+            )
+            pygame.draw.line(
+                self.surf, (230, 230, 230), (menu_width / 2 + 5, 10), (menu_width, 10)
+            )
+        else:
+            self.rekrutacja.draw(self.surf)
+            pygame.draw.line(
+                self.surf,
+                (230, 230, 230),
+                ((menu_width - 10) / 2, 50),
+                (menu_width, 50),
+            )
+            pygame.draw.line(
+                self.surf,
+                (230, 230, 230),
+                ((menu_width - 10) / 2, 50),
+                ((menu_width - 10) / 2, 10),
+            )
+            pygame.draw.line(
+                self.surf, (230, 230, 230), ((menu_width - 10) / 2, 10), (0, 10)
+            )
+        screen.blit(self.surf, self.rect)
+
+
+class Pole:
+    def __init__(self, w, h, player, pos):
+        self.surf = pygame.Surface((w, h), pygame.SRCALPHA)
+        self.rect = self.surf.get_frect(topleft=pos)
+        self.player = player
+        self.button_group = pygame.sprite.Group()
+        self.setup()
+
+    def setup(self):
+        pass
+
+    def draw(self, screen):
+        self.surf.fill((0, 0, 0, 0))
+        for button in self.button_group:
+            button.draw(self.surf)
+        screen.blit(self.surf, self.rect)
+
+    def event(self, mouse_pos, turn, user_len, id):
+        if turn % user_len == id:
+            for button in self.button_group:
+                if button.rect.collidepoint(mouse_pos):
+                    button.click()
+
+    def update(self, mouse_pos):
+        for button in self.button_group:
+            if button.rect.collidepoint(mouse_pos):
+                button.hover()
+                MouseDisplay().update(pygame.mouse.get_pos(), button.description)
+
+
+class PoleRekrutacji(Pole):
+    def __init__(self, w, h, player, pos):
+        self.group = Mapa().army_group
+        super().__init__(w, h, player, pos)
+
+    def setup(self):
+        x, y = 5, 5
         id = 0
         for jednostka in self.player.frakcja["jednostka"]:
-            self.create_recruit_button(
+            Recruit(
+                40,
+                40,
+                "red",
+                (x, y),
                 jednostka,
                 id,
-                x,
-                y,
-                self.player.recruit_pos,
-                self.player.x,
-                self.player.y,
+                self.button_group,
+                f"{jednostka["nazwa"]}",
             )
             x += 95
             id += 1
@@ -49,47 +216,52 @@ class SideMenu:
                 x = 5
                 y += 50
 
-    def fill(self):
-        self.surf.fill(menu_color)
 
-    def event(self, mouse_pos, flag, turn, id, users):
-        mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
-        if self.rect.collidepoint(mouse_pos) and flag.show:
-            flag.klikniecie_flag = False
-            mouse_pos = pozycja_myszy_na_surface(mouse_pos, rec_panel_pos)
-            if turn % len(users) == id:
-                for button in self.recruit_group:
-                    if button.rect.collidepoint(mouse_pos):
-                        button.click(id)
+class PoleAkcji(Pole):
+    def __init__(self, w, h, player, pos):
+        super().__init__(w, h, player, pos)
 
-    def draw(self, screen):
-        self.fill()
-        self.recruit_group.draw(self.recruit_surface)
-        self.surf.blit(self.recruit_surface, self.recruit_rec)
-        screen.blit(self.surf, self.rect)
-
-    def create_recruit_button(
-        self, jednostka, id, x, y, recruit_pos, miasto_x, miasto_y
-    ):
-        Recruit(
+    def setup(self):
+        Rozkaz(
             40,
             40,
             "red",
-            (x, y),
-            jednostka,
-            id,
-            self.group,
-            self.recruit_group,
-            recruit_pos,
-            self.player,
-            self.mapa,
-            miasto_x,
-            miasto_y,
+            (5, 5),
+            "zloto_rozkaz",
+            self.button_group,
+            """przychód złota 125% na 2 tury
+            4 tury cooldown""",
         )
-
-        self.gold_rect = self.scaled_gold_icon.get_frect(topleft=(x + 45, y + 5))
-        self.recruit_surface.blit(self.scaled_gold_icon, self.gold_rect)
-        display = f"{jednostka["cost"]}"
-        text = self.res_font.render(display, True, "white")
-        text_rect = text.get_rect(topleft=(x + 60, y + 10))
-        self.recruit_surface.blit(text, text_rect)
+        Upgrade(
+            40,
+            40,
+            "red",
+            (100, 5),
+            "zloto_upgrade",
+            self.button_group,
+            """ulepsz wydobycie zlota.
+            level 2 : 110%"
+            level 3 : 120%"
+            level 4 : 130%""",
+        )
+        Upgrade(
+            40,
+            40,
+            "blue",
+            (195, 5),
+            "mury_upgrade",
+            self.button_group,
+            """ulepsz obronę murów miasta.
+            level 2 : 75%
+            level 3 : 80%""",
+        )
+        Rozkaz(
+            40,
+            40,
+            "blue",
+            (5, 50),
+            "movement_rozkaz",
+            self.button_group,
+            """zwieksz ruch wszystkich jednostek na 1 turę
+            3 tury cooldown""",
+        )

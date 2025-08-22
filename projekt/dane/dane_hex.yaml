@@ -1,0 +1,38 @@
+tile_width : 112
+tile_height : 108
+tileproperties : 
+  - koszt_ruchu: 7
+    widocznosc: 3
+    image : kurhan
+    typ: 0
+    obrona: 0.45
+        
+  - koszt_ruchu: 3
+    widocznosc: 2
+    image : rowniny
+    typ: 1
+    obrona : 0.3
+    
+  - koszt_ruchu: 4
+    widocznosc: 4
+    image : grass
+    typ: 2
+    obrona : 0.4
+    
+  - koszt_ruchu: 4
+    widocznosc: 4
+    image : grass
+    typ: 3
+    obrona : 0.4
+    
+  - koszt_ruchu: 5
+    widocznosc: 2
+    image : pustkowie
+    typ: 4
+    obrona : 0.25
+    
+  - koszt_ruchu: 7
+    widocznosc: 4
+    image : gora
+    typ: 5
+    obrona : 0.5

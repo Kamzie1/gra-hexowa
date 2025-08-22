@@ -1,0 +1,54 @@
+zloto_rozkaz:
+  mnoznik: 0.25 #0.25 plus 1
+  tury: 2
+  cooldown : 4
+  koszt:
+    gold: 100
+
+movement_rozkaz:
+    mnoznik: 4
+    tury: 1
+    cooldown : 3
+    koszt:
+        gold: 80
+
+zloto_upgrade:
+  - koszt:
+      gold: 0
+    mnoznik: 1
+
+  - koszt:
+      gold: 100
+    mnoznik: 1.1
+
+  - koszt:
+      gold: 150
+    mnoznik: 1.2
+
+  - koszt:
+      gold: 200
+    mnoznik: 1.3
+
+  - koszt:
+      gold: maks.
+    mnoznik: 1.3
+
+mury_upgrade:
+  - koszt:
+      gold: 0
+    mnoznik: 0.6
+
+  - koszt:
+      gold: 100
+    mnoznik: 0.65
+
+  - koszt:
+      gold: 150
+    mnoznik: 0.7
+
+  - koszt:
+      gold: maks.
+    mnoznik: 0.7
+
+
+

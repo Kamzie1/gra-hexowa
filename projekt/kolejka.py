@@ -10,6 +10,7 @@ from projekt.narzedzia import (
 )
 from projekt.ustawienia import Width, Height, srodek
 import random
+from projekt.network import Client
 
 
 class Kolejka:
@@ -34,16 +35,16 @@ class Kolejka:
         self.opponents = pygame.Surface((self.w - 30, self.h))
         self.opponents_rect = self.opponents.get_frect(topleft=(self.w / 2 + 30, 0))
 
-    def run(self, screen, client):
-        self.event_handler(client)
-        self.draw(screen, client)
+    def run(self, screen):
+        self.event_handler()
+        self.draw(screen)
 
-    def draw(self, screen, client):
+    def draw(self, screen):
         screen.fill("white")
         self.content.fill("white")
 
-        self.displayPlayers(client)
-        self.ustawienia.draw(self.content, client.room)
+        self.displayPlayers()
+        self.ustawienia.draw(self.content, Client().room)
 
         pygame.draw.line(
             self.content,
@@ -54,46 +55,46 @@ class Kolejka:
         )
 
         self.ready.draw(self.content)
-        self.room_id.display(f"Id pokoju: {client.room["room_id"]}", "black", screen)
+        self.room_id.display(f"Id pokoju: {Client().room["room_id"]}", "black", screen)
         self.leave.draw(screen)
 
         screen.blit(self.content, self.content_rect)
 
-    def displayPlayers(self, client):
+    def displayPlayers(self):
         self.opponents.fill("white")
         x = 0
         y = 0
-        for user in client.room["users"]:
-            if not user["name"] == client.name:
+        for user in Client().room["users"]:
+            if not user["name"] == Client().name:
                 self.drawOpponentDisplay(x, y, user)
                 x += 250
                 if x > self.w:
                     x = 0
                     y += 350
             else:
-                self.playerCard.draw(client.name, self.content)
+                self.playerCard.draw(Client().name, self.content)
 
-        for user in client.room["spectators"]:
-            if not user["name"] == client.name:
+        for user in Client().room["spectators"]:
+            if not user["name"] == Client().name:
                 self.drawOpponentDisplay(x, y, user)
                 x += 250
                 if x > self.w:
                     x = 0
                     y += 350
             else:
-                self.playerCard.draw(client.name, self.content)
+                self.playerCard.draw(Client().name, self.content)
 
         self.content.blit(self.opponents, self.opponents_rect)
 
-    def leave_event(self, client, mouse_pos):
+    def leave_event(self, mouse_pos):
         if self.leave.rect.collidepoint(mouse_pos):
-            client.ekran = 0
+            Client().ekran = 0
             try:
-                client.leave()
+                Client().leave()
             except Exception as e:
                 print(e)
 
-    def event_handler(self, client):
+    def event_handler(self):
         mouse_pos = pygame.mouse.get_pos()
         mouse_pos = pozycja_myszy_na_surface(
             mouse_pos, (self.content_rect.x, self.content_rect.y)
@@ -115,22 +116,22 @@ class Kolejka:
                 ):
                     self.ustawienia.map_id += 1
                     self.ustawienia.map_id %= len(self.ustawienia.maps)
-                client.ustawienia(self.load_ustawienia())
+                Client().ustawienia(self.load_ustawienia())
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if self.ready.rect.collidepoint(mouse_pos):
                     print("click")
                     self.ready.click()
-                    client.ustawienia(self.load_ustawienia())
-                self.leave_event(client, pygame.mouse.get_pos())
+                    Client().ustawienia(self.load_ustawienia())
+                self.leave_event(pygame.mouse.get_pos())
                 if self.playerCard.colorsButton.rect.collidepoint(mouse_pos):
                     self.playerCard.color += 1
                     self.playerCard.color %= len(self.playerCard.colors)
-                    client.ustawienia(self.load_ustawienia())
+                    Client().ustawienia(self.load_ustawienia())
 
                 if self.playerCard.fractionButton.rect.collidepoint(mouse_pos):
                     self.playerCard.fraction += 1
                     self.playerCard.fraction %= len(self.playerCard.frakcje)
-                    client.ustawienia(self.load_ustawienia())
+                    Client().ustawienia(self.load_ustawienia())
 
     def load_ustawienia(self):
         return {
@@ -174,7 +175,7 @@ class PlayerCard:
         self.rect = self.surf.get_frect(topleft=(0, 0))
         self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", 20)
 
-        self.frakcje = ["Japonia", "Japonia2", "Spectator"]
+        self.frakcje = ["Japonia", "Prusy", "Spectator"]
         self.colors = ["red", "blue"]
 
         self.fraction = 0

@@ -1,0 +1,12 @@
+import pygame
+from projekt.assetMenager import AssetManager
+
+
+class Podswietlenie(pygame.sprite.Sprite):
+    def __init__(self, url, pos, group):
+        super().__init__(group)
+        self.image = AssetManager.get_asset(url)
+        self.rect = self.image.get_frect(center=pos)
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)

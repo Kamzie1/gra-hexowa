@@ -1,22 +1,62 @@
+from projekt.narzedzia import Singleton, KoniecGry, oblicz_pos
+from projekt.player import Player
+from projekt.assetMenager import AssetManager
 import socketio
 import threading
 import socketio.exceptions
-from projekt.narzedzia import KoniecGry
-from projekt.ustawienia import Width, Height
 import time
 
 
-class Client:
+class Client(metaclass=Singleton):
     def __init__(self):
+        if hasattr(self, "_initialized"):
+            return
+        self.turn = 0
         self.ekran = 0
         self.start_game = False
         self.connected = False
         self.sio = socketio.Client(reconnection=True)
         self._setup_events()
         self.state_loaded = True
-        self.turn = 0
-        self.koniecGry = KoniecGry(Width, Height)
         self.name = "anonim"
+
+    def load_player(self):
+        return {
+            "name": self.name,
+            "x": self.users[self.id]["x"],
+            "y": self.users[self.id]["y"],
+            "frakcja": AssetManager.frakcja[self.users[self.id]["fraction"]],
+            "num": self.users[self.id]["id"],
+            "pos": oblicz_pos(self.users[self.id]["x"], self.users[self.id]["y"]),
+            "color": self.users[self.id]["color"],
+            "id": self.id,
+            "gold": self.users[self.id]["gold"],
+            "akcje": self.load_akcje(),
+        }
+
+    def load_spectator(self):
+        return {
+            "name": self.name,
+            "x": self.width / 2,
+            "y": self.height / 2,
+            "frakcja": AssetManager.frakcja["Japonia"],
+            "num": -1,
+            "pos": oblicz_pos(self.width / 2, self.height / 2),
+            "color": "red",
+            "id": -1,
+            "gold": 0,
+            "akcje": self.load_akcje(),
+        }
+
+    def load_akcje(self):
+        return {
+            "zloto_upgrade": 1,
+            "mury_upgrade": 1,
+            "zloto_rozkaz_cooldown": False,
+            "zloto_rozkaz": 1,
+            "movement_rozkaz_cooldown": False,
+            "movement_rozkaz": 0,
+        }
 
     def _setup_events(self):
         @self.sio.event
@@ -49,8 +89,10 @@ class Client:
             for user in self.users:
                 if user["name"] == self.name:
                     self.id = user["id"]
+                    self.player = Player(self.load_player())
             for user in self.spectators:
                 if user["name"] == self.name:
+                    self.player = Player(self.load_spectator())
                     self.ekran = 3
 
         @self.sio.on("new_state")
@@ -64,22 +106,22 @@ class Client:
             for user in data["users"]:
                 if user["name"] == self.name:
                     self.id = user["id"]
-                    self.mapa.player.id = self.id
+                    self.player.id = self.id
                     self.ekran = 2
 
             for user in data["spectators"]:
                 if user["name"] == self.name:
                     self.id = -1
-                    self.mapa.player.id = self.id
+                    self.player.id = self.id
                     self.ekran = 3
             self.state_loaded = False
             self.turn = data["turn"]
             if self.ekran == 2:
-                self.mapa.player.gold = data["users"][self.id]["gold"]
-                if self.turn % len(
+                self.player.gold = data["users"][self.id]["gold"]
+                if self.turn % len(self.users) == self.player.id and self.turn >= len(
                     self.users
-                ) == self.mapa.player.id and self.turn >= len(self.users):
-                    self.mapa.zarabiaj()
+                ):
+                    self.player.gold += self.player.zloto_income
                     self.mapa.heal()
             self.mapa.import_state(self.state, self.users)
 
@@ -90,9 +132,9 @@ class Client:
             self.ekran = 3
             self.id = -1
             if result == self.name:
-                self.koniecGry.display("Wygrałeś", self.mapa.player.color)
+                KoniecGry().display("Wygrałeś", self.player.color)
             else:
-                self.koniecGry.display("Przegrałeś", self.mapa.player.color)
+                KoniecGry().display("Przegrałeś", self.player.color)
 
         @self.sio.on("ustawienia")
         def ustawienia(room):
@@ -160,7 +202,7 @@ class Client:
     def send_state(self, state):
         self.sio.emit(
             "new_state",
-            {"state": state, "nadawca": self.name, "gold": self.mapa.player.gold},
+            {"state": state, "nadawca": self.name, "gold": self.player.gold},
         )
 
     def send_result(self, result):
