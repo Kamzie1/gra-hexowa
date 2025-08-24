@@ -146,6 +146,13 @@ class Squad(pygame.sprite.Sprite):
             )
             self.wojownicy[jednostka["array_pos"]] = w
 
+    def __len__(self):
+        dl = 0
+        for wojownik in self.wojownicy:
+            if wojownik is not None:
+                dl += 1
+        return dl
+
     def __add__(self, other):
         wojownicy = []
         for wojownik in self.wojownicy:

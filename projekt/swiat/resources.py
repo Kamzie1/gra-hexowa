@@ -49,10 +49,7 @@ class Resource(metaclass=Singleton):
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, resource_pos)
             for button in self.button_group:
                 if button.rect.collidepoint(mouse_pos):
-                    if isinstance(button, Menu):
-                        button.click()
-                    else:
-                        button.click()
+                    button.click()
 
     def draw(self, screen):
         self.fill()

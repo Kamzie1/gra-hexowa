@@ -59,7 +59,9 @@ class Spectator:
         mouse_pos = pygame.mouse.get_pos()
         MouseDisplay().show = False
         Resource().update()
-        self.turn_Display.hover(mouse_pos, Client().pogoda[0])
+        self.turn_Display.hover(
+            mouse_pos, Client().pogoda, Client().player.akcje["wheater_forecast"]
+        )
         if SquadDisplay().show:
             SquadDisplay().update(pygame.mouse.get_pos())
 
@@ -76,7 +78,12 @@ class Spectator:
         Mapa().draw(screen)
         Resource().draw(screen)
         self.turn_Display.display(
-            "grey", screen, Client().users, Client().turn, Client().pogoda[0]
+            "grey",
+            screen,
+            Client().users,
+            Client().turn,
+            Client().pogoda,
+            Client().player.akcje["wheater_forecast"],
         )
         Mini_map().draw(screen)
         for jednostka in Mapa().army_group:

@@ -55,19 +55,17 @@ class Najechanie:
     @origin.setter
     def origin(self, value):
         self._origin = value
-        self.rect = AssetManager.get_asset(f"{self.flag}_podswietlenie").get_frect(
-            center=self.origin
-        )
 
-    def update(self, mouse_pos, Tile_array, origin):
+    def update(self, mouse_pos, Tile_array, origin, widziane):
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, origin)
 
         for tiles in Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
                     self.origin = tile.pos
-                    # dodac widok zachowanie dla nie widocznej czesic
-                    if tile.jednostka is not None:
+                    if widziane[tile.x][tile.y] == 0:
+                        self.flag = None
+                    elif tile.jednostka is not None:
                         self.flag = tile.jednostka.color
                     elif tile.budynek is not None:
                         self.flag = tile.budynek.color
@@ -76,12 +74,14 @@ class Najechanie:
                     self.display = str(int(tile.obrona * 100)) + "%"
 
     def draw(self, screen):
-        surf = AssetManager.get_asset(f"{self.flag}_podswietlenie")
-        font = AssetManager.get_font("consolas", 24)
-        text = font.render(self.display, True, "black")
-        text_rect = text.get_rect(center=self.origin)
-        screen.blit(text, text_rect)
-        screen.blit(surf, self.rect)
+        if self.flag is not None:
+            surf = AssetManager.get_asset(f"{self.flag}_podswietlenie")
+            rect = surf.get_frect(center=self.origin)
+            font = AssetManager.get_font("consolas", 24)
+            text = font.render(self.display, True, "black")
+            text_rect = text.get_rect(center=self.origin)
+            screen.blit(text, text_rect)
+            screen.blit(surf, rect)
 
 
 class Klikniecie:

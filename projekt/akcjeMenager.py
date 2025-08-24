@@ -23,11 +23,8 @@ class AkcjeMenager:
     def reset_buff(self, typ, rodzaj):
         if rodzaj == "cooldown":
             self.buffs[typ + "_cooldown"] = False
-            print("reset cooldown")
         else:
             self.buffs[typ] -= AssetManager.get_akcje(typ, "mnoznik")
-            print("reset")
-        print(self.buffs)
 
     def get_akcje(self):
         return self.buffs

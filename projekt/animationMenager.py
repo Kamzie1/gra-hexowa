@@ -21,10 +21,28 @@ class AnimationMenager:
     def draw(animation, screen):
         match (animation[1]):
             case 0:
-                AnimationMenager.draw_text(animation, screen)
+                AnimationMenager.draw_damage(animation, screen)
+            case 1:
+                AnimationMenager.draw_crit(animation, screen)
 
     @staticmethod
-    def draw_text(animation, screen):
+    def draw_damage(animation, screen):
+        text = AssetManager.get_font("consolas", 26).render(
+            animation[2], True, (100, 100, 100)
+        )
+        if animation[0] < 4:
+            text.set_alpha(240)
+        if animation[0] > 36:
+            text.set_alpha(240)
+        if animation[0] < 12:
+            text.set_alpha(200)
+        if animation[0] > 28:
+            text.set_alpha(200)
+        text_rect = text.get_frect(center=animation[3])
+        screen.blit(text, text_rect)
+
+    @staticmethod
+    def draw_crit(animation, screen):
         text = AssetManager.get_font("consolas", 26).render(animation[2], True, "red")
         if animation[0] < 4:
             text.set_alpha(240)

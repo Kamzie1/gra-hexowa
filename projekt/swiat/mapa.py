@@ -80,11 +80,7 @@ class Mapa(metaclass=Singleton):
 
         self.update_based_border(mouse_pos)
         self.update_based_mouse(mouse_pos)
-        self.najechanie.update(
-            mouse_pos,
-            self.Tile_array,
-            self.origin,
-        )
+        self.najechanie.update(mouse_pos, self.Tile_array, self.origin, self.widziane)
 
     def update_based_mouse(self, mouse_pos):
         if pygame.mouse.get_pressed()[1]:
@@ -445,7 +441,8 @@ class Mapa(metaclass=Singleton):
                         else:
                             if (
                                 not tile.jednostka is None
-                                and Client().turn % len(Client().users) == id
+                                and Client().turn % len(Client().users)
+                                == Client().player.id
                             ):
                                 if (
                                     tile.jednostka.owner_id != Client().player.id
@@ -487,13 +484,11 @@ class Mapa(metaclass=Singleton):
             self.move_flag.tile.jednostka = None
         else:
             self.move_flag.tile.jednostka.wojownicy[self.split] = None
-            print(self.move_flag.tile.jednostka)
         self.move_flag.pos = tile.pos
         self.move_flag.tile = tile
         self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
         tile.jednostka = self.move_flag
         if tile.budynek is not None:
-            print("owning...")
             tile.budynek.own(
                 self.move_flag.owner,
                 self.move_flag.owner_id,
@@ -503,30 +498,36 @@ class Mapa(metaclass=Singleton):
         self.calculate_income()
 
     def recruit(self, tile):
-        try:
+        if (
+            Client().player.gold
+            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
+                "cost"
+            ]
+        ):
             Client().player.gold -= Client().player.frakcja["jednostka"][
                 self.move_flag.wojownicy[3].id
             ]["cost"]
-        except:
-            print("not enough money")
-        else:
             self.move_flag.pos = tile.pos
             self.move_flag.tile = tile
             self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
             tile.jednostka = self.move_flag
+        else:
+            print("not enough money")
 
     def recruit_join(self, tile):
-        try:
+        if (
+            Client().player.gold
+            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
+                "cost"
+            ]
+            and len(tile.jednostka) + len(self.move_flag) > 7
+        ):
             Client().player.gold -= Client().player.frakcja["jednostka"][
                 self.move_flag.wojownicy[3].id
             ]["cost"]
-        except:
-            print("not enough money")
+            self.join(tile.jednostka, self.move_flag, tile)
         else:
-            try:
-                self.join(tile.jednostka, self.move_flag, tile)
-            except:
-                pass
+            print("not enough money")
 
     def join(self, squad1, squad2, tile):
         if not self.validate_join(squad1, squad2):

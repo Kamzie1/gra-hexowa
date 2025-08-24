@@ -121,10 +121,8 @@ class Client(metaclass=Singleton):
             self.mapa.import_state(self.state, self.users)
             match (self.pogoda[0]):
                 case 1:
-                    print("słońce")
                     self.mapa.refresh_movement(-4)
                 case 2:
-                    print("mgła")
                     self.mapa.refresh_wzrok(-4)
                 case _:
                     pass
@@ -222,3 +220,4 @@ class Client(metaclass=Singleton):
 
     def ustawienia(self, ustawienia):
         self.sio.emit("settings", {"settings": ustawienia, "nadawca": self.name})
+        print("ustawienia")

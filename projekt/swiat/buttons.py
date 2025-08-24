@@ -203,6 +203,8 @@ class Rozkaz(Button):
                     Client().users[Client().player.id]["akcje"]["movement_rozkaz"],
                     Client().player.id,
                 )
+                if Client().player.akcje["change_wheater"]:
+                    Client().pogoda[0] = 0
 
     def draw(self, screen):
         if Client().player.akcje[self.typ + "_cooldown"]:

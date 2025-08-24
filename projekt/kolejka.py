@@ -96,6 +96,7 @@ class Kolejka:
                 print(e)
 
     def event_handler(self):
+        self.ustawienia.dirty = False
         mouse_pos = pygame.mouse.get_pos()
         mouse_pos = pozycja_myszy_na_surface(
             mouse_pos, (self.content_rect.x, self.content_rect.y)
@@ -104,23 +105,9 @@ class Kolejka:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if self.ustawienia.rect.collidepoint(mouse_pos):
-                mouse_pos = pozycja_myszy_na_surface(
-                    mouse_pos, (self.ustawienia.rect.x, self.ustawienia.rect.y)
-                )
-                self.ustawienia.wioski.update(event, mouse_pos)
-                self.ustawienia.gold.update(event, mouse_pos)
-                if (
-                    event.type == pygame.MOUSEBUTTONUP
-                    and event.button == 1
-                    and self.ustawienia.mapaSwitch.rect.collidepoint(mouse_pos)
-                ):
-                    self.ustawienia.map_id += 1
-                    self.ustawienia.map_id %= len(self.ustawienia.maps)
-                Client().ustawienia(self.load_ustawienia())
+            self.ustawienia.event_handler(event, mouse_pos)
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if self.ready.rect.collidepoint(mouse_pos):
-                    print("click")
                     self.ready.click()
                     Client().ustawienia(self.load_ustawienia())
                 self.leave_event(pygame.mouse.get_pos())
@@ -133,6 +120,8 @@ class Kolejka:
                     self.playerCard.fraction += 1
                     self.playerCard.fraction %= len(self.playerCard.frakcje)
                     Client().ustawienia(self.load_ustawienia())
+        if self.ustawienia.dirty:
+            Client().ustawienia(self.load_ustawienia())
 
     def load_ustawienia(self):
         return {
@@ -226,3 +215,21 @@ class Ustawienia:
         self.gold.draw(self.surf)
         self.mapaSwitch.draw(self.map_id, self.surf)
         screen.blit(self.surf, self.rect)
+
+    def event_handler(self, event, mouse_pos):
+        if self.rect.collidepoint(mouse_pos):
+            mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
+            self.wioski.update(event, mouse_pos)
+            self.gold.update(event, mouse_pos)
+            if (
+                event.type == pygame.MOUSEBUTTONUP
+                and event.button == 1
+                and self.mapaSwitch.rect.collidepoint(mouse_pos)
+            ):
+                self.map_id += 1
+                self.map_id %= len(self.maps)
+                self.dirty = True
+            if self.wioski.dirty:
+                self.dirty = True
+            if self.gold.dirty:
+                self.dirty = True

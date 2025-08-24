@@ -45,9 +45,6 @@ class AttackDisplay(metaclass=Singleton):
                 break
             i += 1
 
-        print(id)
-        print(attack_angle)
-
         self.attacker = OddzialAttack(
             self.width / 2, self.height, attacker, id, AttackDisplay.sasiedzi, distance
         )
@@ -82,7 +79,6 @@ class AttackDisplay(metaclass=Singleton):
         attacker.atak_points -= attacker.bronie[0]["koszt_ataku"]
         defense_buff = wojownik.pancerz - attacker.bronie[0]["przebicie"]
         if self.pogoda == 3 and attacker.bronie[0]["typ"] == "prochowa":
-            print("deszcz")
             rzut = random.randint(0, 1)
             if rzut:
                 return 0
@@ -93,6 +89,13 @@ class AttackDisplay(metaclass=Singleton):
             atak = random.randint(
                 attacker.bronie[0]["atak"][0], attacker.bronie[0]["atak"][1]
             )
+            if random.randint(1, 10) < 2:
+                atak += (
+                    random.randint(
+                        attacker.bronie[0]["atak"][0], attacker.bronie[0]["atak"][1]
+                    )
+                    / 2
+                )
             return atak
         return 0
 
@@ -133,26 +136,24 @@ class Oddzial:
             if i < 3:
                 pozycja.wojownik = self.squad.wojownicy[self.secondline[i]]
                 pozycja.line = 2
-                if self.squad.wojownicy[self.secondline[i]] is not None:
-                    pozycja.id = self.squad.wojownicy[self.secondline[i]].pos
-                    if (
-                        int(
-                            pozycja.wojownik.atak_points
-                            / pozycja.wojownik.bronie[0]["koszt_ataku"]
-                        )
-                        > 0
-                        and pozycja.wojownik.bronie[0]["range"] >= self.distance
-                    ):
-                        pozycja.active = True
-                        print(
-                            "distrnace:",
-                            self.distance,
-                            pozycja.wojownik.bronie[0]["range"],
-                        )
+                if self.distance == 1:
+                    pozycja.active = False
+                else:
+                    if self.squad.wojownicy[self.secondline[i]] is not None:
+                        pozycja.id = self.squad.wojownicy[self.secondline[i]].pos
+                        if (
+                            int(
+                                pozycja.wojownik.atak_points
+                                / pozycja.wojownik.bronie[0]["koszt_ataku"]
+                            )
+                            > 0
+                            and pozycja.wojownik.bronie[0]["range"] >= self.distance
+                        ):
+                            pozycja.active = True
+                        else:
+                            pozycja.active = False
                     else:
                         pozycja.active = False
-                else:
-                    pozycja.active = False
 
             else:
                 pozycja.wojownik = self.squad.wojownicy[self.firstline[i - 3]]
@@ -168,11 +169,6 @@ class Oddzial:
                         and self.distance <= pozycja.wojownik.bronie[0]["range"]
                     ):
                         pozycja.active = True
-                        print(
-                            "distrnace:",
-                            self.distance,
-                            pozycja.wojownik.bronie[0]["range"],
-                        )
                     else:
                         pozycja.active = False
                 else:
@@ -256,12 +252,20 @@ class OddzialDefend(Oddzial):
                     self.squad.zdrowie(pozycja.id, pozycja.wojownik.zdrowie - damage)
                     pozycja.wojownik = self.squad.wojownicy[pozycja.id]
                     AttackDisplay().ifselected = True
-                    animation = (
-                        40,
-                        0,
-                        str(damage),
-                        (pozycja.pos[0] + 70, pozycja.pos[1] - 30),
-                    )
+                    if damage > AttackDisplay().selected.wojownik.bronie[0]["atak"][1]:
+                        animation = (
+                            40,
+                            1,  # crit
+                            str(damage),
+                            (pozycja.pos[0] + 70, pozycja.pos[1] - 30),
+                        )
+                    else:
+                        animation = (
+                            40,
+                            0,  # damage
+                            str(damage),
+                            (pozycja.pos[0] + 70, pozycja.pos[1] - 30),
+                        )
                     AnimationMenager.animations.append(animation)
                     if (
                         int(

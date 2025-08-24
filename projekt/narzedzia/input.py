@@ -70,12 +70,14 @@ class IntInput(Input):
         screen.blit(self.surf, self.rect)
 
     def update(self, event, mouse_pos):
+        self.dirty = False
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             if self.rect.collidepoint(mouse_pos):
                 self.active = True
             else:
                 self.active = False
         elif event.type == pygame.KEYDOWN and self.active:
+            self.dirty = True
             if event.key == pygame.K_BACKSPACE:
                 self.display = self.display[:-1]
                 if len(self.display) == 0:

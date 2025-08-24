@@ -57,4 +57,10 @@ wheater_forecast:
   koszt:
     gold: 25
 
+change_wheater:
+  mnoznik: 1
+  tury: 1
+  cooldown : 3
+  koszt:
+    gold: 50
 

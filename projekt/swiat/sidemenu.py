@@ -274,3 +274,12 @@ class PoleAkcji(Pole):
             self.button_group,
             f"""Odkryj przyszłą pogodę 1 tura cooldown""",
         )
+        Rozkaz(
+            40,
+            40,
+            "blue",
+            (195, 50),
+            "change_wheater",
+            self.button_group,
+            f"""Zmień na czas twojego ruchu pogodę na chmury 2 tury cooldown""",
+        )
