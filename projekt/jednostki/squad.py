@@ -125,22 +125,26 @@ class Squad(pygame.sprite.Sprite):
             )
             self.wojownicy[jednostka["array_pos"]] = w
 
-    def __add__(self, other):
-        wojownicy = []
+    def __len__(self):
+        dl = 0
         for wojownik in self.wojownicy:
             if wojownik is not None:
-                wojownik.pos = len(wojownicy)
-                wojownicy.append(wojownik)
+                dl += 1
+        return dl
 
-        for wojownik in other.wojownicy:
+    def __add__(self, other):
+        for o_wojownik in other.wojownicy:
+            if o_wojownik is None:
+                continue
+            for i in range(7):
+                if self.wojownicy[i] is None:
+                    self.wojownicy[i] = o_wojownik
+                    break
+        i = 0
+        for wojownik in self.wojownicy:
             if wojownik is not None:
-                wojownik.pos = len(wojownicy)
-                wojownicy.append(wojownik)
-
-        while len(wojownicy) != 7:
-            wojownicy.append(None)
-
-        self.wojownicy = wojownicy
+                wojownik.pos = i
+            i += 1
 
     def display(self, id):
         representation = f"{self.owner} ruch: {self.ruch}"
@@ -160,3 +164,12 @@ class Squad(pygame.sprite.Sprite):
             if wojownik is None:
                 continue
             wojownik.zdrowie += value
+
+    @property
+    def medyk(self):
+        for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
+            if wojownik.name == "Medyk":
+                return True
+        return False

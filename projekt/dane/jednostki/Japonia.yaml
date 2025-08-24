@@ -31,6 +31,22 @@
       id: 1
       kategoria: jednostka
 
+    - nazwa: Medyk
+      zdrowie: 20
+      morale: 90
+      ruch: 10
+      bronie:
+        - Rece
+      wzrok: Oczy
+      pancerz: 0
+      atak_points: 1
+      red: medyk_red.png
+      blue: medyk_blue.png
+      cost: 250
+      id: 2
+      kategoria: jednostka
+      heal : 10
+
     - nazwa: Yukimura Sanada
       zdrowie: 100
       morale: 100
@@ -43,7 +59,7 @@
       red: Yukimura_Sanada_red.png
       blue: Yukimura_Sanada_blue.png
       cost: 400
-      id: 2
+      id: 3
       kategoria: jednostka
 
     - nazwa: Kolumbryna
@@ -58,7 +74,7 @@
       red: kolubryna.png
       blue: kolubryna.png
       cost: 300
-      id: 3
+      id: 4
       kategoria: jednostka
 
     - nazwa: Ashigaru z rusznicą
@@ -72,7 +88,7 @@
       atak_points: 10
       red: Ashigaru_rusznikaru_red.png
       blue: Ashigaru_rusznikaru_blue.png
-      id: 4
+      id: 5
       cost: 300
       kategoria: jednostka
 
@@ -87,7 +103,7 @@
       atak_points: 20
       red: Samuraj_kawalerzysta_red.png
       blue: Samuraj_kawalerzysta_blue.png
-      id: 5
+      id: 6
       cost: 300
       kategoria: jednostka
 

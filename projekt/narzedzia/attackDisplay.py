@@ -127,26 +127,32 @@ class Oddzial:
             if i < 3:
                 pozycja.wojownik = self.squad.wojownicy[self.secondline[i]]
                 pozycja.line = 2
-                if self.squad.wojownicy[self.secondline[i]] is not None:
-                    pozycja.id = self.squad.wojownicy[self.secondline[i]].pos
-                    if (
-                        int(
-                            pozycja.wojownik.atak_points
-                            / pozycja.wojownik.bronie[0]["koszt_ataku"]
-                        )
-                        > 0
-                        and pozycja.wojownik.bronie[0]["range"] >= self.distance
-                    ):
-                        pozycja.active = True
-                        print(
-                            "distrnace:",
-                            self.distance,
-                            pozycja.wojownik.bronie[0]["range"],
-                        )
+                if (
+                    self.distance == 1
+                    and self.squad.wojownicy[self.firstline[i]] is not None
+                ):
+                    pozycja.active = False
+                else:
+                    if self.squad.wojownicy[self.secondline[i]] is not None:
+                        pozycja.id = self.squad.wojownicy[self.secondline[i]].pos
+                        if (
+                            int(
+                                pozycja.wojownik.atak_points
+                                / pozycja.wojownik.bronie[0]["koszt_ataku"]
+                            )
+                            > 0
+                            and pozycja.wojownik.bronie[0]["range"] >= self.distance
+                        ):
+                            pozycja.active = True
+                            print(
+                                "distrnace:",
+                                self.distance,
+                                pozycja.wojownik.bronie[0]["range"],
+                            )
+                        else:
+                            pozycja.active = False
                     else:
                         pozycja.active = False
-                else:
-                    pozycja.active = False
 
             else:
                 pozycja.wojownik = self.squad.wojownicy[self.firstline[i - 3]]
@@ -228,6 +234,59 @@ class OddzialDefend(Oddzial):
         ]
         super().__init__(width, height, squad, id, sasiedzi, distance)
         self.rect = self.surf.get_frect(topright=(width * 2, 0))
+
+    def load_army(self):
+        i = 0
+        for pozycja in self.pozycje_group:
+            if i < 3:
+                pozycja.wojownik = self.squad.wojownicy[self.secondline[i]]
+                pozycja.line = 2
+                if self.distance == 1:
+                    pozycja.active = False
+                else:
+                    if self.squad.wojownicy[self.secondline[i]] is not None:
+                        pozycja.id = self.squad.wojownicy[self.secondline[i]].pos
+                        if (
+                            int(
+                                pozycja.wojownik.atak_points
+                                / pozycja.wojownik.bronie[0]["koszt_ataku"]
+                            )
+                            > 0
+                        ):
+                            pozycja.active = True
+                            print(
+                                "distrnace:",
+                                self.distance,
+                                pozycja.wojownik.bronie[0]["range"],
+                            )
+                        else:
+                            pozycja.active = False
+                    else:
+                        pozycja.active = False
+
+            else:
+                pozycja.wojownik = self.squad.wojownicy[self.firstline[i - 3]]
+                pozycja.line = 1
+                if self.squad.wojownicy[self.firstline[i - 3]] is not None:
+                    pozycja.id = self.squad.wojownicy[self.firstline[i - 3]].pos
+                    if (
+                        int(
+                            pozycja.wojownik.atak_points
+                            / pozycja.wojownik.bronie[0]["koszt_ataku"]
+                        )
+                        > 0
+                    ):
+                        pozycja.active = True
+                        print(
+                            "distrnace:",
+                            self.distance,
+                            pozycja.wojownik.bronie[0]["range"],
+                        )
+                    else:
+                        pozycja.active = False
+                else:
+                    pozycja.active = False
+            i += 1
 
     def draw(self, screen):
         self.surf.fill("white")

@@ -384,35 +384,38 @@ class Mapa(metaclass=Singleton):
             self.calculate_income()
 
     def recruit(self, tile):
-        try:
+        if (
+            Client().player.gold
+            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
+                "cost"
+            ]
+        ):
             Client().player.gold -= Client().player.frakcja["jednostka"][
                 self.move_flag.wojownicy[3].id
             ]["cost"]
-        except:
-            print("not enough money")
-        else:
             self.move_flag.pos = tile.pos
             self.move_flag.tile = tile
             self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
             tile.jednostka = self.move_flag
+        else:
+            print("not enough money")
 
     def recruit_join(self, tile):
-        try:
+        if (
+            Client().player.gold
+            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
+                "cost"
+            ]
+            and len(tile.jednostka) + len(self.move_flag) <= 7
+        ):
             Client().player.gold -= Client().player.frakcja["jednostka"][
                 self.move_flag.wojownicy[3].id
             ]["cost"]
-        except:
-            print("not enough money")
+            self.join(tile.jednostka, self.move_flag, tile)
         else:
-            try:
-                self.join(tile.jednostka, self.move_flag, tile)
-            except:
-                pass
+            print("not enough money")
 
     def join(self, squad1, squad2, tile):
-        if not self.validate_join(squad1, squad2):
-            raise ValueError
-
         squad2.ruch = self.correct_moves[tile.x][tile.y]
 
         squad1 = squad1 + squad2
@@ -420,19 +423,6 @@ class Mapa(metaclass=Singleton):
         if not squad2.tile is None:
             squad2.tile.jednostka = None
         squad2.kill()
-
-    def validate_join(self, squad1, squad2):
-        none_count = 0
-        not_none_count = 0
-        for wojownik in squad1.wojownicy:
-            if wojownik is None:
-                none_count += 1
-        for wojownik in squad2.wojownicy:
-            if wojownik is not None:
-                not_none_count += 1
-        if 7 - none_count + not_none_count > 7:
-            return False
-        return True
 
     def attackValidate(self, squad1, squad2):
         distance = self.BFS(squad1.tile.x, squad1.tile.y, squad2.tile.x, squad2.tile.y)
@@ -489,6 +479,8 @@ class Mapa(metaclass=Singleton):
             else:
                 frakcja = Client().opponent.frakcja
             s = Squad(self.army_group, jednostka, tile, frakcja)
+            if Client().turn % 2 == s.owner_id and s.medyk:
+                s.heal(frakcja["jednostka"][2]["heal"])  # medyk
             tile.jednostka = s
 
         for budynek in state["budynki"]:
