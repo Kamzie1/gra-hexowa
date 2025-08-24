@@ -6,6 +6,7 @@ from .squadDisplay import SquadDisplay
 from .mapa import Mapa
 from projekt.network import Client
 from projekt.akcjeMenager import AkcjeMenager
+import random
 
 
 class Button(pygame.sprite.Sprite):
@@ -341,3 +342,37 @@ class Rotate(SquadButtonDisplay):
         squad.wojownicy[1] = bufor
         if squad.wojownicy[1] is not None:
             squad.wojownicy[1].pos = 1
+
+
+class Gamble(Button):
+    def __init__(self, width, height, color, pos, button_group, image_name=None):
+        super().__init__(
+            width,
+            height,
+            color,
+            pos,
+            button_group,
+            "Hazard: wydaj 10 za możliwość zyskania 20!!!",
+            image_name,
+        )
+        self.font = AssetManager.get_font("consolas", 10)
+        self.gold_icon = AssetManager.get_asset("złoto")
+        self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
+        self.gold_rect = self.scaled_gold_icon.get_frect(
+            topleft=(pos[0] + 45, pos[1] + 5)
+        )
+        self.display = "10"
+        self.text = self.font.render(self.display, True, "white")
+        self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
+
+    def click(self):
+        if Client().player.gold >= 10:
+            if random.randint(0, 3):
+                Client().player.gold -= 10
+            else:
+                Client().player.gold += 10
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.scaled_gold_icon, self.gold_rect)
+        screen.blit(self.text, self.text_rect)

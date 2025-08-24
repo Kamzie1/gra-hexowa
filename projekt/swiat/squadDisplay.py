@@ -150,7 +150,10 @@ class SquadDisplay(metaclass=Singleton):
         zasięg : {wojownik.bronie[0]["range"]}
         koszt ataku : {wojownik.bronie[0]["koszt_ataku"]} 
         punkty ataku : {wojownik.atak_points}
+
         """
+        if wojownik.name == "Medyk":
+            statystyki += f"specjalne: uzdrawia \n co rundę wszystkie jednostki \n w formacji o {wojownik.jednostka['heal']} hp"
         self.display_text((self.width / 32, 100), pos, statystyki, self.wojownik_font)
 
     def display_text(self, offset, pos, text, font):

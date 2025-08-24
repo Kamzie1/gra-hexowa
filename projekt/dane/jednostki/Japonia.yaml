@@ -99,12 +99,42 @@
       bronie:
         - Katana
       wzrok: Oczy
-      pancerz: 3
+      pancerz: 4
       atak_points: 20
       red: Samuraj_kawalerzysta_red.png
       blue: Samuraj_kawalerzysta_blue.png
       id: 6
       cost: 300
+      kategoria: jednostka
+
+    - nazwa: Kawaleria
+      zdrowie: 100
+      morale: 90
+      ruch: 25
+      bronie:
+        - Wlocznia
+      wzrok: Oczy
+      pancerz: 3
+      atak_points: 20
+      red: kawaleria_red.png
+      blue: kawaleria_red.png
+      id: 7
+      cost: 300
+      kategoria: jednostka
+
+    - nazwa: Zwiadowca
+      zdrowie: 50
+      morale: 60
+      ruch: 25
+      bronie:
+        - Rece
+      wzrok: Lornetka
+      pancerz: 3
+      atak_points: 10
+      red: scout_red.png
+      blue: scout_red.png
+      id: 8
+      cost: 80
       kategoria: jednostka
 
   specjalne:

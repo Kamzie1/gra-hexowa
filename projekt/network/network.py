@@ -60,8 +60,8 @@ class Client(metaclass=Singleton):
     def uruchom_gre(self):
         package1 = {"x": 6, "y": 6, "frakcja": "Japonia", "color": "red", "id": 0}
         package2 = {
-            "x": 4,
-            "y": 4,
+            "x": 10,
+            "y": 10,
             "frakcja": "Prusy",
             "color": "blue",
             "id": 1,

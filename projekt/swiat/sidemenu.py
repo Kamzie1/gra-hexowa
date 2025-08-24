@@ -13,6 +13,7 @@ from .buttons import (
     AkcjeShowButton,
     Rozkaz,
     Upgrade,
+    Gamble,
 )
 import pygame
 from os.path import join
@@ -260,3 +261,4 @@ class PoleAkcji(Pole):
             """zwieksz ruch wszystkich jednostek na 1 turę
             3 tury cooldown""",
         )
+        Gamble(40, 40, "red", (100, 50), self.button_group)
