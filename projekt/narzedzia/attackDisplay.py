@@ -25,11 +25,12 @@ class AttackDisplay(metaclass=Singleton):
         self.defender = None
         self.turn = "Pierwsza Linia"
 
-    def update(self, attacker, defender, distance, x1, y1, x2, y2, defense):
+    def update(self, attacker, defender, distance, x1, y1, x2, y2, defense, pogoda):
         self.show = True
         self.distance = distance
         self.defense = defense
         self.turn = 1
+        self.pogoda = pogoda
         attack_angle = (y2 - y1, x2 - x1)
         match (x1 % 2):
             case 0:
@@ -80,6 +81,11 @@ class AttackDisplay(metaclass=Singleton):
         attacker = self.selected.wojownik
         attacker.atak_points -= attacker.bronie[0]["koszt_ataku"]
         defense_buff = wojownik.pancerz - attacker.bronie[0]["przebicie"]
+        if self.pogoda == 3 and attacker.bronie[0]["typ"] == "prochowa":
+            print("deszcz")
+            rzut = random.randint(0, 1)
+            if rzut:
+                return 0
         rzut = random.randint(0, 100)
         if defense_buff > 0:
             rzut -= defense_buff

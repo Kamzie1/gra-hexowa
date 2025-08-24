@@ -5,6 +5,7 @@ import socketio
 import threading
 import socketio.exceptions
 import time
+from projekt.akcjeMenager import AkcjeMenager
 
 
 class Client(metaclass=Singleton):
@@ -31,7 +32,7 @@ class Client(metaclass=Singleton):
             "color": self.users[self.id]["color"],
             "id": self.id,
             "gold": self.users[self.id]["gold"],
-            "akcje": self.load_akcje(),
+            "akcje": self.users[self.id]["akcje"],
         }
 
     def load_spectator(self):
@@ -45,17 +46,7 @@ class Client(metaclass=Singleton):
             "color": "red",
             "id": -1,
             "gold": 0,
-            "akcje": self.load_akcje(),
-        }
-
-    def load_akcje(self):
-        return {
-            "zloto_upgrade": 1,
-            "mury_upgrade": 1,
-            "zloto_rozkaz_cooldown": False,
-            "zloto_rozkaz": 1,
-            "movement_rozkaz_cooldown": False,
-            "movement_rozkaz": 0,
+            "akcje": None,
         }
 
     def _setup_events(self):
@@ -86,6 +77,7 @@ class Client(metaclass=Singleton):
             self.start_game = True
             self.ekran = 2
             self.state = data["state"]
+            self.pogoda = data["pogoda"]
             for user in self.users:
                 if user["name"] == self.name:
                     self.id = user["id"]
@@ -101,6 +93,7 @@ class Client(metaclass=Singleton):
             print(data["state"]["jednostki"])
             self.users = data["users"]
             self.state = data["state"]
+            self.pogoda = data["pogoda"]
             print(self.users)
             self.spectators = data["spectators"]
             for user in data["users"]:
@@ -115,16 +108,27 @@ class Client(metaclass=Singleton):
                     self.player.id = self.id
                     self.ekran = 3
             self.state_loaded = False
+            self.player.akcje = self.users[self.id]["akcje"]
             self.turn = data["turn"]
             if self.ekran == 2:
                 self.player.gold = data["users"][self.id]["gold"]
                 if self.turn % len(self.users) == self.player.id and self.turn >= len(
                     self.users
                 ):
+                    self.player.akcjeMenager.turn()
                     self.player.gold += self.player.zloto_income
                     self.mapa.heal()
             self.mapa.import_state(self.state, self.users)
-
+            match (self.pogoda[0]):
+                case 1:
+                    print("słońce")
+                    self.mapa.refresh_movement(-4)
+                case 2:
+                    print("mgła")
+                    self.mapa.refresh_wzrok(-4)
+                case _:
+                    pass
+            self.mapa.calculate_widok()
             self.state_loaded = True
 
         @self.sio.on("end_game")
@@ -202,7 +206,12 @@ class Client(metaclass=Singleton):
     def send_state(self, state):
         self.sio.emit(
             "new_state",
-            {"state": state, "nadawca": self.name, "gold": self.player.gold},
+            {
+                "state": state,
+                "nadawca": self.name,
+                "gold": self.player.gold,
+                "akcje": self.player.akcje,
+            },
         )
 
     def send_result(self, result):

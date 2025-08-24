@@ -21,6 +21,7 @@ class Wojownik:
         self.original_zdrowie = self.zdrowie
         self.jednostka = jednostka
         self.id = id
+        self.wzrok = jednostka["wzrok"]
 
         self.image = AssetManager.get_unit(self.name, color)
 

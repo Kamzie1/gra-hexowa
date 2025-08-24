@@ -20,6 +20,10 @@ class Player:
     def akcje(self):
         return self.akcjeMenager.buffs
 
+    @akcje.setter
+    def akcje(self, value):
+        self.akcjeMenager.buffs = value
+
     @property
     def gold(self):
         return self._gold
@@ -32,6 +36,9 @@ class Player:
             raise TypeError("wrong type")
         else:
             self._gold = value
+
+    def get_akcje(self):
+        return self.akcjeMenager.get_akcje()
 
     def __str__(self):
         return self.name

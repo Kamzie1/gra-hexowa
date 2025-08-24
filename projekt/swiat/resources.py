@@ -4,10 +4,9 @@ from os.path import join
 import pygame
 from .buttons import Menu, Surrender
 from projekt.assetMenager import AssetManager
-from projekt.narzedzia import Singleton, KoniecGry
+from projekt.narzedzia import Singleton, KoniecGry, MouseDisplay
 from projekt.network import Client
 from .mapa import Mapa
-from .mouseDisplay import MouseDisplay
 from projekt.flag import Flag
 
 

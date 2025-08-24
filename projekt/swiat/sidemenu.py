@@ -17,10 +17,10 @@ from .buttons import (
 import pygame
 from os.path import join
 from .mapa import Mapa
-from projekt.narzedzia import Singleton
+from projekt.narzedzia import Singleton, MouseDisplay
 from projekt.network import Client
-from .mouseDisplay import MouseDisplay
 from projekt.flag import Flag
+from projekt.assetMenager import AssetManager
 
 
 class SideMenu(metaclass=Singleton):
@@ -44,7 +44,7 @@ class SideMenu(metaclass=Singleton):
             (0, 10),
             self.button_group,
             "Rekrutuj",
-            "consolas.ttf",
+            "consolas",
             28,
             Client().player.color,
         )
@@ -55,7 +55,7 @@ class SideMenu(metaclass=Singleton):
             (menu_width / 2 + 5, 10),
             self.button_group,
             "Akcje",
-            "consolas.ttf",
+            "consolas",
             28,
             Client().player.color,
         )
@@ -108,7 +108,7 @@ class SideMenu(metaclass=Singleton):
             (0, 10),
             self.button_group,
             "Rekrutuj",
-            "consolas.ttf",
+            "consolas",
             28,
             player.color,
         )
@@ -119,7 +119,7 @@ class SideMenu(metaclass=Singleton):
             (menu_width / 2 + 5, 10),
             self.button_group,
             "Akcje",
-            "consolas.ttf",
+            "consolas",
             28,
             player.color,
         )
@@ -262,6 +262,15 @@ class PoleAkcji(Pole):
             (5, 50),
             "movement_rozkaz",
             self.button_group,
-            """zwieksz ruch wszystkich jednostek na 1 turę
+            f"""zwieksz ruch wszystkich jednostek o {AssetManager.get_akcje("movement_rozkaz", "mnoznik")} na 1 turę
             3 tury cooldown""",
+        )
+        Rozkaz(
+            40,
+            40,
+            "red",
+            (100, 50),
+            "wheater_forecast",
+            self.button_group,
+            f"""Odkryj przyszłą pogodę 1 tura cooldown""",
         )

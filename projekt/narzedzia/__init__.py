@@ -9,3 +9,4 @@ from .koniecgry import KoniecGry
 from .queue import Queue
 from .singleton import Singleton
 from .pozycja import Pozycja
+from .mouseDisplay import MouseDisplay

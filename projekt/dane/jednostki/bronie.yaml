@@ -5,6 +5,7 @@ Katana:
     przebicie: 6
     koszt_ataku: 3
     range: 1
+    typ: biała
 
 
 Yumonji_Jari_2 : 
@@ -14,6 +15,7 @@ Yumonji_Jari_2 :
     przebicie: 10 
     koszt_ataku: 3 
     range: 1
+    typ : biała
 
 Kolumbryna : 
     atak: 
@@ -22,6 +24,7 @@ Kolumbryna :
     przebicie: 12 
     koszt_ataku: 10 
     range: 7
+    typ : prochowa
 
 Yari : 
     atak: 
@@ -30,6 +33,7 @@ Yari :
     przebicie: 5 
     koszt_atku: 10 
     range: 1
+    typ : biała
 
 Wlocznia : 
     atak: 
@@ -38,6 +42,7 @@ Wlocznia :
     przebicie: 8 
     koszt_ataku: 3 
     range: 1
+    typ : biała
 
 
 Rusznica : 
@@ -47,6 +52,7 @@ Rusznica :
     przebicie: 8
     koszt_ataku: 10
     range: 3
+    typ : prochowa
 
 Kopia :
     atak: 
@@ -55,3 +61,4 @@ Kopia :
     przebicie: 8
     koszt_ataku: 5
     range: 1
+    typ : biała

@@ -49,9 +49,15 @@ class Squad(pygame.sprite.Sprite):
         for wojownik in self.wojownicy:
             if wojownik is None:
                 continue
-            if wojownik.jednostka["wzrok"] > maks:
-                maks = wojownik.jednostka["wzrok"]
+            if wojownik.wzrok > maks:
+                maks = wojownik.wzrok
         return maks
+
+    def wzrok_akt(self, value):
+        for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
+            wojownik.wzrok += value
 
     @property
     def length(self):
@@ -90,6 +96,11 @@ class Squad(pygame.sprite.Sprite):
             if wojownik is None:
                 continue
             wojownik.ruch -= diff
+
+    def akt_ruch(self, value):
+        for wojownik in self.wojownicy:
+            if wojownik is not None:
+                wojownik.ruch += value
 
     @property
     def range(self):

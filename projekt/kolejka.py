@@ -11,6 +11,7 @@ from projekt.narzedzia import (
 from projekt.ustawienia import Width, Height, srodek
 import random
 from projekt.network import Client
+from projekt.assetMenager import AssetManager
 
 
 class Kolejka:
@@ -18,7 +19,7 @@ class Kolejka:
         # atrybuty
         self.w = Width / 3
         self.h = Height / 1.5
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", 20)
+        self.font = AssetManager.get_font("consolas", 20)
 
         # obiekty
         self.ready = PrzyciskReady(
@@ -27,7 +28,7 @@ class Kolejka:
         self.leave = Przycisk(200, 34, (230, 230, 230), (5, 5), "Opuść kolejkę", "red")
         self.content = pygame.Surface((Width / 1.5, Height / 1.5))
         self.content_rect = self.content.get_frect(center=srodek)
-        self.room_id = Display(400, 50, (srodek[0] - 200, 5), "consolas.ttf", 34)
+        self.room_id = Display(400, 50, (srodek[0] - 200, 5), "consolas", 34)
         self.playerCard = PlayerCard()
         self.ustawienia = Ustawienia()
 
@@ -173,7 +174,7 @@ class PlayerCard:
         self.surf = pygame.Surface((250, 500))
         self.surf.fill((200, 200, 200))
         self.rect = self.surf.get_frect(topleft=(0, 0))
-        self.font = pygame.font.Font("Grafika/fonts/consolas.ttf", 20)
+        self.font = AssetManager.get_font("consolas", 20)
 
         self.frakcje = ["Japonia", "Prusy", "Spectator"]
         self.colors = ["red", "blue"]
@@ -205,9 +206,9 @@ class Ustawienia:
     def __init__(self):
         self.surf = pygame.Surface((Width / 7, Height / 2))
         self.rect = self.surf.get_frect(topright=(Width / 1.5, 0))
-        self.wioskiLabel = Display(Width / 8, 50, (0, 0), "consolas.ttf", 32)
+        self.wioskiLabel = Display(Width / 8, 50, (0, 0), "consolas", 32)
         self.wioski = IntInput(Width / 8, 50, (0, 60), "grey", "black", "15")
-        self.goldLabel = Display(Width / 8, 50, (0, 120), "consolas.ttf", 32)
+        self.goldLabel = Display(Width / 8, 50, (0, 120), "consolas", 32)
         self.gold = IntInput(Width / 8, 50, (0, 180), "grey", "black", "1000")
         self.maps = ["mapa1(30x30)", "mapa2(10x10)", "mapa3(40x40)", "random"]
         self.size = [(30, 30), (10, 10), (40, 40), (0, 0)]

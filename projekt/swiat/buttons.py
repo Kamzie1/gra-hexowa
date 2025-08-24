@@ -57,7 +57,7 @@ class TextButton(pygame.sprite.Sprite):
         super().__init__(button_group)
         self.image = pygame.Surface((width, height))
         self.image.fill(color)
-        self.font = AssetManager.get_font("consolas", 24)
+        self.font = AssetManager.get_font(font, font_size)
         text_surf = self.font.render(tekst, True, font_color)
         text_rect = text_surf.get_rect(center=(width / 2, height / 2))
         self.image.blit(text_surf, text_rect)
@@ -198,8 +198,11 @@ class Rozkaz(Button):
                 )
                 Client().player.akcje[self.typ + "_cooldown"] = True
 
-                print(Client().player.akcje)
                 Mapa().calculate_income()
+                Mapa().refresh_movement(
+                    Client().users[Client().player.id]["akcje"]["movement_rozkaz"],
+                    Client().player.id,
+                )
 
     def draw(self, screen):
         if Client().player.akcje[self.typ + "_cooldown"]:

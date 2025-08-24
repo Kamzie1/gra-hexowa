@@ -10,7 +10,6 @@ from projekt.swiat import (
     SquadButtonDisplay,
     Rotate,
     SquadDisplay,
-    MouseDisplay,
 )
 from projekt.player import Player
 from projekt.narzedzia import (
@@ -19,6 +18,7 @@ from projekt.narzedzia import (
     KoniecGry,
     AttackDisplay,
     Display,
+    MouseDisplay,
 )
 from projekt.flag import Flag
 from projekt.network import Client
@@ -39,15 +39,13 @@ class Gra:
         SideMenu()
         Flag()
         KoniecGry(Width, Height)
-        self.turn_Display = TurnDisplay(
-            300, 34, (srodek[0] - 25, 0), "consolas.ttf", 20
-        )
+        self.turn_Display = TurnDisplay(500, 34, (srodek[0] - 25, 0), "consolas", 20)
         SquadDisplay(Width / 2, Height / 2, srodek, "black")
         self.squadButtonDisplay = SquadButtonDisplay(
             80, 80, "blue", (srodek[0] - 50, Height - 50)
         )
         self.not_you_turnDisplay = Display(
-            Width / 2, 100, (srodek[0] - Width / 4, srodek[1] / 2), "consolas.ttf", 100
+            Width / 2, 100, (srodek[0] - Width / 4, srodek[1] / 2), "consolas", 100
         )
         self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
 
@@ -67,6 +65,9 @@ class Gra:
         MouseDisplay().show = False
         SideMenu().update()
         Resource().update()
+        self.turn_Display.hover(
+            mouse_pos, Client().pogoda, Client().player.akcje["wheater_forecast"]
+        )
         if SquadDisplay().show:
             SquadDisplay().update(pygame.mouse.get_pos())
 
@@ -87,10 +88,21 @@ class Gra:
     def draw(self, screen):
         screen.fill("black")
         Mapa().draw(screen)
+        if Client().turn % len(Client().users) != Client().id:
+            self.not_you_turnDisplay.display(
+                "Tura Przeciwnika", Client().player.color, screen
+            )
         if Flag().show:
             SideMenu().draw(screen)
         Resource().draw(screen)
-        self.turn_Display.display("grey", screen, Client().users, Client().turn)
+        self.turn_Display.display(
+            "grey",
+            screen,
+            Client().users,
+            Client().turn,
+            Client().pogoda,
+            Client().player.akcje["wheater_forecast"],
+        )
         Mini_map().draw(screen)
         for jednostka in Mapa().army_group:
             jednostka.draw(Mapa().mapSurf)

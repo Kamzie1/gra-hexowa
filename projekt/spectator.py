@@ -10,7 +10,6 @@ from projekt.swiat import (
     SquadButtonDisplay,
     Rotate,
     SquadDisplay,
-    MouseDisplay,
 )
 from projekt.player import Player
 from projekt.narzedzia import (
@@ -19,6 +18,7 @@ from projekt.narzedzia import (
     KoniecGry,
     AttackDisplay,
     Display,
+    MouseDisplay,
 )
 from projekt.flag import Flag
 from projekt.network import Client
@@ -36,9 +36,7 @@ class Spectator:
         Resource()
         Flag()
         KoniecGry(Width, Height)
-        self.turn_Display = TurnDisplay(
-            300, 34, (srodek[0] - 25, 0), "consolas.ttf", 20
-        )
+        self.turn_Display = TurnDisplay(300, 34, (srodek[0] - 25, 0), "consolas", 20)
         SquadDisplay(Width / 2, Height / 2, srodek, "black")
         self.squadButtonDisplay = SquadButtonDisplay(
             80, 80, "blue", (srodek[0] - 50, Height - 50)
@@ -61,6 +59,7 @@ class Spectator:
         mouse_pos = pygame.mouse.get_pos()
         MouseDisplay().show = False
         Resource().update()
+        self.turn_Display.hover(mouse_pos, Client().pogoda[0])
         if SquadDisplay().show:
             SquadDisplay().update(pygame.mouse.get_pos())
 
@@ -76,7 +75,9 @@ class Spectator:
         screen.fill("black")
         Mapa().draw(screen)
         Resource().draw(screen)
-        self.turn_Display.display("grey", screen, Client().users, Client().turn)
+        self.turn_Display.display(
+            "grey", screen, Client().users, Client().turn, Client().pogoda[0]
+        )
         Mini_map().draw(screen)
         for jednostka in Mapa().army_group:
             jednostka.draw(Mapa().mapSurf)

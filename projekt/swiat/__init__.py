@@ -6,4 +6,3 @@ from .tile import Najechanie, Ruch, Klikniecie
 from .turn import Turn
 from .buttons import Button, SquadButtonDisplay, Rotate, Exit
 from .squadDisplay import SquadDisplay
-from .mouseDisplay import MouseDisplay

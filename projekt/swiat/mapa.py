@@ -195,12 +195,7 @@ class Mapa(metaclass=Singleton):
         ]
         tablica_odwiedzonych[x][y] = jednostka.ruch
         queue = priority_queue()
-        if jednostka.ruch == jednostka.max_ruch:
-            queue.append(
-                (x, y, jednostka.ruch + Client().player.akcje["movement_rozkaz"])
-            )
-        else:
-            queue.append((x, y, jednostka.ruch))
+        queue.append((x, y, jednostka.ruch))
         while not queue.empty():
             x, y, ruch = queue.pop()
             sasiedzix, sasiedziy = get_sasiedzi(x, y)
@@ -315,13 +310,20 @@ class Mapa(metaclass=Singleton):
             if jednostka.owner_id == Client().player.id and jednostka.tile is not None:
                 self.widok_jednostka(jednostka.tile.x, jednostka.tile.y, jednostka)
 
+        for budynek in self.building_group:
+            if budynek.owner_id == Client().player.id and budynek.name == "Wioska":
+                sasiedzi_x, sasiedzi_y = get_sasiedzi(budynek.tile.x, budynek.tile.y)
+                self.widok[budynek.tile.x][budynek.tile.y] = 0
+                for i in range(6):
+                    self.widok[budynek.tile.x + sasiedzi_x[i]][
+                        budynek.tile.y + sasiedzi_y[i]
+                    ] = 0
+
     def draw(self, screen):
         self.mapSurf.fill("black")
         for tile in self.tiles_group:
             if self.widziane[tile.x][tile.y]:
                 tile.draw(self.mapSurf)
-                if self.widok[tile.x][tile.y] == -1:
-                    self.mapSurf.blit(AssetManager.get_asset("chmura"), tile.rect)
 
         for budynek in self.building_group:
             if (
@@ -329,6 +331,10 @@ class Mapa(metaclass=Singleton):
                 and self.widziane[budynek.tile.x][budynek.tile.y] > 0
             ):
                 budynek.draw(self.mapSurf)
+
+        for tile in self.tiles_group:
+            if self.widziane[tile.x][tile.y] and self.widok[tile.x][tile.y] == -1:
+                self.mapSurf.blit(AssetManager.get_asset("chmura"), tile.rect)
         self.najechanie.draw(self.mapSurf)
         if Flag().klikniecie_flag:
             self.mapSurf.blit(self.klikniecie.image, self.klikniecie.rect)
@@ -434,6 +440,7 @@ class Mapa(metaclass=Singleton):
                                             tile.x,
                                             tile.y,
                                             tile.obrona,
+                                            Client().pogoda[0],
                                         )
                         else:
                             if (
@@ -457,6 +464,7 @@ class Mapa(metaclass=Singleton):
                                             tile.x,
                                             tile.y,
                                             tile.obrona,
+                                            Client().pogoda[0],
                                         )
                                     else:
                                         failed = True
@@ -547,6 +555,8 @@ class Mapa(metaclass=Singleton):
 
     def attackValidate(self, squad1, squad2):
         distance = self.BFS(squad1.tile.x, squad1.tile.y, squad2.tile.x, squad2.tile.y)
+        # if Client().pogoda[0] == 4 and distance - 1 > 1:  # Wind
+        #    distance += 1
         if distance - 1 > squad1.range:
             return 0
         return distance - 1
@@ -607,8 +617,9 @@ class Mapa(metaclass=Singleton):
                     frakcja,
                 )
                 tile.obrona = AssetManager.get_mnoznik(
-                    "mury_upgrade", Client().player.akcje["mury_upgrade"]
-                )  # dodać dla przeciwnika !!!
+                    "mury_upgrade",
+                    Client().users[budynek["owner_id"]]["akcje"]["mury_upgrade"],
+                )
 
             else:
                 b = Wioska(
@@ -626,8 +637,23 @@ class Mapa(metaclass=Singleton):
     def refresh(self):
         for budynek in self.building_group:
             budynek.tile.obrona = AssetManager.get_mnoznik(
-                "mury_upgrade", Client().player.akcje["mury_upgrade"]
+                "mury_upgrade",
+                Client().users[budynek.owner_id]["akcje"]["mury_upgrade"],
             )
+
+    def refresh_movement(self, value, id=None):
+        for jednostka in self.army_group:
+            if id is None:
+                jednostka.akt_ruch(value)
+            elif jednostka.owner_id == id:
+                jednostka.akt_ruch(value)
+
+    def refresh_wzrok(self, value, id=None):
+        for jednostka in self.army_group:
+            if id is None:
+                jednostka.wzrok_akt(value)
+            elif jednostka.owner_id == id:
+                jednostka.wzrok_akt(value)
 
     def calculate_income(self):
         Client().player.zloto_income = 0

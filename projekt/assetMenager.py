@@ -21,6 +21,14 @@ class AssetManager:
     fonts = {}
     images = {}
     tiles = {}
+    typyPogodyNazwa = ["Chmury", "Słońce", "Mgła", "Deszcz", "Wiatr"]
+    typyPogodyOpis = [
+        "Brak zmian",
+        "Ruch wszystkich jednostek -4",
+        "Wzrok wszystkich jednostek -4",
+        "Broń prochowa ma 50% szans na niewystrzelenie pocisku",
+        "Zasięg jednostek o zasięgu >1 -1",
+    ]
 
     @staticmethod
     def preload_assets():
@@ -60,6 +68,9 @@ class AssetManager:
                 20: pygame.font.Font(join("Grafika", "fonts", path), 20),
                 24: pygame.font.Font(join("Grafika", "fonts", path), 24),
                 26: pygame.font.Font(join("Grafika", "fonts", path), 26),
+                28: pygame.font.Font(join("Grafika", "fonts", path), 28),
+                32: pygame.font.Font(join("Grafika", "fonts", path), 32),
+                34: pygame.font.Font(join("Grafika", "fonts", path), 34),
                 100: pygame.font.Font(join("Grafika", "fonts", path), 100),
             }
 

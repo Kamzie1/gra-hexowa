@@ -50,5 +50,11 @@ mury_upgrade:
       gold: maks.
     mnoznik: 0.7
 
+wheater_forecast:
+  mnoznik: 1
+  tury: 1
+  cooldown : 2
+  koszt:
+    gold: 25
 
 

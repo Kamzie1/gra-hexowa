@@ -1,4 +1,4 @@
-from projekt.narzedzia import Singleton
+from .singleton import Singleton
 import pygame
 from projekt.assetMenager import AssetManager
 
