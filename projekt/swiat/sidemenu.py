@@ -39,23 +39,23 @@ class SideMenu(metaclass=Singleton):
         self.button_group = pygame.sprite.Group()
         self.rekrutacjaButton = RekrutacjaShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (0, 10),
             self.button_group,
             "Rekrutuj",
-            "consolas.ttf",
+            "consolas",
             28,
             Client().player.color,
         )
         self.akcjeButton = AkcjeShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (menu_width / 2 + 5, 10),
             self.button_group,
             "Akcje",
-            "consolas.ttf",
+            "consolas",
             28,
             Client().player.color,
         )
@@ -99,23 +99,23 @@ class SideMenu(metaclass=Singleton):
 
         self.rekrutacjaButton = RekrutacjaShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (0, 10),
             self.button_group,
             "Rekrutuj",
-            "consolas.ttf",
+            "consolas",
             28,
             player.color,
         )
         self.akcjeButton = AkcjeShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (menu_width / 2 + 5, 10),
             self.button_group,
             "Akcje",
-            "consolas.ttf",
+            "consolas",
             28,
             player.color,
         )
@@ -126,12 +126,12 @@ class SideMenu(metaclass=Singleton):
         if self.type:
             self.akcje.draw(self.surf)
             pygame.draw.line(
-                self.surf, (230, 230, 230), (0, 50), (menu_width / 2 + 5, 50)
+                self.surf, (230, 230, 230), (0, 70), (menu_width / 2 + 5, 70)
             )
             pygame.draw.line(
                 self.surf,
                 (230, 230, 230),
-                (menu_width / 2 + 5, 50),
+                (menu_width / 2 + 5, 70),
                 (menu_width / 2 + 5, 10),
             )
             pygame.draw.line(
@@ -142,13 +142,13 @@ class SideMenu(metaclass=Singleton):
             pygame.draw.line(
                 self.surf,
                 (230, 230, 230),
-                ((menu_width - 10) / 2, 50),
-                (menu_width, 50),
+                ((menu_width - 10) / 2, 70),
+                (menu_width, 70),
             )
             pygame.draw.line(
                 self.surf,
                 (230, 230, 230),
-                ((menu_width - 10) / 2, 50),
+                ((menu_width - 10) / 2, 70),
                 ((menu_width - 10) / 2, 10),
             )
             pygame.draw.line(
@@ -193,12 +193,12 @@ class PoleRekrutacji(Pole):
         super().__init__(w, h, player, pos)
 
     def setup(self):
-        x, y = 5, 5
+        x, y = 5, 20
         id = 0
         for jednostka in self.player.frakcja["jednostka"]:
             Recruit(
-                40,
-                40,
+                60,
+                60,
                 "red",
                 (x, y),
                 jednostka,
@@ -206,11 +206,11 @@ class PoleRekrutacji(Pole):
                 self.button_group,
                 f"{jednostka["nazwa"]}",
             )
-            x += 95
+            x += 175
             id += 1
-            if x > menu_width - 25:
+            if x + 85 > menu_width - 25:
                 x = 5
-                y += 50
+                y += 120
 
 
 class PoleAkcji(Pole):
@@ -219,20 +219,20 @@ class PoleAkcji(Pole):
 
     def setup(self):
         Rozkaz(
-            40,
-            40,
+            60,
+            60,
             "red",
-            (5, 5),
+            (5, 20),
             "zloto_rozkaz",
             self.button_group,
             """przychód złota 125% na 2 tury
             4 tury cooldown""",
         )
         Upgrade(
-            40,
-            40,
+            60,
+            60,
             "red",
-            (100, 5),
+            (180, 20),
             "zloto_upgrade",
             self.button_group,
             """ulepsz wydobycie zlota.
@@ -241,10 +241,10 @@ class PoleAkcji(Pole):
             level 4 : 130%""",
         )
         Upgrade(
-            40,
-            40,
+            60,
+            60,
             "blue",
-            (195, 5),
+            (355, 20),
             "mury_upgrade",
             self.button_group,
             """ulepsz obronę murów miasta.
@@ -252,13 +252,13 @@ class PoleAkcji(Pole):
             level 3 : 80%""",
         )
         Rozkaz(
-            40,
-            40,
+            60,
+            60,
             "blue",
-            (5, 50),
+            (5, 140),
             "movement_rozkaz",
             self.button_group,
             """zwieksz ruch wszystkich jednostek na 1 turę
             3 tury cooldown""",
         )
-        Gamble(40, 40, "red", (100, 50), self.button_group)
+        Gamble(60, 60, "red", (180, 140), self.button_group)

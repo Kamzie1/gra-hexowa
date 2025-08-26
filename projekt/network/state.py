@@ -25,6 +25,7 @@ def get_miasto(package, owner):
         "color": package["color"],
         "jednostki": [Miasto],
         "strategy": 0,
+        "wzmocnienie": False,
     }
 
 
@@ -74,12 +75,13 @@ def get_budynek_miasto(miasto):
 
 
 def get_wioska(x, y):
+    typ = random.randint(1, 4)
     return {
         "owner": "none",
         "owner_id": -1,
         "pos": id_to_pos(x, y),
         "color": "grey",
-        "id": 1,  # tile wioski
+        "id": typ,  # tile wioski
     }
 
 

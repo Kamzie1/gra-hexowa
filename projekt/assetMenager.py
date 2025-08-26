@@ -4,7 +4,7 @@ import yaml
 
 
 class AssetManager:
-    assets = ["turn", "złoto", "menu", "armor"]
+    assets = ["turn", "zloto", "menu", "armor", "medale", "srebro", "stal", "food"]
     maps = {}
     mapy = ["mapa1(30x30)"]
     efekty_heksow = [
@@ -32,6 +32,10 @@ class AssetManager:
         for frakcja in AssetManager.frakcja:
             AssetManager.load_fraction(frakcja)
         AssetManager.load_akcje()
+        for i in range(AssetManager.get_akcje("mury_upgrade", "maks_level")):
+            AssetManager.images[f"mury{i+1}"] = pygame.image.load(
+                join("Grafika", "jednostki-grafika", f"mury{i+1}.png")
+            ).convert_alpha()
 
     @staticmethod
     def load_common_assets():
@@ -59,6 +63,7 @@ class AssetManager:
                 20: pygame.font.Font(join("Grafika", "fonts", path), 20),
                 24: pygame.font.Font(join("Grafika", "fonts", path), 24),
                 26: pygame.font.Font(join("Grafika", "fonts", path), 26),
+                28: pygame.font.Font(join("Grafika", "fonts", path), 28),
                 100: pygame.font.Font(join("Grafika", "fonts", path), 100),
             }
 
@@ -164,13 +169,13 @@ class AssetManager:
     def get_koszt(name, level=None):
         if level is None:
             return AssetManager.akcje[name]["koszt"]
-        return AssetManager.akcje[name][level - 1]["koszt"]
+        return AssetManager.akcje[name]["levele"][level - 1]["koszt"]
 
     @staticmethod
     def get_mnoznik(name, level=None):
         if level is None:
             return AssetManager.akcje[name]["mnoznik"]
-        return AssetManager.akcje[name][level - 1]["mnoznik"]
+        return AssetManager.akcje[name]["levele"][level - 1]["mnoznik"]
 
     @staticmethod
     def get_akcje(name, other=None):

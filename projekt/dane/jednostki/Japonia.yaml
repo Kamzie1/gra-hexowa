@@ -12,7 +12,12 @@
       atak_points: 9
       red: Bodyguard_red.png
       blue: Bodyguard_blue.png
-      cost: 120
+      cost:
+        srebro: 120
+        stal: 0
+        zloto: 0
+        medale: 0
+        food: 0
       id: 0
       kategoria: jednostka
 
@@ -27,7 +32,12 @@
       atak_points: 9
       red: włócznik.png
       blue: włócznik_blue.png
-      cost: 200
+      cost:
+        srebro: 200
+        stal: 0
+        zloto: 0
+        medale: 0
+        food: 0
       id: 1
       kategoria: jednostka
 
@@ -42,7 +52,12 @@
       atak_points: 1
       red: medyk_red.png
       blue: medyk_blue.png
-      cost: 250
+      cost:
+        srebro: 150
+        stal: 0
+        zloto: 50
+        medale: 5
+        food: 0
       id: 2
       kategoria: jednostka
       heal : 10
@@ -58,7 +73,12 @@
       atak_points: 12
       red: Yukimura_Sanada_red.png
       blue: Yukimura_Sanada_blue.png
-      cost: 400
+      cost:
+        srebro: 300
+        stal: 20
+        zloto: 100
+        medale: 10
+        food: 0
       id: 3
       kategoria: jednostka
 
@@ -73,7 +93,12 @@
       atak_points: 10
       red: kolubryna.png
       blue: kolubryna.png
-      cost: 300
+      cost:
+        srebro: 300
+        stal: 150
+        zloto: 0
+        medale: 3
+        food: 0
       id: 4
       kategoria: jednostka
 
@@ -89,7 +114,12 @@
       red: Ashigaru_rusznikaru_red.png
       blue: Ashigaru_rusznikaru_blue.png
       id: 5
-      cost: 300
+      cost:
+        srebro: 400
+        stal: 30
+        zloto: 0
+        medale: 2
+        food: 0
       kategoria: jednostka
 
     - nazwa: Kawaleria samurajska
@@ -104,7 +134,12 @@
       red: Samuraj_kawalerzysta_red.png
       blue: Samuraj_kawalerzysta_blue.png
       id: 6
-      cost: 300
+      cost:
+        srebro: 500
+        stal: 40
+        zloto: 40
+        medale: 3
+        food: 0
       kategoria: jednostka
 
     - nazwa: Kawaleria
@@ -119,7 +154,12 @@
       red: kawaleria_red.png
       blue: kawaleria_red.png
       id: 7
-      cost: 300
+      cost:
+        srebro: 500
+        stal: 0
+        zloto: 30
+        medale: 2
+        food: 0
       kategoria: jednostka
 
     - nazwa: Zwiadowca
@@ -134,7 +174,12 @@
       red: scout_red.png
       blue: scout_red.png
       id: 8
-      cost: 80
+      cost:
+        srebro: 100
+        stal: 0
+        zloto: 0
+        medale: 0
+        food: 0
       kategoria: jednostka
 
   specjalne:
@@ -156,19 +201,64 @@
     - nazwa: Miasto
       image: miasto.png
       earn:
-        gold: 30
-      heal: 10
+        zloto: 2
+        srebro: 30
+        stal: 7
+        food: 40
+      heal: 12
       id: 0
       kategoria: budynek
       ruch : 7
       obrona : 0.6
 
-    - nazwa: Wioska
-      image: miasto.png
+    - nazwa: Wioska_zloto
+      image: miasto_zloto.png
       earn:
-        gold: 30
+        zloto: 10
+        srebro: 0
+        stal: 0
+        food: 0
       heal: 10
       id: 1
+      kategoria: budynek
+      ruch : 3
+      obrona: 0.45
+
+    - nazwa: Wioska_srebro
+      image: miasto_srebro.png
+      earn:
+        zloto: 0
+        srebro: 30
+        stal: 0
+        food: 0
+      heal: 10
+      id: 2
+      kategoria: budynek
+      ruch : 3
+      obrona: 0.45
+
+    - nazwa: Wioska_stal
+      image: miasto_stal.png
+      earn:
+        zloto: 0
+        srebro: 0
+        stal: 7
+        food: 0
+      heal: 10
+      id: 3
+      kategoria: budynek
+      ruch : 3
+      obrona: 0.45
+
+    - nazwa: Wioska_food
+      image: miasto_food.png
+      earn:
+        zloto: 0
+        srebro: 0
+        stal: 0
+        food: 40
+      heal: 10
+      id: 4
       kategoria: budynek
       ruch : 3
       obrona: 0.45

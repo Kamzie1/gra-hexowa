@@ -26,8 +26,9 @@ class Turn(metaclass=Singleton):
             Client().send_state(new_state)
             Client().player.akcjeMenager.turn()
             if Client().turn % 2 == Client().player.id and Client().turn != 1:
-                Client().player.gold += Client().player.zloto_income
+                Client().player.earn()
                 Mapa().heal()
+            Mapa().swap()
 
     def draw(self, screen):
         self.surf.blit(self.image, self.rect)

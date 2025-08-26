@@ -5,6 +5,9 @@ from projekt.assetMenager import AssetManager
 
 
 # klasa wojownik, podstawowa klasa reprezentująca mechanikę każdej jednostki, czyli jej ruch i atak, dziedziczy od specjalnej klasy Sprite od pygame pozwalajacej na lepszą kontrolę w pygame
+lords = ["Yukimura Sanada", "Medyk"]
+
+
 class Wojownik:
     # inicjalizacja
     def __init__(self, jednostka, id, kategoria, color, zdrowie, morale, ruch, pos):
@@ -31,8 +34,6 @@ class Wojownik:
     @zdrowie.setter
     def zdrowie(self, value):
         self._zdrowie = value
-        if self.zdrowie <= 0:
-            raise ValueError("zdrowie poniżej zera")
         if self.zdrowie > self.jednostka["zdrowie"]:
             self.zdrowie = self.jednostka["zdrowie"]
 
@@ -54,3 +55,32 @@ class Wojownik:
     def draw(self, pos, offset, screen):
         rect = self.image.get_frect(center=(pos[0] + offset[0], pos[1] + offset[1]))
         screen.blit(self.image, rect)
+
+    @property
+    def lord(self):
+        if self.name in lords:
+            return True
+        return False
+
+    def __lt__(self, other):
+        if self.name == other.name:
+            if self.zdrowie == other.name:
+                return self.morale < other.morale
+            return self.zdrowie < other.zdrowie
+
+        if self.zdrowie == other.name:
+            return self.morale < other.morale
+        return self.zdrowie < other.zdrowie
+
+    def __gt__(self, other):
+        if self.name == other.name:
+            if self.zdrowie == other.name:
+                return self.morale < other.morale
+            return self.zdrowie > other.zdrowie
+        if self.zdrowie == other.name:
+            return self.morale > other.morale
+        return self.zdrowie > other.zdrowie
+
+
+if __name__ == "__main__":
+    pass

@@ -11,13 +11,14 @@ from projekt.swiat import (
     Rotate,
     SquadDisplay,
     MouseDisplay,
+    AttackDisplay,
+    Wzmocnienie,
 )
 from projekt.player import Player
 from projekt.narzedzia import (
     oblicz_pos,
     TurnDisplay,
     KoniecGry,
-    AttackDisplay,
 )
 from projekt.flag import Flag
 from projekt.network import Client
@@ -51,6 +52,9 @@ class Gra:
             80, 80, "blue", (srodek[0] - 50, Height - 50)
         )
         self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
+        self.wzmocnienieButton = Wzmocnienie(
+            80, 80, "blue", (srodek[0] + 150, Height - 50)
+        )
 
     # metoda uruchamiająca grę
     def run(self):
@@ -87,6 +91,11 @@ class Gra:
             if self.rotateButton.rect.collidepoint(mouse_pos):
                 MouseDisplay().update(mouse_pos, "Obróć oddział")
 
+            if self.wzmocnienieButton.rect.collidepoint(mouse_pos):
+                MouseDisplay().update(
+                    mouse_pos, "Wzmocnij oddział (+5% obrony) za 4 ruchu"
+                )
+
         if AttackDisplay().show:
             AttackDisplay().hover(pygame.mouse.get_pos())
 
@@ -113,6 +122,9 @@ class Gra:
             )
             if Client().player.id == Mapa().move_flag.owner_id:
                 self.screen.blit(self.rotateButton.image, self.rotateButton.rect)
+                self.screen.blit(
+                    self.wzmocnienieButton.image, self.wzmocnienieButton.rect
+                )
         if AttackDisplay().show:
             AttackDisplay().display(self.screen)
 
@@ -123,6 +135,7 @@ class Gra:
         if KoniecGry().show:
             KoniecGry().draw(self.screen)
         MouseDisplay().draw(self.screen)
+        AnimationMenager.display(self.screen)
 
     def event_handler(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -148,6 +161,9 @@ class Gra:
                 SideMenu().event(mouse_pos, self.flag)
                 self.squadButtonDisplay.event(mouse_pos, Mapa().move_flag)
                 self.rotateButton.event(Mapa().move_flag, mouse_pos, Client().player.id)
+                self.wzmocnienieButton.event(
+                    Mapa().move_flag, mouse_pos, Client().player.id
+                )
 
                 if SquadDisplay().show:
                     SquadDisplay().event(

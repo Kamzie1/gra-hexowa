@@ -4,9 +4,8 @@ from .przycisk import Przycisk
 from .priority_queue import priority_queue
 from .error_log import Error_log
 from .display import TurnDisplay
-from .attackDisplay import AttackDisplay
 from .koniecgry import KoniecGry
 from .queue import Queue
 from .singleton import Singleton
 from .switch import Switch
-from .pozycja import Pozycja
+from .pozycja import Pozycja, AttackPosition

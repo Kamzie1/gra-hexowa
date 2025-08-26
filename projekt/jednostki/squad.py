@@ -42,6 +42,7 @@ class Squad(pygame.sprite.Sprite):
         self.load_data(info, frakcja)
         self.hex_positions = Hex_positions
         self.strategy = info["strategy"]
+        self.wzmocnienie = info["wzmocnienie"]
 
     @property
     def length(self):
@@ -105,6 +106,7 @@ class Squad(pygame.sprite.Sprite):
         info["owner_id"] = self.owner_id
         info["pos"] = self.pos
         info["strategy"] = self.strategy
+        info["wzmocnienie"] = self.wzmocnienie
         info["jednostki"] = []
         for wojownik in self.wojownicy:
             if wojownik is not None:
@@ -147,13 +149,15 @@ class Squad(pygame.sprite.Sprite):
             i += 1
 
     def display(self, id):
-        representation = f"{self.owner} ruch: {self.ruch}"
+        representation = (
+            f"{self.owner} ruch: {self.ruch} wzmocnienie: {self.wzmocnienie}"
+        )
         return representation
 
     def zdrowie(self, id, value):
-        try:
+        if value > 0:
             self.wojownicy[id].zdrowie = value
-        except ValueError:
+        else:
             self.wojownicy[id] = None
             if self.length == 0:
                 self.kill()

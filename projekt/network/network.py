@@ -36,9 +36,15 @@ class Client(metaclass=Singleton):
     def load_akcje(self):
         return {
             "zloto_upgrade": 1,
+            "srebro_upgrade": 1,
+            "stal_upgrade": 1,
+            "food_upgrade": 1,
             "mury_upgrade": 1,
             "zloto_rozkaz_cooldown": False,
             "zloto_rozkaz": 1,
+            "srebro_rozkaz": 1,
+            "stal_rozkaz": 1,
+            "food_rozkaz": 1,
             "movement_rozkaz_cooldown": False,
             "movement_rozkaz": 0,
         }
@@ -81,3 +87,23 @@ class Client(metaclass=Singleton):
                 KoniecGry().display("Przegrałeś", self.player.color)
             case 1:
                 KoniecGry().display("Wygrałeś", self.player.color)
+
+    def pay(self, cost):
+        Client().player.gold -= cost["zloto"]
+        Client().player.srebro -= cost["srebro"]
+        Client().player.stal -= cost["stal"]
+        Client().player.food -= cost["food"]
+        Client().player.medals -= cost["medale"]
+
+    def validate_cost(self, cost):
+        if Client().player.gold < cost["zloto"]:
+            return False
+        if Client().player.srebro < cost["srebro"]:
+            return False
+        if Client().player.stal < cost["stal"]:
+            return False
+        if Client().player.food < cost["food"]:
+            return False
+        if Client().player.medals < cost["medale"]:
+            return False
+        return True

@@ -40,6 +40,28 @@ class Button(pygame.sprite.Sprite):
     def draw(self):
         self.image.fill(self.color)
 
+    def display_cost(self, cost, screen):
+        y = 0
+        types = ["srebro", "stal", "zloto", "food", "medale"]
+        for currency in types:
+            if cost[currency]:
+                self.display_currency(y, currency, cost[currency], screen)
+                y += 1
+
+    def display_currency(self, y, currency, cost, screen):
+        image = AssetManager.get_asset(currency)
+        scaled_image = pygame.transform.scale(image, (25, 25))
+        screen.blit(
+            scaled_image,
+            scaled_image.get_frect(
+                topleft=(self.pos[0] + 65, self.pos[1] + 5 + 25 * y)
+            ),
+        )
+        text = AssetManager.get_font("consolas", 16).render(str(cost), True, "white")
+        screen.blit(
+            text, text.get_frect(topleft=(self.pos[0] + 85, self.pos[1] + 8 + 25 * y))
+        )
+
 
 class TextButton(pygame.sprite.Sprite):
     def __init__(
@@ -50,14 +72,14 @@ class TextButton(pygame.sprite.Sprite):
         pos,
         button_group,
         tekst,
-        font,
-        font_size,
-        font_color,
+        font="consolas",
+        font_size=24,
+        font_color="black",
     ) -> None:
         super().__init__(button_group)
         self.image = pygame.Surface((width, height))
         self.image.fill(color)
-        self.font = AssetManager.get_font("consolas", 24)
+        self.font = AssetManager.get_font(font, font_size)
         text_surf = self.font.render(tekst, True, font_color)
         text_rect = text_surf.get_rect(center=(width / 2, height / 2))
         self.image.blit(text_surf, text_rect)
@@ -131,15 +153,6 @@ class Recruit(Button):
         super().__init__(width, height, color, pos, button_group, description)
         self.jednostka = jednostka
         self.id = id
-        self.font = AssetManager.get_font("consolas", 10)
-        self.gold_icon = AssetManager.get_asset("złoto")
-        self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
-        self.gold_rect = self.scaled_gold_icon.get_frect(
-            topleft=(pos[0] + 45, pos[1] + 5)
-        )
-        self.display = f"{jednostka["cost"]}"
-        self.text = self.font.render(self.display, True, "white")
-        self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
 
     def click(self):
         info = {}
@@ -148,6 +161,7 @@ class Recruit(Button):
         info["owner_id"] = Client().player.id
         info["pos"] = (5000, 5000)
         info["strategy"] = 0
+        info["wzmocnienie"] = 0
         info["jednostki"] = []
         jednostka = self.jednostka
         jednostka["array_pos"] = 3
@@ -161,8 +175,7 @@ class Recruit(Button):
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-        screen.blit(self.scaled_gold_icon, self.gold_rect)
-        screen.blit(self.text, self.text_rect)
+        self.display_cost(self.jednostka["cost"], screen)
 
 
 class Rozkaz(Button):
@@ -171,35 +184,23 @@ class Rozkaz(Button):
     ):
         super().__init__(width, height, color, pos, button_group, description, image)
         self.typ = typ
-        self.font = AssetManager.get_font("consolas", 10)
-        self.gold_icon = AssetManager.get_asset("złoto")
-        self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
-        self.gold_rect = self.scaled_gold_icon.get_frect(
-            topleft=(pos[0] + 45, pos[1] + 5)
-        )
-        self.display = f"{AssetManager.get_koszt(self.typ)["gold"]}"
-        self.text = self.font.render(self.display, True, "white")
-        self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
         self.color = color
 
     def click(self):
         cooldown = self.typ + "_cooldown"
-        if not Client().player.akcje[cooldown]:
-            try:
-                Client().player.gold -= AssetManager.get_akcje(self.typ, "koszt")[
-                    "gold"
-                ]
-            except:
-                print("not enough money")
-            else:
-                Client().player.akcjeMenager.applybuff(self.typ)
-                Client().player.akcje[self.typ] += AssetManager.get_akcje(
-                    self.typ, "mnoznik"
-                )
-                Client().player.akcje[self.typ + "_cooldown"] = True
+        if not Client().player.akcje[cooldown] and Client().validate_cost(
+            AssetManager.get_akcje(self.typ, "koszt")
+        ):
 
-                print(Client().player.akcje)
-                Mapa().calculate_income()
+            Client().pay(AssetManager.get_akcje(self.typ, "koszt"))
+            Client().player.akcjeMenager.applybuff(self.typ)
+            Client().player.akcje[self.typ] += AssetManager.get_akcje(
+                self.typ, "mnoznik"
+            )
+            Client().player.akcje[self.typ + "_cooldown"] = True
+
+            print(Client().player.akcje)
+            Mapa().calculate_income()
 
     def draw(self, screen):
         if Client().player.akcje[self.typ + "_cooldown"]:
@@ -207,8 +208,7 @@ class Rozkaz(Button):
         else:
             self.image.fill(self.color)
         screen.blit(self.image, self.rect)
-        screen.blit(self.scaled_gold_icon, self.gold_rect)
-        screen.blit(self.text, self.text_rect)
+        self.display_cost(AssetManager.get_koszt(self.typ), screen)
 
 
 class Upgrade(Button):
@@ -217,17 +217,8 @@ class Upgrade(Button):
     ):
         super().__init__(width, height, color, pos, button_group, description, image)
         self.typ = typ
-        self.font = AssetManager.get_font("consolas", 10)
-        self.level_font = AssetManager.get_font("consolas", 16)
-        self.gold_icon = AssetManager.get_asset("złoto")
-        self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
-        self.gold_rect = self.scaled_gold_icon.get_frect(
-            topleft=(pos[0] + 45, pos[1] + 5)
-        )
+        self.level_font = AssetManager.get_font("consolas", 20)
         self.level = Client().player.akcje[typ]
-        self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
-        self.text = self.font.render(self.display, True, "white")
-        self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
 
     @property
     def level(self):
@@ -237,35 +228,31 @@ class Upgrade(Button):
     def level(self, value):
         self._level = value
         Client().player.akcje[self.typ] = value
-        self.display = f"{AssetManager.get_koszt(self.typ, self.level+1)["gold"]}"
-        self.text = self.font.render(self.display, True, "white")
-        self.text_rect = self.text.get_rect(
-            topleft=(self.pos[0] + 60, self.pos[1] + 10)
-        )
         self.level_surf = self.level_font.render(str(self.level), True, "white")
         self.level_rect = self.level_surf.get_rect(
-            bottomleft=(self.pos[0] + 30, self.pos[1] + 20)
+            bottomleft=(self.pos[0] + 45, self.pos[1] + 26)
         )
         Mapa().calculate_income()
 
     def click(self):
-        if self.level < 4:
-            try:
-                Client().player.gold -= AssetManager.get_koszt(
-                    self.typ, self.level + 1
-                )["gold"]
-            except:
-                print("not enough money")
-            else:
-                self.level = self.level + 1
-                Mapa().refresh()
+        if self.level < AssetManager.get_akcje(
+            self.typ, "maks_level"
+        ) and Client().validate_cost(AssetManager.get_koszt(self.typ, self.level + 1)):
+            Client().pay(AssetManager.get_koszt(self.typ, self.level + 1))
+            self.level = self.level + 1
+            Mapa().refresh()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-        if self.level != len(AssetManager.get_akcje(self.typ)) - 1:
-            screen.blit(self.scaled_gold_icon, self.gold_rect)
+        if self.level != AssetManager.get_akcje(self.typ, "maks_level"):
+            self.display_cost(AssetManager.get_koszt(self.typ, self.level + 1), screen)
+        else:
+            text = self.level_font.render("maks.", True, "white")
+            screen.blit(
+                text,
+                text.get_frect(topleft=(self.pos[0] + 70, self.pos[1] + 25)),
+            )
         screen.blit(self.level_surf, self.level_rect)
-        screen.blit(self.text, self.text_rect)
 
 
 class Menu(Button):
@@ -302,6 +289,24 @@ class SquadButtonDisplay:
 
     def click(self):
         SquadDisplay().show = not SquadDisplay().show
+
+
+class Wzmocnienie(SquadButtonDisplay):
+    def __init__(self, width, height, color, pos, tekst=None):
+        super().__init__(width, height, color, pos, tekst)
+
+    def event(self, squad, mouse_pos, id):
+        if squad is None:
+            return
+        if squad.owner_id != id:
+            return
+        if squad.ruch < 4:
+            return
+        if squad.wzmocnienie:
+            return
+        if self.rect.collidepoint(mouse_pos):
+            squad.wzmocnienie = True
+            squad.ruch -= 4
 
 
 class Rotate(SquadButtonDisplay):
@@ -355,15 +360,13 @@ class Gamble(Button):
             "Hazard: wydaj 10 za możliwość zyskania 20!!!",
             image_name,
         )
-        self.font = AssetManager.get_font("consolas", 10)
-        self.gold_icon = AssetManager.get_asset("złoto")
-        self.scaled_gold_icon = pygame.transform.scale(self.gold_icon, (20, 20))
-        self.gold_rect = self.scaled_gold_icon.get_frect(
-            topleft=(pos[0] + 45, pos[1] + 5)
-        )
-        self.display = "10"
-        self.text = self.font.render(self.display, True, "white")
-        self.text_rect = self.text.get_rect(topleft=(pos[0] + 60, pos[1] + 10))
+        self.cost = {
+            "zloto": 10,
+            "srebro": 0,
+            "stal": 0,
+            "food": 0,
+            "medale": 0,
+        }
 
     def click(self):
         if Client().player.gold >= 10:
@@ -374,5 +377,4 @@ class Gamble(Button):
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-        screen.blit(self.scaled_gold_icon, self.gold_rect)
-        screen.blit(self.text, self.text_rect)
+        self.display_cost(self.cost, screen)

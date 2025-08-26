@@ -13,7 +13,8 @@ from projekt.narzedzia import (
 )
 from projekt.jednostki import Squad, Miasto, Wioska
 from projekt.assetMenager import AssetManager
-from projekt.narzedzia import Singleton, AttackDisplay
+from projekt.narzedzia import Singleton
+from .attackDisplay import AttackDisplay
 from projekt.network import Client
 from .squadDisplay import SquadDisplay
 
@@ -58,6 +59,20 @@ class Mapa(metaclass=Singleton):
             (tile_width / 2, tile_height / 2),
         )
         self.import_state(Client().state)
+        self.mury_rect = AssetManager.get_asset("mury1").get_frect(
+            center=Client().player.pos
+        )
+        self.mury_opponent_rect = AssetManager.get_asset("mury1").get_frect(
+            center=Client().opponent.pos
+        )
+
+    def swap(self):
+        self.mury_rect = AssetManager.get_asset("mury1").get_frect(
+            center=Client().player.pos
+        )
+        self.mury_opponent_rect = AssetManager.get_asset("mury1").get_frect(
+            center=Client().opponent.pos
+        )
 
     @property
     def origin(self):
@@ -249,6 +264,14 @@ class Mapa(metaclass=Singleton):
                                 self.correct_moves[tile.x][tile.y],
                             )
             self.move_group.draw(self.mapSurf)
+        self.mapSurf.blit(
+            AssetManager.get_asset(f"mury{Client().player.akcje["mury_upgrade"]}"),
+            self.mury_rect,
+        )
+        self.mapSurf.blit(
+            AssetManager.get_asset(f"mury{Client().opponent.akcje["mury_upgrade"]}"),
+            self.mury_opponent_rect,
+        )
 
     def event(
         self,
@@ -328,6 +351,7 @@ class Mapa(metaclass=Singleton):
                                             self.move_flag.tile.y,
                                             tile.x,
                                             tile.y,
+                                            self.move_flag.tile.obrona,
                                             tile.obrona,
                                         )
                         else:
@@ -348,6 +372,7 @@ class Mapa(metaclass=Singleton):
                                             self.move_flag.tile.y,
                                             tile.x,
                                             tile.y,
+                                            self.move_flag.tile.obrona,
                                             tile.obrona,
                                         )
                                     else:
@@ -384,15 +409,14 @@ class Mapa(metaclass=Singleton):
             self.calculate_income()
 
     def recruit(self, tile):
-        if (
-            Client().player.gold
-            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
-                "cost"
-            ]
+        if Client().validate_cost(
+            Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id]["cost"]
         ):
-            Client().player.gold -= Client().player.frakcja["jednostka"][
-                self.move_flag.wojownicy[3].id
-            ]["cost"]
+            Client().pay(
+                Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
+                    "cost"
+                ]
+            )
             self.move_flag.pos = tile.pos
             self.move_flag.tile = tile
             self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
@@ -402,15 +426,18 @@ class Mapa(metaclass=Singleton):
 
     def recruit_join(self, tile):
         if (
-            Client().player.gold
-            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
-                "cost"
-            ]
+            Client().validate_cost(
+                Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
+                    "cost"
+                ]
+            )
             and len(tile.jednostka) + len(self.move_flag) <= 7
         ):
-            Client().player.gold -= Client().player.frakcja["jednostka"][
-                self.move_flag.wojownicy[3].id
-            ]["cost"]
+            Client().pay(
+                Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
+                    "cost"
+                ]
+            )
             self.join(tile.jednostka, self.move_flag, tile)
         else:
             print("not enough money")
@@ -481,6 +508,12 @@ class Mapa(metaclass=Singleton):
             s = Squad(self.army_group, jednostka, tile, frakcja)
             if Client().turn % 2 == s.owner_id and s.medyk:
                 s.heal(frakcja["jednostka"][2]["heal"])  # medyk
+            if (
+                Client().player.name == s.owner
+                and Client().turn % 2 == Client().player.id
+            ):
+                s.wzmocnienie = False
+
             tile.jednostka = s
 
         for budynek in state["budynki"]:
@@ -529,15 +562,20 @@ class Mapa(metaclass=Singleton):
                 )
 
     def calculate_income(self):
-        Client().player.zloto_income = 0
+        types = ["srebro", "stal", "food", "zloto"]
+        for typ in types:
+            self.calculate_income_by_type(typ)
+
+    def calculate_income_by_type(self, typ):
+        Client().player.income[typ] = 0
         for budynek in self.building_group:
             if isinstance(budynek, Miasto) and budynek.owner_id == Client().player.id:
-                Client().player.zloto_income += int(
-                    budynek.earn["gold"]
+                Client().player.income[typ] += int(
+                    budynek.earn[typ]
                     * AssetManager.get_mnoznik(
-                        "zloto_upgrade", Client().player.akcje["zloto_upgrade"]
+                        f"{typ}_upgrade", Client().player.akcje[f"{typ}_upgrade"]
                     )
-                    * Client().player.akcje["zloto_rozkaz"]
+                    * Client().player.akcje[f"{typ}_rozkaz"]
                 )
             else:
                 pass
