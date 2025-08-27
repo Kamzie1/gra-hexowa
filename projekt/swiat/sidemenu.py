@@ -35,7 +35,8 @@ class SideMenu(metaclass=Singleton):
         )
         self.akcje = PoleAkcji(menu_width, menu_height, Client().player, (0, 60))
         self.type = 0  # 0 to rekrutacja, 1 to akcje
-
+        self.dirty = False
+        self.reset = False
         self.button_group = pygame.sprite.Group()
         self.rekrutacjaButton = RekrutacjaShowButton(
             (menu_width - 10) / 2,
@@ -74,18 +75,26 @@ class SideMenu(metaclass=Singleton):
                 self.rekrutacja.update(mouse_pos)
 
     def event(self, mouse_pos, flag):
+        self.reset = False
+        self.dirty = False
         if self.rect.collidepoint(mouse_pos) and flag.show:
+            self.dirty = True
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
             flag.klikniecie_flag = False
             for button in self.button_group:
                 if button.rect.collidepoint(mouse_pos):
                     self.type = button.click()
+                    self.reset = True
+                    self.rekrutacja.refresh()
                     return
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, (0, 60))
             if self.type:
                 self.akcje.event(mouse_pos, Client().turn, Client().player.id)
             else:
                 self.rekrutacja.event(mouse_pos, Client().turn, Client().player.id)
+        else:
+            self.rekrutacja.refresh()
+        print(self.reset)
 
     def swap(self, player):
         for button in self.button_group:
@@ -211,6 +220,21 @@ class PoleRekrutacji(Pole):
             if x + 85 > menu_width - 25:
                 x = 5
                 y += 120
+
+    def refresh(self):
+        for button in self.button_group:
+            button.count = 0
+
+    def event(self, mouse_pos, turn, id):
+        dirty = False
+        if turn % 2 == id:
+            for button in self.button_group:
+                if button.rect.collidepoint(mouse_pos):
+                    button.click()
+                    dirty = True
+        if not dirty:
+            SideMenu().reset = True
+            self.refresh()
 
 
 class PoleAkcji(Pole):

@@ -273,14 +273,15 @@ class Mapa(metaclass=Singleton):
             self.mury_opponent_rect,
         )
 
-    def event(
-        self,
-        mouse_pos,
-        flag,
-        squadButtonDisplay,
-        rotateButton,
-    ):
+    def event(self, mouse_pos, flag, squadButtonDisplay, rotateButton, dirty, reset):
+        if reset:
+            print("vv")
+            self.move_flag = None
+            self.correct_moves = None
+        if dirty:
+            return
         failed = False
+        kliked = False
         if AttackDisplay().show:
             if AttackDisplay().rect.collidepoint(mouse_pos):
                 AttackDisplay().event(mouse_pos)
@@ -300,6 +301,7 @@ class Mapa(metaclass=Singleton):
         for tiles in self.Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
+                    kliked = True
                     AttackDisplay().show = False
                     flag.klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
@@ -331,13 +333,13 @@ class Mapa(metaclass=Singleton):
                                 self.move(tile)
                             else:
                                 if tile.jednostka.owner_id == Client().player.id:
-                                    if not self.move_flag.tile == tile:
-                                        try:
-                                            self.join(
-                                                tile.jednostka, self.move_flag, tile
-                                            )
-                                        except:
-                                            pass
+                                    if (
+                                        not self.move_flag.tile == tile
+                                        and len(self.move_flag) + len(tile.jednostka)
+                                        <= 7
+                                    ):
+                                        self.join(tile.jednostka, self.move_flag, tile)
+
                                 elif tile.jednostka.owner_id == Client().opponent.id:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
@@ -390,6 +392,9 @@ class Mapa(metaclass=Singleton):
                         self.split = None
                         for tile in self.move_group:
                             tile.kill()
+        if reset and not kliked:
+            self.move_flag = None
+            self.correct_moves = None
 
     def move(self, tile):
         if self.split is None:
@@ -409,14 +414,8 @@ class Mapa(metaclass=Singleton):
             self.calculate_income()
 
     def recruit(self, tile):
-        if Client().validate_cost(
-            Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id]["cost"]
-        ):
-            Client().pay(
-                Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
-                    "cost"
-                ]
-            )
+        if Client().validate_cost(self.calculate_cost(self.move_flag)):
+            Client().pay(self.calculate_cost(self.move_flag))
             self.move_flag.pos = tile.pos
             self.move_flag.tile = tile
             self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
@@ -426,21 +425,25 @@ class Mapa(metaclass=Singleton):
 
     def recruit_join(self, tile):
         if (
-            Client().validate_cost(
-                Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
-                    "cost"
-                ]
-            )
+            Client().validate_cost(self.calculate_cost(self.move_flag))
             and len(tile.jednostka) + len(self.move_flag) <= 7
         ):
-            Client().pay(
-                Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
-                    "cost"
-                ]
-            )
+            Client().pay(self.move_flag)
             self.join(tile.jednostka, self.move_flag, tile)
         else:
             print("not enough money")
+
+    def calculate_cost(self, squad):
+        cost = {}
+        types = ["zloto", "srebro", "stal", "medale", "food"]
+        for currency in types:
+            cost[currency] = 0
+        for wojownik in squad.wojownicy:
+            if wojownik is None:
+                continue
+            for currency in types:
+                cost[currency] += wojownik.jednostka["cost"][currency]
+        return cost
 
     def join(self, squad1, squad2, tile):
         squad2.ruch = self.correct_moves[tile.x][tile.y]

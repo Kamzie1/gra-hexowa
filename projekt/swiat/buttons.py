@@ -40,12 +40,15 @@ class Button(pygame.sprite.Sprite):
     def draw(self):
         self.image.fill(self.color)
 
-    def display_cost(self, cost, screen):
+    def display_cost(self, cost, screen, count=0):
         y = 0
         types = ["srebro", "stal", "zloto", "food", "medale"]
         for currency in types:
             if cost[currency]:
-                self.display_currency(y, currency, cost[currency], screen)
+                if count == 0:
+                    self.display_currency(y, currency, cost[currency], screen)
+                elif count > 0:
+                    self.display_currency(y, currency, cost[currency] * count, screen)
                 y += 1
 
     def display_currency(self, y, currency, cost, screen):
@@ -153,8 +156,9 @@ class Recruit(Button):
         super().__init__(width, height, color, pos, button_group, description)
         self.jednostka = jednostka
         self.id = id
+        self.count = 0
 
-    def click(self):
+    def get_squad_info(self):
         info = {}
         info["color"] = Client().player.color
         info["owner"] = Client().player.name
@@ -166,16 +170,36 @@ class Recruit(Button):
         jednostka = self.jednostka
         jednostka["array_pos"] = 3
         info["jednostki"].append(jednostka)
-        Mapa().move_flag = Squad(Mapa().army_group, info, None, Client().player.frakcja)
-        r = Recruit_sample(7)
-        Mapa().correct_moves = Mapa().possible_moves(
-            Client().player.x, Client().player.y, r
-        )
-        Mapa().move_group.empty()
+        return info
+
+    def click(self):
+        if Mapa().move_flag is None:
+            self.count += 1
+            info = self.get_squad_info()
+            Mapa().move_flag = Squad(
+                Mapa().army_group, info, None, Client().player.frakcja
+            )
+            r = Recruit_sample(7)
+            Mapa().correct_moves = Mapa().possible_moves(
+                Client().player.x, Client().player.y, r
+            )
+            Mapa().move_group.empty()
+        elif Mapa().move_flag.tile is None and len(Mapa().move_flag) < 7:
+            self.count += 1
+            info = self.get_squad_info()
+            s = Squad(Mapa().army_group, info, None, Client().player.frakcja)
+            Mapa().move_flag + s
+        else:
+            return
 
     def draw(self, screen):
+        text = AssetManager.get_font("consolas", 20).render(
+            str(self.count), True, "white"
+        )
+        text_rect = text.get_frect(topleft=(self.pos[0] + 45, self.pos[1] + 40))
         screen.blit(self.image, self.rect)
-        self.display_cost(self.jednostka["cost"], screen)
+        screen.blit(text, text_rect)
+        self.display_cost(self.jednostka["cost"], screen, self.count)
 
 
 class Rozkaz(Button):

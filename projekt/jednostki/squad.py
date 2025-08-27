@@ -135,6 +135,8 @@ class Squad(pygame.sprite.Sprite):
         return dl
 
     def __add__(self, other):
+        print("add squad")
+        print(self, other)
         for o_wojownik in other.wojownicy:
             if o_wojownik is None:
                 continue
@@ -147,6 +149,7 @@ class Squad(pygame.sprite.Sprite):
             if wojownik is not None:
                 wojownik.pos = i
             i += 1
+        print(self.wojownicy, other.wojownicy)
 
     def display(self, id):
         representation = (

@@ -256,7 +256,7 @@ class AttackDisplay(metaclass=Singleton):
         pozycja.wojownik = squad.wojownicy[pozycja.id]
         self.ifselected = True
         animation = (
-            40,
+            60,
             0,
             str(damage),
             pos_on_screen(

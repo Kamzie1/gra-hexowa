@@ -148,17 +148,19 @@ class Gra:
                     pygame.quit()
                     exit()
 
+                SideMenu().event(mouse_pos, self.flag)
+                print(SideMenu().reset)
                 Mapa().event(
                     mouse_pos,
                     self.flag,
                     self.squadButtonDisplay,
                     self.rotateButton,
+                    SideMenu().dirty,
+                    SideMenu().reset,
                 )
 
                 Turn().event(mouse_pos)
-                SideMenu().swap(Client().player)
                 Resource().event(mouse_pos, self.flag)
-                SideMenu().event(mouse_pos, self.flag)
                 self.squadButtonDisplay.event(mouse_pos, Mapa().move_flag)
                 self.rotateButton.event(Mapa().move_flag, mouse_pos, Client().player.id)
                 self.wzmocnienieButton.event(
