@@ -43,6 +43,7 @@ class AttackDisplay(metaclass=Singleton):
         self.atakStrategy = Switch(
             300, 32, (self.width / 4, self.height / 4), self.strategies
         )
+        self.selected = None
 
     def update(self, attacker, defender, distance, x1, y1, x2, y2, defense1, defense2):
         self.show = True
@@ -250,7 +251,7 @@ class AttackDisplay(metaclass=Singleton):
             buff = 5
         else:
             buff = 0
-        damage = self.calculateDamage(pozycja.wojownik, defense, buff)
+        damage = self.calculateDamage(pozycja.wojownik, defense, buff, squad.owner)
         squad.zdrowie(pozycja.id, pozycja.wojownik.zdrowie - damage)
         pozycja.wojownik = squad.wojownicy[pozycja.id]
         self.ifselected = True
@@ -525,5 +526,5 @@ class OddzialDefend(Oddzial):
                     and pozycja.wojownik is not None
                 ):
                     AttackDisplay().atak_pozycja(
-                        pozycja, self.squad, (self.rect.x, self.rect.y)
+                        pozycja, self.squad, (self.rect.x, self.rect.y), self.defense
                     )
