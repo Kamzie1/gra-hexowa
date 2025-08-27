@@ -219,6 +219,7 @@ class SquadDisplay(metaclass=Singleton):
         info["owner_id"] = squad.owner_id
         info["pos"] = squad.pos
         info["strategy"] = squad.strategy
+        info["wzmocnienie"] = squad.wzmocnienie
         info["jednostki"] = []
         jednostka = self.selected.wojownik.get_data()
         jednostka["array_pos"] = self.selected.wojownik.pos
