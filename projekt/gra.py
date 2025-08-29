@@ -149,7 +149,6 @@ class Gra:
                     exit()
 
                 SideMenu().event(mouse_pos, self.flag)
-                print(SideMenu().reset)
                 Mapa().event(
                     mouse_pos,
                     self.flag,

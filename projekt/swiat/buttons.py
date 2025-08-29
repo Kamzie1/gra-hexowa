@@ -188,7 +188,7 @@ class Recruit(Button):
             self.count += 1
             info = self.get_squad_info()
             s = Squad(Mapa().army_group, info, None, Client().player.frakcja)
-            Mapa().move_flag + s
+            Mapa().move_flag += s
         else:
             return
 

@@ -38,7 +38,8 @@ class AttackDisplay(metaclass=Singleton):
         self.strategies = [
             "strategia: najsłabszy",
             "strategia: najsilniejszy",
-            "strategia: lord",
+            "strategia: lord/max",
+            "strategia: lord/min",
         ]
         self.atakStrategy = Switch(
             300, 32, (self.width / 4, self.height / 4), self.strategies
@@ -63,9 +64,6 @@ class AttackDisplay(metaclass=Singleton):
                 break
             i += 1
 
-        print(id)
-        print(attack_angle)
-
         self.attacker = OddzialAttack(
             self.width / 2,
             self.height,
@@ -86,7 +84,7 @@ class AttackDisplay(metaclass=Singleton):
         )
 
     def display(self, screen):
-        self.surf.fill("white")
+        self.surf.fill("green")
         self.attacker.draw(self.surf)
         self.defender.draw(self.surf)
         self.atakButton.draw(self.surf)
@@ -163,29 +161,38 @@ class AttackDisplay(metaclass=Singleton):
     def get_target(self, pozycje, strategy):
         max_wojownik = self.load_min_wojownik()
         min_wojownik = self.load_max_wojownik()
-        lord = self.load_min_wojownik()
+        lord_max = self.load_min_wojownik()
+        lord_min = self.load_max_wojownik()
         wybrany = False
         lord_wybrany = False
-        pozycja_min, pozycja_max, pozycja_lord = None, None, None
+        pozycja_min, pozycja_max, pozycja_lord_max, pozycja_lord_min = (
+            None,
+            None,
+            None,
+            None,
+        )
         for pozycja in pozycje:
             if not pozycja.active or pozycja.wojownik is None:
                 continue
             wybrany = True
-            if pozycja.wojownik > max_wojownik:
+            if pozycja.wojownik.damage_score() > max_wojownik.damage_score():
                 max_wojownik = pozycja.wojownik
                 pozycja_max = pozycja
-            if pozycja.wojownik < min_wojownik:
+            if pozycja.wojownik.health_score() < min_wojownik.health_score():
                 min_wojownik = pozycja.wojownik
                 pozycja_min = pozycja
             if pozycja.wojownik.lord:
-                if pozycja.wojownik > lord:
+                if pozycja.wojownik.damage_score() > lord_max.damage_score():
                     lord_wybrany = True
-                    lord = pozycja.wojownik
-                    pozycja_lord = pozycja
+                    lord_max = pozycja.wojownik
+                    pozycja_lord_max = pozycja
+                if pozycja.wojownik.health_score() > lord_min.health_score():
+                    lord_wybrany = True
+                    lord_min = pozycja.wojownik
+                    pozycja_lord_min = pozycja
+
         if not wybrany:
             return None
-
-        print(pozycja_lord, pozycja_max, pozycja_min)
 
         match (strategy):
             case 0:
@@ -194,8 +201,12 @@ class AttackDisplay(metaclass=Singleton):
                 return pozycja_max
             case 2:
                 if lord_wybrany:
-                    return pozycja_lord
+                    return pozycja_lord_max
                 return pozycja_max
+            case 3:
+                if lord_wybrany:
+                    return pozycja_lord_min
+                return pozycja_min
 
     def do_atak(self, attacker, defender):
         for pozycja in attacker.pozycje_group:
@@ -330,11 +341,6 @@ class Oddzial:
                             and pozycja.wojownik.bronie[0]["range"] >= self.distance
                         ):
                             pozycja.active = True
-                            print(
-                                "distrnace:",
-                                self.distance,
-                                pozycja.wojownik.bronie[0]["range"],
-                            )
                         else:
                             pozycja.active = False
                     else:
@@ -354,11 +360,6 @@ class Oddzial:
                         and self.distance <= pozycja.wojownik.bronie[0]["range"]
                     ):
                         pozycja.active = True
-                        print(
-                            "distrnace:",
-                            self.distance,
-                            pozycja.wojownik.bronie[0]["range"],
-                        )
                     else:
                         pozycja.active = False
                 else:
@@ -455,6 +456,11 @@ class Oddzial:
         self.surf.fill("white")
         for pozycja in self.pozycje_group:
             pozycja.display(self.surf, self.squad.color)
+        text = AssetManager.get_font("consolas", 20).render(
+            f"obrona: {self.defense*100}%", True, "black"
+        )
+        text_rect = text.get_frect(topleft=(100, 50))
+        self.surf.blit(text, text_rect)
         screen.blit(self.surf, self.rect)
 
     def event(self, mouse_pos):
@@ -508,23 +514,15 @@ class OddzialDefend(Oddzial):
         super().__init__(width, height, squad, id, sasiedzi, distance, defense)
         self.rect = self.surf.get_frect(topright=(width * 2, 0))
         self.load_defend_army()
+        self.width = width
 
     def draw(self, screen):
         self.surf.fill("white")
         for pozycja in self.pozycje_group:
             pozycja.display(self.surf, self.squad.color)
+        text = AssetManager.get_font("consolas", 20).render(
+            f"obrona: {self.defense*100}%", True, "black"
+        )
+        text_rect = text.get_frect(topright=(self.width - 100, 50))
+        self.surf.blit(text, text_rect)
         screen.blit(self.surf, self.rect)
-
-    def event(self, mouse_pos):
-        if self.rect.collidepoint(mouse_pos):
-            mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
-            for pozycja in self.pozycje_group:
-                if (
-                    pozycja.rect.collidepoint(mouse_pos)
-                    and AttackDisplay().selected is not None
-                    and AttackDisplay().selected.wojownik.atak_points > 0
-                    and pozycja.wojownik is not None
-                ):
-                    AttackDisplay().atak_pozycja(
-                        pozycja, self.squad, (self.rect.x, self.rect.y), self.defense
-                    )

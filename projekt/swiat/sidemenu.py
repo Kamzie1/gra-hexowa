@@ -94,7 +94,6 @@ class SideMenu(metaclass=Singleton):
                 self.rekrutacja.event(mouse_pos, Client().turn, Client().player.id)
         else:
             self.rekrutacja.refresh()
-        print(self.reset)
 
     def swap(self, player):
         for button in self.button_group:

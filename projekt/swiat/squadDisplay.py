@@ -38,7 +38,8 @@ class SquadDisplay(metaclass=Singleton):
         self.strategies = [
             "strategia: najsłabszy",
             "strategia: najsilniejszy",
-            "strategia: lord",
+            "strategia: lord/max",
+            "strategia: lord/min",
         ]
         self.switchStrategy = Switch(300, 32, (self.width - 5, 5), self.strategies)
 

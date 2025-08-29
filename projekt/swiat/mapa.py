@@ -274,18 +274,17 @@ class Mapa(metaclass=Singleton):
         )
 
     def event(self, mouse_pos, flag, squadButtonDisplay, rotateButton, dirty, reset):
+        if AttackDisplay().show:
+            if AttackDisplay().rect.collidepoint(mouse_pos):
+                AttackDisplay().event(mouse_pos)
+                return
         if reset:
-            print("vv")
             self.move_flag = None
             self.correct_moves = None
         if dirty:
             return
         failed = False
         kliked = False
-        if AttackDisplay().show:
-            if AttackDisplay().rect.collidepoint(mouse_pos):
-                AttackDisplay().event(mouse_pos)
-                return
 
         if SquadDisplay().show:
             if SquadDisplay().rect.collidepoint(mouse_pos):
@@ -401,7 +400,6 @@ class Mapa(metaclass=Singleton):
             self.move_flag.tile.jednostka = None
         else:
             self.move_flag.tile.jednostka.wojownicy[self.split] = None
-            print(self.move_flag.tile.jednostka)
         self.move_flag.pos = tile.pos
         self.move_flag.tile = tile
         self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
@@ -428,7 +426,7 @@ class Mapa(metaclass=Singleton):
             Client().validate_cost(self.calculate_cost(self.move_flag))
             and len(tile.jednostka) + len(self.move_flag) <= 7
         ):
-            Client().pay(self.move_flag)
+            Client().pay(self.calculate_cost(self.move_flag))
             self.join(tile.jednostka, self.move_flag, tile)
         else:
             print("not enough money")

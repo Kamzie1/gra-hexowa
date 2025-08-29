@@ -62,24 +62,20 @@ class Wojownik:
             return True
         return False
 
-    def __lt__(self, other):
-        if self.name == other.name:
-            if self.zdrowie == other.name:
-                return self.morale < other.morale
-            return self.zdrowie < other.zdrowie
+    def health_score(self):
+        return self.zdrowie + self.pancerz
 
-        if self.zdrowie == other.name:
-            return self.morale < other.morale
-        return self.zdrowie < other.zdrowie
+    def damage_score(self):
+        return (
+            (self.bronie[0]["atak"][0] + self.bronie[0]["atak"][1]) / 2
+            + self.bronie[0]["przebicie"]
+        ) * int(self.atak_points / self.bronie[0]["koszt_ataku"])
 
-    def __gt__(self, other):
-        if self.name == other.name:
-            if self.zdrowie == other.name:
-                return self.morale < other.morale
-            return self.zdrowie > other.zdrowie
-        if self.zdrowie == other.name:
-            return self.morale > other.morale
-        return self.zdrowie > other.zdrowie
+    def greater_damage(self, other):
+        return self.damage_score() > other.damage_score()
+
+    def smaller_health(self, other):
+        return self.health_score() < other.health_score()
 
 
 if __name__ == "__main__":
