@@ -184,7 +184,10 @@ class SquadDisplay(metaclass=Singleton):
         for pozycja in self.positions_group:
             if pozycja.rect.collidepoint(mouse_pos):
                 if self.selected is not None and self.selected.wojownik is not None:
-                    if squad.owner_id != id or self.selected.wojownik.name == "Fort":
+                    if (
+                        squad.owner_id != id
+                        or self.selected.wojownik.jednostka["ruch"] == 0
+                    ):
                         return
                     self.swap(pozycja, squad)
                 self.selected = pozycja

@@ -99,6 +99,23 @@ class Squad(pygame.sprite.Sprite):
                 wojownik.draw(self.pos, self.hex_positions[i], screen)
             i += 1
 
+    @property
+    def food(self):
+        food = 0
+        for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
+            food += wojownik.food
+        return food
+
+    def inzynier(self) -> bool:
+        for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
+            if wojownik.name == "Inżynier":
+                return True
+        return False
+
     def get_data(self):
         info = {}
         info["color"] = self.color

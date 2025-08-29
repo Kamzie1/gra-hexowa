@@ -8,6 +8,7 @@
       wzrok: Oczy
       pancerz: 8
       atak_points: 10
+      food: 10
       red: Ciezki_kopijnik.png
       blue: Ciezki_kopijnik blue.png
       cost: 
@@ -29,6 +30,7 @@
       wzrok: Lornetka
       pancerz: 10
       atak_points: 20
+      food: 0
       red: rec2.png
       blue: rec2.png
       id: 0
