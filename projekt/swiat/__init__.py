@@ -8,3 +8,4 @@ from .buttons import Button, SquadButtonDisplay, Rotate, Wzmocnienie
 from .squadDisplay import SquadDisplay
 from .mouseDisplay import MouseDisplay
 from .attackDisplay import AttackDisplay
+from .inzynier import InzynierButton, InzynierBuild

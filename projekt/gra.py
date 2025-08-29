@@ -13,6 +13,8 @@ from projekt.swiat import (
     MouseDisplay,
     AttackDisplay,
     Wzmocnienie,
+    InzynierBuild,
+    InzynierButton,
 )
 from projekt.player import Player
 from projekt.narzedzia import (
@@ -38,6 +40,7 @@ class Gra:
         self.clock = pygame.time.Clock()
         Mini_map()
         AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
+        self.inzynierBuild = InzynierBuild(Width / 2, Height / 2, srodek)
         Mapa("mapa1(30x30)")
         Resource()
         Turn()
@@ -54,6 +57,9 @@ class Gra:
         self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
         self.wzmocnienieButton = Wzmocnienie(
             80, 80, "blue", (srodek[0] + 150, Height - 50)
+        )
+        self.inzynierButton = InzynierButton(
+            80, 80, "red", (srodek[0] + 250, Height - 50)
         )
 
     # metoda uruchamiająca grę
@@ -95,6 +101,8 @@ class Gra:
                 MouseDisplay().update(
                     mouse_pos, "Wzmocnij oddział (+5% obrony) za 4 ruchu"
                 )
+            if Mapa().move_flag.inzynier():
+                self.inzynierButton.hover(mouse_pos)
 
         if AttackDisplay().show:
             AttackDisplay().hover(pygame.mouse.get_pos())
@@ -125,8 +133,13 @@ class Gra:
                 self.screen.blit(
                     self.wzmocnienieButton.image, self.wzmocnienieButton.rect
                 )
+                if Mapa().move_flag.inzynier():
+                    self.inzynierButton.draw(self.screen)
         if AttackDisplay().show:
             AttackDisplay().display(self.screen)
+
+        if self.inzynierBuild.show:
+            self.inzynierBuild.draw(self.screen)
 
         Turn().draw(self.screen)
 
@@ -154,6 +167,8 @@ class Gra:
                     self.flag,
                     self.squadButtonDisplay,
                     self.rotateButton,
+                    self.inzynierButton,
+                    self.inzynierBuild,
                     SideMenu().dirty,
                     SideMenu().reset,
                 )
@@ -164,6 +179,9 @@ class Gra:
                 self.rotateButton.event(Mapa().move_flag, mouse_pos, Client().player.id)
                 self.wzmocnienieButton.event(
                     Mapa().move_flag, mouse_pos, Client().player.id
+                )
+                self.inzynierButton.event(
+                    mouse_pos, Mapa().move_flag, self.inzynierBuild
                 )
 
                 if SquadDisplay().show:

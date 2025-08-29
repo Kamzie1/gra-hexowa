@@ -273,10 +273,30 @@ class Mapa(metaclass=Singleton):
             self.mury_opponent_rect,
         )
 
-    def event(self, mouse_pos, flag, squadButtonDisplay, rotateButton, dirty, reset):
+    def event(
+        self,
+        mouse_pos,
+        flag,
+        squadButtonDisplay,
+        rotateButton,
+        inzynierButton,
+        InzynierBlock,
+        dirty,
+        reset,
+    ):
         if AttackDisplay().show:
             if AttackDisplay().rect.collidepoint(mouse_pos):
                 AttackDisplay().event(mouse_pos)
+                return
+        if InzynierBlock.show:
+            if (
+                InzynierBlock.rect.collidepoint(mouse_pos)
+                and self.move_flag is not None
+                and self.move_flag.tile is not None
+            ):
+                InzynierBlock.event(
+                    mouse_pos, self.move_flag.tile.x, self.move_flag.tile.y
+                )
                 return
         if reset:
             self.move_flag = None
@@ -294,6 +314,10 @@ class Mapa(metaclass=Singleton):
             if squadButtonDisplay.rect.collidepoint(mouse_pos):
                 return
             if rotateButton.rect.collidepoint(mouse_pos):
+                return
+            if self.move_flag.inzynier() and inzynierButton.rect.collidepoint(
+                mouse_pos
+            ):
                 return
 
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, self.origin)
@@ -418,6 +442,7 @@ class Mapa(metaclass=Singleton):
             self.move_flag.tile = tile
             self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
             tile.jednostka = self.move_flag
+            self.calculate_income()
         else:
             print("not enough money")
 
@@ -428,6 +453,7 @@ class Mapa(metaclass=Singleton):
         ):
             Client().pay(self.calculate_cost(self.move_flag))
             self.join(tile.jednostka, self.move_flag, tile)
+            self.calculate_income()
         else:
             print("not enough money")
 
@@ -566,6 +592,11 @@ class Mapa(metaclass=Singleton):
         types = ["srebro", "stal", "food", "zloto"]
         for typ in types:
             self.calculate_income_by_type(typ)
+        food = 0
+        for jednostka in self.army_group:
+            if jednostka.owner_id == Client().player.id:
+                food += jednostka.food
+        Client().player.income["food"] -= food
 
     def calculate_income_by_type(self, typ):
         Client().player.income[typ] = 0

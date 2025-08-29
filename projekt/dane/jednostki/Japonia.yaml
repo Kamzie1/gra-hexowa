@@ -10,6 +10,7 @@
       wzrok: Oczy
       pancerz: 4
       atak_points: 9
+      food: 5
       red: Bodyguard_red.png
       blue: Bodyguard_blue.png
       cost:
@@ -30,6 +31,7 @@
       wzrok: Oczy
       pancerz: 3
       atak_points: 9
+      food: 4
       red: włócznik.png
       blue: włócznik_blue.png
       cost:
@@ -50,6 +52,7 @@
       wzrok: Oczy
       pancerz: 0
       atak_points: 1
+      food: 4
       red: medyk_red.png
       blue: medyk_blue.png
       cost:
@@ -71,6 +74,7 @@
       wzrok: Oczy
       pancerz: 8
       atak_points: 12
+      food: 10
       red: Yukimura_Sanada_red.png
       blue: Yukimura_Sanada_blue.png
       cost:
@@ -91,6 +95,7 @@
       wzrok: Lornetka
       pancerz: 2
       atak_points: 10
+      food: 2
       red: kolubryna.png
       blue: kolubryna.png
       cost:
@@ -111,6 +116,7 @@
       wzrok: Oczy
       pancerz: 3
       atak_points: 10
+      food: 4
       red: Ashigaru_rusznikaru_red.png
       blue: Ashigaru_rusznikaru_blue.png
       id: 5
@@ -131,6 +137,7 @@
       wzrok: Oczy
       pancerz: 4
       atak_points: 20
+      food: 8
       red: Samuraj_kawalerzysta_red.png
       blue: Samuraj_kawalerzysta_blue.png
       id: 6
@@ -151,6 +158,7 @@
       wzrok: Oczy
       pancerz: 3
       atak_points: 20
+      food: 6
       red: kawaleria_red.png
       blue: kawaleria_red.png
       id: 7
@@ -171,6 +179,7 @@
       wzrok: Lornetka
       pancerz: 3
       atak_points: 10
+      food: 5
       red: scout_red.png
       blue: scout_red.png
       id: 8
@@ -179,6 +188,27 @@
         stal: 0
         zloto: 0
         medale: 0
+        food: 0
+      kategoria: jednostka
+
+    - nazwa: Inżynier
+      zdrowie: 35
+      morale: 70
+      ruch: 14
+      bronie:
+        - Rece
+      wzrok: Lornetka
+      pancerz: 3
+      atak_points: 2
+      food: 4
+      red: inzynier.png
+      blue: inzynier_blue.png
+      id: 9
+      cost:
+        srebro: 120
+        stal: 10
+        zloto: 10
+        medale: 2
         food: 0
       kategoria: jednostka
 
@@ -192,9 +222,31 @@
       wzrok: Lornetka
       pancerz: 10
       atak_points: 20
+      food: 0
       red: rec2.png
       blue: rec2.png
       id: 0
+      kategoria: specjalne
+
+    - nazwa: Wieża Obserwacyjna
+      zdrowie: 100
+      morale: 90
+      ruch: 0
+      bronie:
+        - Rece
+      wzrok: Lornetka
+      pancerz: 5
+      atak_points: 0
+      food: 0
+      red: rec2.png
+      blue: rec2.png
+      id: 1
+      cost:
+        srebro: 50
+        stal: 50
+        zloto: 0
+        medale: 1
+        food: 0
       kategoria: specjalne
 
   budynek:
