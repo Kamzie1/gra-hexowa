@@ -3,6 +3,7 @@ from os.path import join
 from .miasto import Miasto
 from .podswietlenie import Podswietlenie
 from projekt.assetMenager import AssetManager
+from projekt.network import Client
 
 
 class Wioska(Miasto):
@@ -20,3 +21,4 @@ class Wioska(Miasto):
             self.podswietlenie_group,
         )
         self.image = AssetManager.get_asset(self.name)
+        Client().player.medals += 10

@@ -10,16 +10,11 @@ from projekt.swiat import (
     SquadButtonDisplay,
     Rotate,
     SquadDisplay,
+    AttackDisplay,
+    Wzmocnienie,
 )
 from projekt.player import Player
-from projekt.narzedzia import (
-    oblicz_pos,
-    TurnDisplay,
-    KoniecGry,
-    AttackDisplay,
-    Display,
-    MouseDisplay,
-)
+from projekt.narzedzia import oblicz_pos, TurnDisplay, KoniecGry, MouseDisplay, Display
 from projekt.flag import Flag
 from projekt.network import Client
 from .assetMenager import AssetManager
@@ -48,6 +43,9 @@ class Gra:
             Width / 2, 100, (srodek[0] - Width / 4, srodek[1] / 2), "consolas", 100
         )
         self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
+        self.wzmocnienieButton = Wzmocnienie(
+            80, 80, "blue", (srodek[0] + 150, Height - 50)
+        )
 
     # metoda uruchamiająca grę
     def run(self, screen):
@@ -77,6 +75,11 @@ class Gra:
 
             if self.rotateButton.rect.collidepoint(mouse_pos):
                 MouseDisplay().update(mouse_pos, "Obróć oddział")
+
+            if self.wzmocnienieButton.rect.collidepoint(mouse_pos):
+                MouseDisplay().update(
+                    mouse_pos, "Wzmocnij oddział (+5% obrony) za 4 ruchu"
+                )
 
         if AttackDisplay().show:
             AttackDisplay().hover(pygame.mouse.get_pos())
@@ -111,6 +114,7 @@ class Gra:
             screen.blit(self.squadButtonDisplay.image, self.squadButtonDisplay.rect)
             if Client().player.id == Mapa().move_flag.owner_id:
                 screen.blit(self.rotateButton.image, self.rotateButton.rect)
+                screen.blit(self.wzmocnienieButton.image, self.wzmocnienieButton.rect)
         if AttackDisplay().show:
             AttackDisplay().display(screen)
 
@@ -121,6 +125,7 @@ class Gra:
         if KoniecGry().show:
             KoniecGry().draw(screen)
         MouseDisplay().draw(screen)
+        AnimationMenager.display(screen)
 
     def event_handler(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -133,17 +138,22 @@ class Gra:
                     pygame.quit()
                     exit()
 
+                SideMenu().event(mouse_pos)
                 Mapa().event(
                     mouse_pos,
                     self.squadButtonDisplay,
                     self.rotateButton,
+                    SideMenu().dirty,
+                    SideMenu().reset,
                 )
 
                 Turn().event(mouse_pos)
                 Resource().event(mouse_pos)
-                SideMenu().event(mouse_pos)
                 self.squadButtonDisplay.event(mouse_pos, Mapa().move_flag)
                 self.rotateButton.event(Mapa().move_flag, mouse_pos, Client().player.id)
+                self.wzmocnienieButton.event(
+                    Mapa().move_flag, mouse_pos, Client().player.id
+                )
 
                 if SquadDisplay().show:
                     SquadDisplay().event(

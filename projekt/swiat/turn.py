@@ -4,6 +4,7 @@ from projekt.assetMenager import AssetManager
 from projekt.narzedzia import Singleton
 from projekt.network import Client
 from .mapa import Mapa
+from .sidemenu import SideMenu
 
 
 class Turn(metaclass=Singleton):

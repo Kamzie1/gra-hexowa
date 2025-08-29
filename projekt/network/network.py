@@ -32,6 +32,10 @@ class Client(metaclass=Singleton):
             "color": self.users[self.id]["color"],
             "id": self.id,
             "gold": self.users[self.id]["gold"],
+            "srebro": self.users[self.id]["srebro"],
+            "stal": self.users[self.id]["stal"],
+            "food": self.users[self.id]["food"],
+            "medals": self.users[self.id]["medals"],
             "akcje": self.users[self.id]["akcje"],
         }
 
@@ -116,7 +120,7 @@ class Client(metaclass=Singleton):
                     self.users
                 ):
                     self.player.akcjeMenager.turn()
-                    self.player.gold += self.player.zloto_income
+                    self.player.earn()
                     self.mapa.heal()
             self.mapa.import_state(self.state, self.users)
             match (self.pogoda[0]):
@@ -208,6 +212,10 @@ class Client(metaclass=Singleton):
                 "state": state,
                 "nadawca": self.name,
                 "gold": self.player.gold,
+                "srebro": self.player.srebro,
+                "stal": self.player.stal,
+                "food": self.player.food,
+                "medals": self.player.medals,
                 "akcje": self.player.akcje,
             },
         )
@@ -221,3 +229,30 @@ class Client(metaclass=Singleton):
     def ustawienia(self, ustawienia):
         self.sio.emit("settings", {"settings": ustawienia, "nadawca": self.name})
         print("ustawienia")
+
+    def end_game(self, result):
+        match (result):
+            case -1:
+                KoniecGry().display("Przegrałeś", self.player.color)
+            case 1:
+                KoniecGry().display("Wygrałeś", self.player.color)
+
+    def pay(self, cost):
+        Client().player.gold -= cost["zloto"]
+        Client().player.srebro -= cost["srebro"]
+        Client().player.stal -= cost["stal"]
+        Client().player.food -= cost["food"]
+        Client().player.medals -= cost["medale"]
+
+    def validate_cost(self, cost):
+        if Client().player.gold < cost["zloto"]:
+            return False
+        if Client().player.srebro < cost["srebro"]:
+            return False
+        if Client().player.stal < cost["stal"]:
+            return False
+        if Client().player.food < cost["food"]:
+            return False
+        if Client().player.medals < cost["medale"]:
+            return False
+        return True

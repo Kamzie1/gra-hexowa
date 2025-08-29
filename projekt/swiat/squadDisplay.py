@@ -38,7 +38,8 @@ class SquadDisplay(metaclass=Singleton):
         self.strategies = [
             "strategia: najsłabszy",
             "strategia: najsilniejszy",
-            "strategia: lord",
+            "strategia: lord/max",
+            "strategia: lord/min",
         ]
         self.switchStrategy = Switch(300, 32, (self.width - 5, 5), self.strategies)
 
@@ -150,7 +151,10 @@ class SquadDisplay(metaclass=Singleton):
         zasięg : {wojownik.bronie[0]["range"]}
         koszt ataku : {wojownik.bronie[0]["koszt_ataku"]} 
         punkty ataku : {wojownik.atak_points}
+
         """
+        if wojownik.name == "Medyk":
+            statystyki += f"specjalne: uzdrawia \n co rundę wszystkie jednostki \n w formacji o {wojownik.jednostka['heal']} hp"
         self.display_text((self.width / 32, 100), pos, statystyki, self.wojownik_font)
 
     def display_text(self, offset, pos, text, font):
@@ -216,6 +220,7 @@ class SquadDisplay(metaclass=Singleton):
         info["owner_id"] = squad.owner_id
         info["pos"] = squad.pos
         info["strategy"] = squad.strategy
+        info["wzmocnienie"] = squad.wzmocnienie
         info["jednostki"] = []
         jednostka = self.selected.wojownik.get_data()
         jednostka["array_pos"] = self.selected.wojownik.pos

@@ -13,6 +13,7 @@ from .buttons import (
     AkcjeShowButton,
     Rozkaz,
     Upgrade,
+    Gamble,
 )
 import pygame
 from os.path import join
@@ -35,11 +36,12 @@ class SideMenu(metaclass=Singleton):
         )
         self.akcje = PoleAkcji(menu_width, menu_height, Client().player, (0, 60))
         self.type = 0  # 0 to rekrutacja, 1 to akcje
-
+        self.dirty = False
+        self.reset = False
         self.button_group = pygame.sprite.Group()
         self.rekrutacjaButton = RekrutacjaShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (0, 10),
             self.button_group,
@@ -50,7 +52,7 @@ class SideMenu(metaclass=Singleton):
         )
         self.akcjeButton = AkcjeShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (menu_width / 2 + 5, 10),
             self.button_group,
@@ -74,12 +76,17 @@ class SideMenu(metaclass=Singleton):
                 self.rekrutacja.update(mouse_pos)
 
     def event(self, mouse_pos):
+        self.reset = False
+        self.dirty = False
         if self.rect.collidepoint(mouse_pos) and Flag().show:
+            self.dirty = True
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, menu_pos)
             Flag().klikniecie_flag = False
             for button in self.button_group:
                 if button.rect.collidepoint(mouse_pos):
                     self.type = button.click()
+                    self.reset = True
+                    self.rekrutacja.refresh()
                     return
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, (0, 60))
             if self.type:
@@ -87,9 +94,9 @@ class SideMenu(metaclass=Singleton):
                     mouse_pos, Client().turn, len(Client().users), Client().player.id
                 )
             else:
-                self.rekrutacja.event(
-                    mouse_pos, Client().turn, len(Client().users), Client().player.id
-                )
+                self.rekrutacja.event(mouse_pos, Client().turn, Client().player.id)
+        else:
+            self.rekrutacja.refresh()
 
     def swap(self, player):
         for button in self.button_group:
@@ -103,7 +110,7 @@ class SideMenu(metaclass=Singleton):
 
         self.rekrutacjaButton = RekrutacjaShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (0, 10),
             self.button_group,
@@ -114,7 +121,7 @@ class SideMenu(metaclass=Singleton):
         )
         self.akcjeButton = AkcjeShowButton(
             (menu_width - 10) / 2,
-            40,
+            60,
             (20, 20, 20),
             (menu_width / 2 + 5, 10),
             self.button_group,
@@ -130,12 +137,12 @@ class SideMenu(metaclass=Singleton):
         if self.type:
             self.akcje.draw(self.surf)
             pygame.draw.line(
-                self.surf, (230, 230, 230), (0, 50), (menu_width / 2 + 5, 50)
+                self.surf, (230, 230, 230), (0, 70), (menu_width / 2 + 5, 70)
             )
             pygame.draw.line(
                 self.surf,
                 (230, 230, 230),
-                (menu_width / 2 + 5, 50),
+                (menu_width / 2 + 5, 70),
                 (menu_width / 2 + 5, 10),
             )
             pygame.draw.line(
@@ -146,13 +153,13 @@ class SideMenu(metaclass=Singleton):
             pygame.draw.line(
                 self.surf,
                 (230, 230, 230),
-                ((menu_width - 10) / 2, 50),
-                (menu_width, 50),
+                ((menu_width - 10) / 2, 70),
+                (menu_width, 70),
             )
             pygame.draw.line(
                 self.surf,
                 (230, 230, 230),
-                ((menu_width - 10) / 2, 50),
+                ((menu_width - 10) / 2, 70),
                 ((menu_width - 10) / 2, 10),
             )
             pygame.draw.line(
@@ -197,12 +204,12 @@ class PoleRekrutacji(Pole):
         super().__init__(w, h, player, pos)
 
     def setup(self):
-        x, y = 5, 5
+        x, y = 5, 20
         id = 0
         for jednostka in self.player.frakcja["jednostka"]:
             Recruit(
-                40,
-                40,
+                60,
+                60,
                 "red",
                 (x, y),
                 jednostka,
@@ -210,11 +217,26 @@ class PoleRekrutacji(Pole):
                 self.button_group,
                 f"{jednostka["nazwa"]}",
             )
-            x += 95
+            x += 175
             id += 1
-            if x > menu_width - 25:
+            if x + 85 > menu_width - 25:
                 x = 5
-                y += 50
+                y += 120
+
+    def refresh(self):
+        for button in self.button_group:
+            button.count = 0
+
+    def event(self, mouse_pos, turn, id):
+        dirty = False
+        if turn % len(Client().users) == id:
+            for button in self.button_group:
+                if button.rect.collidepoint(mouse_pos):
+                    button.click()
+                    dirty = True
+        if not dirty:
+            SideMenu().reset = True
+            self.refresh()
 
 
 class PoleAkcji(Pole):
@@ -223,20 +245,20 @@ class PoleAkcji(Pole):
 
     def setup(self):
         Rozkaz(
-            40,
-            40,
+            60,
+            60,
             "red",
-            (5, 5),
+            (5, 20),
             "zloto_rozkaz",
             self.button_group,
             """przychód złota 125% na 2 tury
             4 tury cooldown""",
         )
         Upgrade(
-            40,
-            40,
+            60,
+            60,
             "red",
-            (100, 5),
+            (180, 20),
             "zloto_upgrade",
             self.button_group,
             """ulepsz wydobycie zlota.
@@ -245,10 +267,10 @@ class PoleAkcji(Pole):
             level 4 : 130%""",
         )
         Upgrade(
-            40,
-            40,
+            60,
+            60,
             "blue",
-            (195, 5),
+            (355, 20),
             "mury_upgrade",
             self.button_group,
             """ulepsz obronę murów miasta.
@@ -256,30 +278,31 @@ class PoleAkcji(Pole):
             level 3 : 80%""",
         )
         Rozkaz(
-            40,
-            40,
+            60,
+            60,
             "blue",
-            (5, 50),
+            (5, 140),
             "movement_rozkaz",
             self.button_group,
             f"""zwieksz ruch wszystkich jednostek o {AssetManager.get_akcje("movement_rozkaz", "mnoznik")} na 1 turę
             3 tury cooldown""",
         )
         Rozkaz(
-            40,
-            40,
+            60,
+            60,
             "red",
-            (100, 50),
+            (180, 140),
             "wheater_forecast",
             self.button_group,
             f"""Odkryj przyszłą pogodę 1 tura cooldown""",
         )
         Rozkaz(
-            40,
-            40,
+            60,
+            60,
             "blue",
-            (195, 50),
+            (355, 140),
             "change_wheater",
             self.button_group,
             f"""Zmień na czas twojego ruchu pogodę na chmury 2 tury cooldown""",
         )
+        Gamble(60, 60, "red", (5, 260), self.button_group)

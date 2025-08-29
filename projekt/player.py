@@ -8,12 +8,16 @@ class Player:
         self.id = data["id"]
         self.name = data["name"]
         self._gold = data["gold"]
+        self.srebro = data["srebro"]
+        self.stal = data["stal"]
+        self.medals = data["medals"]
+        self.food = data["food"]
         self.frakcja = data["frakcja"]
         self.pos = data["pos"]
         self.x = data["x"]
         self.y = data["y"]
         self.color = data["color"]
-        self.zloto_income = 7 * self.frakcja["budynek"][0]["earn"]["gold"]
+        self.income = {}
         self.akcjeMenager = AkcjeMenager(data["akcje"])
 
     @property
@@ -37,8 +41,11 @@ class Player:
         else:
             self._gold = value
 
-    def get_akcje(self):
-        return self.akcjeMenager.get_akcje()
+    def earn(self):
+        self.gold += self.income["zloto"]
+        self.srebro += self.income["srebro"]
+        self.stal += self.income["stal"]
+        self.food += self.income["food"]
 
     def __str__(self):
         return self.name

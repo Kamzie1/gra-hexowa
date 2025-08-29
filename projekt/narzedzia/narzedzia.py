@@ -73,3 +73,10 @@ def id_to_pos(x, y):
 
 def calc_scaled_offset(offset, pos, skala):
     return (pos[0] + offset[0] * skala, pos[1] + offset[1] * skala)
+
+
+def pos_on_screen(*args):
+    pos = args[0]
+    for i in range(1, len(args)):
+        pos = (pos[0] + args[i][0], pos[1] + args[i][1])
+    return pos

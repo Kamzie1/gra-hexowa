@@ -14,7 +14,8 @@ from projekt.narzedzia import (
 )
 from projekt.jednostki import Squad, Miasto, Wioska
 from projekt.assetMenager import AssetManager
-from projekt.narzedzia import Singleton, AttackDisplay
+from projekt.narzedzia import Singleton
+from .attackDisplay import AttackDisplay
 from projekt.network import Client
 from .squadDisplay import SquadDisplay
 from projekt.flag import Flag
@@ -65,6 +66,7 @@ class Mapa(metaclass=Singleton):
         )
         self.import_state(Client().state, Client().users)
         self.calculate_widok()
+        self.calculate_income()
 
     @property
     def origin(self):
@@ -307,7 +309,7 @@ class Mapa(metaclass=Singleton):
                 self.widok_jednostka(jednostka.tile.x, jednostka.tile.y, jednostka)
 
         for budynek in self.building_group:
-            if budynek.owner_id == Client().player.id and budynek.name == "Wioska":
+            if budynek.owner_id == Client().player.id:
                 sasiedzi_x, sasiedzi_y = get_sasiedzi(budynek.tile.x, budynek.tile.y)
                 self.widok[budynek.tile.x][budynek.tile.y] = 0
                 for i in range(6):
@@ -364,10 +366,22 @@ class Mapa(metaclass=Singleton):
         rotateButton,
     ):
         failed = False
+        for user in Client().users:
+            asset = (AssetManager.get_asset(f"mury{user["akcje"]["mury_upgrade"]}"),)
+            self.mapSurf.blit(asset, asset.get_frect(center=(user["x"], user["y"])))
+
+    def event(self, mouse_pos, squadButtonDisplay, rotateButton, dirty, reset):
         if AttackDisplay().show:
             if AttackDisplay().rect.collidepoint(mouse_pos):
                 AttackDisplay().event(mouse_pos)
                 return
+        if reset:
+            self.move_flag = None
+            self.correct_moves = None
+        if dirty:
+            return
+        failed = False
+        kliked = False
 
         if SquadDisplay().show:
             if SquadDisplay().rect.collidepoint(mouse_pos):
@@ -383,6 +397,7 @@ class Mapa(metaclass=Singleton):
         for tiles in self.Tile_array:
             for tile in tiles:
                 if clicked(tile.pos, mouse_pos):
+                    kliked = True
                     AttackDisplay().show = False
                     Flag().klikniecie_flag = True
                     self.klikniecie.origin = tile.pos
@@ -415,14 +430,14 @@ class Mapa(metaclass=Singleton):
                                 self.move(tile)
                             else:
                                 if tile.jednostka.owner_id == Client().player.id:
-                                    if not self.move_flag.tile == tile:
-                                        try:
-                                            self.join(
-                                                tile.jednostka, self.move_flag, tile
-                                            )
-                                        except:
-                                            pass
-                                elif tile.jednostka.owner_id != Client().player.id:
+                                    if (
+                                        not self.move_flag.tile == tile
+                                        and len(self.move_flag) + len(tile.jednostka)
+                                        <= 7
+                                    ):
+                                        self.join(tile.jednostka, self.move_flag, tile)
+
+                                elif tile.jednostka.owner_id == Client().opponent.id:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )
@@ -435,6 +450,7 @@ class Mapa(metaclass=Singleton):
                                             self.move_flag.tile.y,
                                             tile.x,
                                             tile.y,
+                                            self.move_flag.tile.obrona,
                                             tile.obrona,
                                             Client().pogoda[0],
                                         )
@@ -460,6 +476,7 @@ class Mapa(metaclass=Singleton):
                                             self.move_flag.tile.y,
                                             tile.x,
                                             tile.y,
+                                            self.move_flag.tile.obrona,
                                             tile.obrona,
                                             Client().pogoda[0],
                                         )
@@ -478,6 +495,9 @@ class Mapa(metaclass=Singleton):
                         self.split = None
                         for tile in self.move_group:
                             tile.kill()
+        if reset and not kliked:
+            self.move_flag = None
+            self.correct_moves = None
 
     def move(self, tile):
         if self.split is None:
@@ -498,15 +518,8 @@ class Mapa(metaclass=Singleton):
         self.calculate_income()
 
     def recruit(self, tile):
-        if (
-            Client().player.gold
-            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
-                "cost"
-            ]
-        ):
-            Client().player.gold -= Client().player.frakcja["jednostka"][
-                self.move_flag.wojownicy[3].id
-            ]["cost"]
+        if Client().validate_cost(self.calculate_cost(self.move_flag)):
+            Client().pay(self.calculate_cost(self.move_flag))
             self.move_flag.pos = tile.pos
             self.move_flag.tile = tile
             self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
@@ -516,23 +529,27 @@ class Mapa(metaclass=Singleton):
 
     def recruit_join(self, tile):
         if (
-            Client().player.gold
-            > Client().player.frakcja["jednostka"][self.move_flag.wojownicy[3].id][
-                "cost"
-            ]
-            and len(tile.jednostka) + len(self.move_flag) > 7
+            Client().validate_cost(self.calculate_cost(self.move_flag))
+            and len(tile.jednostka) + len(self.move_flag) <= 7
         ):
-            Client().player.gold -= Client().player.frakcja["jednostka"][
-                self.move_flag.wojownicy[3].id
-            ]["cost"]
+            Client().pay(self.calculate_cost(self.move_flag))
             self.join(tile.jednostka, self.move_flag, tile)
         else:
             print("not enough money")
 
-    def join(self, squad1, squad2, tile):
-        if not self.validate_join(squad1, squad2):
-            raise ValueError
+    def calculate_cost(self, squad):
+        cost = {}
+        types = ["zloto", "srebro", "stal", "medale", "food"]
+        for currency in types:
+            cost[currency] = 0
+        for wojownik in squad.wojownicy:
+            if wojownik is None:
+                continue
+            for currency in types:
+                cost[currency] += wojownik.jednostka["cost"][currency]
+        return cost
 
+    def join(self, squad1, squad2, tile):
         squad2.ruch = self.correct_moves[tile.x][tile.y]
 
         squad1 = squad1 + squad2
@@ -541,23 +558,10 @@ class Mapa(metaclass=Singleton):
             squad2.tile.jednostka = None
         squad2.kill()
 
-    def validate_join(self, squad1, squad2):
-        none_count = 0
-        not_none_count = 0
-        for wojownik in squad1.wojownicy:
-            if wojownik is None:
-                none_count += 1
-        for wojownik in squad2.wojownicy:
-            if wojownik is not None:
-                not_none_count += 1
-        if 7 - none_count + not_none_count > 7:
-            return False
-        return True
-
     def attackValidate(self, squad1, squad2):
         distance = self.BFS(squad1.tile.x, squad1.tile.y, squad2.tile.x, squad2.tile.y)
-        # if Client().pogoda[0] == 4 and distance - 1 > 1:  # Wind
-        #    distance += 1
+        if Client().pogoda[0] == 4 and distance - 1 > 1:  # Wind
+            distance += 1
         if distance - 1 > squad1.range:
             return 0
         return distance - 1
@@ -603,6 +607,14 @@ class Mapa(metaclass=Singleton):
                 Client().users[jednostka["owner_id"]]["fraction"]
             ]
             s = Squad(self.army_group, jednostka, tile, frakcja)
+            if Client().turn % len(Client().users) == s.owner_id and s.medyk:
+                s.heal(frakcja["jednostka"][2]["heal"])  # medyk
+            if (
+                Client().player.name == s.owner
+                and Client().turn % len(Client().users) == Client().player.id
+            ):
+                s.wzmocnienie = False
+
             tile.jednostka = s
 
         for budynek in state["budynki"]:
@@ -657,15 +669,20 @@ class Mapa(metaclass=Singleton):
                 jednostka.wzrok_akt(value)
 
     def calculate_income(self):
-        Client().player.zloto_income = 0
+        types = ["srebro", "stal", "food", "zloto"]
+        for typ in types:
+            self.calculate_income_by_type(typ)
+
+    def calculate_income_by_type(self, typ):
+        Client().player.income[typ] = 0
         for budynek in self.building_group:
             if isinstance(budynek, Miasto) and budynek.owner_id == Client().player.id:
-                Client().player.zloto_income += int(
-                    budynek.earn["gold"]
+                Client().player.income[typ] += int(
+                    budynek.earn[typ]
                     * AssetManager.get_mnoznik(
-                        "zloto_upgrade", Client().player.akcje["zloto_upgrade"]
+                        f"{typ}_upgrade", Client().player.akcje[f"{typ}_upgrade"]
                     )
-                    * Client().player.akcje["zloto_rozkaz"]
+                    * Client().player.akcje[f"{typ}_rozkaz"]
                 )
             else:
                 pass

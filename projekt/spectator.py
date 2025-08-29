@@ -10,13 +10,13 @@ from projekt.swiat import (
     SquadButtonDisplay,
     Rotate,
     SquadDisplay,
+    AttackDisplay,
 )
 from projekt.player import Player
 from projekt.narzedzia import (
     oblicz_pos,
     TurnDisplay,
     KoniecGry,
-    AttackDisplay,
     Display,
     MouseDisplay,
 )
