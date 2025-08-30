@@ -23,11 +23,12 @@ class Turn(metaclass=Singleton):
             and Client().turn % 2 == Client().player.id
         ):
             new_state = Mapa().load_state()
-            Mapa().import_state(new_state)
-            Client().send_state(new_state)
-            Client().player.akcjeMenager.turn()
             if Client().turn % 2 == Client().player.id and Client().turn != 1:
                 Client().player.earn()
+            Client().send_state(new_state)
+            Mapa().import_state(new_state)
+            Client().player.akcjeMenager.turn()
+            if Client().turn % 2 == Client().player.id and Client().turn != 1:
                 Mapa().heal()
             Mapa().swap()
             SideMenu().swap(Client().player)

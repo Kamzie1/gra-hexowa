@@ -279,6 +279,7 @@ class Mapa(metaclass=Singleton):
         flag,
         squadButtonDisplay,
         rotateButton,
+        wzmocnienieButton,
         inzynierButton,
         InzynierBlock,
         dirty,
@@ -298,6 +299,8 @@ class Mapa(metaclass=Singleton):
                     mouse_pos, self.move_flag.tile.x, self.move_flag.tile.y
                 )
                 return
+            else:
+                InzynierBlock.show = False
         if reset:
             self.move_flag = None
             self.correct_moves = None
@@ -312,6 +315,8 @@ class Mapa(metaclass=Singleton):
 
         if not self.move_flag is None and isinstance(self.move_flag, Squad):
             if squadButtonDisplay.rect.collidepoint(mouse_pos):
+                return
+            if wzmocnienieButton.rect.collidepoint(mouse_pos):
                 return
             if rotateButton.rect.collidepoint(mouse_pos):
                 return
@@ -368,7 +373,7 @@ class Mapa(metaclass=Singleton):
                                     ):
                                         self.join(tile.jednostka, self.move_flag, tile)
 
-                                elif tile.jednostka.owner_id == Client().opponent.id:
+                                elif tile.jednostka.team != Client().player.team:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )
@@ -387,8 +392,8 @@ class Mapa(metaclass=Singleton):
                         else:
                             if not tile.jednostka is None:
                                 if (
-                                    tile.jednostka.owner_id == Client().opponent.id
-                                    and self.move_flag.owner_id == Client().player.id
+                                    tile.jednostka.team != Client().player.team
+                                    and self.move_flag.team == Client().player.team
                                 ):
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
@@ -454,9 +459,11 @@ class Mapa(metaclass=Singleton):
             Client().pay(self.calculate_cost(self.move_flag))
             self.move_flag.pos = tile.pos
             self.move_flag.tile = tile
-            self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
+            for wojownik in self.move_flag.wojownicy:
+                if wojownik is not None:
+                    wojownik.ruch = 0
             tile.jednostka = self.move_flag
-            self.calculate_income()
+            Client().player.income["food"] -= self.move_flag.food
         else:
             print("not enough money")
 
@@ -466,8 +473,11 @@ class Mapa(metaclass=Singleton):
             and len(tile.jednostka) + len(self.move_flag) <= 7
         ):
             Client().pay(self.calculate_cost(self.move_flag))
+            for wojownik in self.move_flag.wojownicy:
+                if wojownik is not None:
+                    wojownik.ruch = 0
             self.join(tile.jednostka, self.move_flag, tile)
-            self.calculate_income()
+            Client().player.income["food"] -= self.move_flag.food
         else:
             print("not enough money")
 
@@ -551,6 +561,13 @@ class Mapa(metaclass=Singleton):
             else:
                 frakcja = Client().opponent.frakcja
             s = Squad(self.army_group, jednostka, tile, frakcja)
+            if s.owner_id == Client().player.id:
+                if Client().player.hunger:
+                    if Client().player.hunger < 4:
+                        s.ruch -= Client().player.hunger * 3
+                    else:
+                        s.ruch -= 9
+                        s.get_hunger(Client().player.hunger)
             if Client().turn % 2 == s.owner_id and s.medyk:
                 s.heal(frakcja["jednostka"][2]["heal"])  # medyk
             if (
@@ -613,11 +630,12 @@ class Mapa(metaclass=Singleton):
         types = ["srebro", "stal", "food", "zloto"]
         for typ in types:
             self.calculate_income_by_type(typ)
-        food = 0
-        for jednostka in self.army_group:
-            if jednostka.owner_id == Client().player.id:
-                food += jednostka.food
-        Client().player.income["food"] -= food
+            if typ == "food":
+                food = 0
+                for jednostka in self.army_group:
+                    if jednostka.owner_id == Client().player.id:
+                        food += jednostka.food
+                Client().player.income["food"] -= food
 
     def calculate_income_by_type(self, typ):
         Client().player.income[typ] = 0

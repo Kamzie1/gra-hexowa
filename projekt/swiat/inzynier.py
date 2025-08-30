@@ -142,6 +142,7 @@ class BuildingBlock(Block):
         info["owner_id"] = Client().player.id
         info["pos"] = (5000, 5000)
         info["id"] = self.budynek["id"]
+        info["team"] = Client().player.team
         return Budynek(Mapa().building_group, info, None, Client().player.frakcja)
 
     def draw(self, screen):
@@ -186,6 +187,7 @@ class SquadBlock(Block):
         info["pos"] = (5000, 5000)
         info["strategy"] = 0
         info["wzmocnienie"] = 0
+        info["team"] = Client().player.team
         info["jednostki"] = []
         jednostka = self.budynek
         jednostka["array_pos"] = 3

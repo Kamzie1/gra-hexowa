@@ -7,11 +7,12 @@ class Player:
     def __init__(self, data):
         self.id = data["id"]
         self.name = data["name"]
+        self.team = data["team"]
         self._gold = 10000
         self.srebro = 10000
         self.stal = 10000
         self.medals = 10000
-        self._food = 100000
+        self._food = 1000
         self.hunger = 0
         self.frakcja = data["frakcja"]
         self.pos = data["pos"]
@@ -60,10 +61,10 @@ class Player:
     def get_hunger_description(self):
         if self.hunger == 0:
             return "0 dni głodu"
-        if self.hunger < 3:
-            return f"{self.hunger} dni głodu \n -{self.hunger*2} do ruchu"
+        if self.hunger < 4:
+            return f"{self.hunger} dni głodu \n -{self.hunger*3} do ruchu"
         else:
-            return f"{self.hunger} dni głodu \n -4 do ruchu i -{self.hunger-2}% zdrowia"
+            return f"{self.hunger} dni głodu \n -9 do ruchu i -{self.hunger-3}% zdrowia"
 
     def __str__(self):
         return self.name

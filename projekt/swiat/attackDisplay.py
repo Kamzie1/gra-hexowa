@@ -130,6 +130,7 @@ class AttackDisplay(metaclass=Singleton):
             if self.stop:
                 return
             self.attacker.attacker_update_positions()
+        self.defender.update_atak_points()
 
     def active_pozycje(self):
         for pozycja in self.attacker.pozycje_group:
@@ -456,9 +457,14 @@ class Oddzial:
         self.surf.fill("white")
         for pozycja in self.pozycje_group:
             pozycja.display(self.surf, self.squad.color)
-        text = AssetManager.get_font("consolas", 20).render(
-            f"obrona: {self.defense*100}%", True, "black"
-        )
+        if self.squad.wzmocnienie:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100 + 5}%", True, "black"
+            )
+        else:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100}%", True, "black"
+            )
         text_rect = text.get_frect(topleft=(100, 50))
         self.surf.blit(text, text_rect)
         screen.blit(self.surf, self.rect)
@@ -520,9 +526,19 @@ class OddzialDefend(Oddzial):
         self.surf.fill("white")
         for pozycja in self.pozycje_group:
             pozycja.display(self.surf, self.squad.color)
-        text = AssetManager.get_font("consolas", 20).render(
-            f"obrona: {self.defense*100}%", True, "black"
-        )
+        if self.squad.wzmocnienie:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100 + 5}%", True, "black"
+            )
+        else:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100}%", True, "black"
+            )
         text_rect = text.get_frect(topright=(self.width - 100, 50))
         self.surf.blit(text, text_rect)
         screen.blit(self.surf, self.rect)
+
+    def update_atak_points(self):
+        for pozycja in self.pozycje_group:
+            if pozycja.wojownik is not None:
+                pozycja.wojownik.atak_points = pozycja.wojownik.jednostka["atak_points"]

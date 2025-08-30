@@ -168,6 +168,7 @@ class Gra:
                     self.flag,
                     self.squadButtonDisplay,
                     self.rotateButton,
+                    self.wzmocnienieButton,
                     self.inzynierButton,
                     self.inzynierBuild,
                     SideMenu().dirty,
