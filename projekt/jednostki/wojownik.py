@@ -19,6 +19,7 @@ class Wojownik:
         self.pancerz = jednostka["pancerz"]
         self.bronie = jednostka["bronie"]
         self.atak_points = jednostka["atak_points"]
+        self.food = jednostka["food"]
         self.kategoria = kategoria
         self.original_ruch = self.ruch
         self.original_zdrowie = self.zdrowie

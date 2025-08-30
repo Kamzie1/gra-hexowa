@@ -36,6 +36,7 @@ class Client(metaclass=Singleton):
             "stal": self.users[self.id]["stal"],
             "food": self.users[self.id]["food"],
             "medals": self.users[self.id]["medals"],
+            "team": self.users[self.id]["team"],
             "akcje": self.users[self.id]["akcje"],
         }
 
@@ -50,7 +51,32 @@ class Client(metaclass=Singleton):
             "color": "red",
             "id": -1,
             "gold": 0,
-            "akcje": None,
+            "srebro": 0,
+            "stal": 0,
+            "medals": 0,
+            "food": 0,
+            "team": -1,
+            "akcje": self.load_akcje(),
+        }
+
+    def load_akcje(self):
+        return {
+            "zloto_upgrade": 1,
+            "srebro_upgrade": 1,
+            "stal_upgrade": 1,
+            "food_upgrade": 1,
+            "mury_upgrade": 1,
+            "zloto_rozkaz_cooldown": False,
+            "zloto_rozkaz": 1,
+            "movement_rozkaz_cooldown": False,
+            "movement_rozkaz": 0,
+            "srebro_rozkaz": 1,
+            "stal_rozkaz": 1,
+            "food_rozkaz": 1,
+            "wheater_forecast": 0,
+            "wheater_forecast_cooldown": False,
+            "change_wheater": 0,
+            "change_wheater_cooldown": False,
         }
 
     def _setup_events(self):

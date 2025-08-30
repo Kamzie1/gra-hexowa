@@ -7,6 +7,7 @@ from projekt.narzedzia import (
     Switch,
     ColorSwitch,
     IntInput,
+    TeamSwitch,
 )
 from projekt.ustawienia import Width, Height, srodek
 import random
@@ -120,6 +121,12 @@ class Kolejka:
                     self.playerCard.fraction += 1
                     self.playerCard.fraction %= len(self.playerCard.frakcje)
                     Client().ustawienia(self.load_ustawienia())
+
+                if self.playerCard.teamButton.rect.collidepoint(mouse_pos):
+                    if Client().room["teams"]:
+                        self.playerCard.team += 1
+                        self.playerCard.team %= Client().room["teams"]
+                        Client().ustawienia(self.load_ustawienia())
         if self.ustawienia.dirty:
             Client().ustawienia(self.load_ustawienia())
 
@@ -139,6 +146,7 @@ class Kolejka:
             "ready": self.ready.value,
             "fraction": self.playerCard.frakcje[self.playerCard.fraction],
             "color": self.playerCard.colors[self.playerCard.color],
+            "team": self.playerCard.team,
         }
 
     def drawOpponentDisplay(self, x, y, user):
@@ -148,11 +156,15 @@ class Kolejka:
         text = self.font.render(user["name"], True, "black")
         text_rect = text.get_frect(topleft=(20, 10))
 
+        team = self.font.render(f"Team{user["team"]}", True, "black")
+        team_rect = team.get_rect(bottomright=(140, 220))
+
         fraction = self.font.render(user["fraction"], True, "black")
-        fraction_rect = fraction.get_rect(bottomright=(150, 250))
+        fraction_rect = fraction.get_rect(bottomright=(140, 250))
 
         surf.blit(text, text_rect)
         surf.blit(fraction, fraction_rect)
+        surf.blit(team, team_rect)
         self.opponents.blit(surf, rect)
         if user["color"] is not None:
             pygame.draw.rect(self.opponents, user["color"], rect, width=3)
@@ -170,15 +182,18 @@ class PlayerCard:
 
         self.fraction = 0
         self.color = 0
+        self.team = 0
         self.buttonGroup = pygame.sprite.Group()
 
-        self.fractionButton = Switch(250, 100, (250, 500), self.frakcje)
+        self.teamButton = TeamSwitch(250, 50, (250, 440))
+        self.fractionButton = Switch(250, 50, (250, 500), self.frakcje)
         self.colorsButton = ColorSwitch(50, 50, (260, 0), self.colors)
 
     def draw(self, name, screen):
         self.surf.fill((200, 200, 200))
         self.fractionButton.draw(self.fraction, self.surf)
         self.colorsButton.draw(self.color, screen)
+        self.teamButton.draw(self.team, self.surf)
 
         # imie
         text = self.font.render(name, True, "black")

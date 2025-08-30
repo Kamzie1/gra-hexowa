@@ -46,10 +46,13 @@ class AttackDisplay(metaclass=Singleton):
         )
         self.selected = None
 
-    def update(self, attacker, defender, distance, x1, y1, x2, y2, defense1, defense2):
+    def update(
+        self, attacker, defender, distance, x1, y1, x2, y2, defense1, defense2, pogoda
+    ):
         self.show = True
         self.distance = distance
         self.turn = 1
+        self.pogoda = pogoda
         attack_angle = (y2 - y1, x2 - x1)
         match (x1 % 2):
             case 0:
@@ -130,6 +133,7 @@ class AttackDisplay(metaclass=Singleton):
             if self.stop:
                 return
             self.attacker.attacker_update_positions()
+        self.defender.update_atak_points()
 
     def active_pozycje(self):
         for pozycja in self.attacker.pozycje_group:
@@ -231,7 +235,7 @@ class AttackDisplay(metaclass=Singleton):
         self.attacker.hover(mouse_pos)
         self.defender.hover(mouse_pos)
 
-    def calculateDamage(self, wojownik, defense, buff, owner):
+    def calculateDamage(self, wojownik, defense, buff, owner_id):
         attacker = self.selected.wojownik
         self.selected.wojownik.atak_points -= self.selected.wojownik.bronie[0][
             "koszt_ataku"
@@ -241,20 +245,23 @@ class AttackDisplay(metaclass=Singleton):
         rzut += random.randint(0, 50)
         if defense_buff > 0:
             rzut -= defense_buff
+        if self.pogoda == 3 and wojownik.bronie[0]["typ"] == "prochowa":
+            if not random.randint(0, 2):
+                return 0
         if rzut > defense * 100 + buff:
             atak = random.randint(
                 attacker.bronie[0]["atak"][0], attacker.bronie[0]["atak"][1]
             )
             if atak > wojownik.zdrowie:
-                if owner == Client().player.name:
+                if owner_id == Client().player.id:
                     Client().player.medals += 5
                 else:
-                    Client().opponent.medals += 5
+                    Client().users[owner_id]["medals"] += 5
             else:
-                if owner == Client().player.name:
+                if owner_id == Client().player.id:
                     Client().player.medals += 1
                 else:
-                    Client().opponent.medals += 1
+                    Client().users[owner_id]["medals"] += 1
             return atak
         return 0
 
@@ -263,7 +270,7 @@ class AttackDisplay(metaclass=Singleton):
             buff = 5
         else:
             buff = 0
-        damage = self.calculateDamage(pozycja.wojownik, defense, buff, squad.owner)
+        damage = self.calculateDamage(pozycja.wojownik, defense, buff, squad.owner_id)
         squad.zdrowie(pozycja.id, pozycja.wojownik.zdrowie - damage)
         pozycja.wojownik = squad.wojownicy[pozycja.id]
         self.ifselected = True
@@ -457,9 +464,14 @@ class Oddzial:
         self.surf.fill("white")
         for pozycja in self.pozycje_group:
             pozycja.display(self.surf, self.squad.color)
-        text = AssetManager.get_font("consolas", 20).render(
-            f"obrona: {self.defense*100}%", True, "black"
-        )
+        if self.squad.wzmocnienie:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100 + 5}%", True, "black"
+            )
+        else:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100}%", True, "black"
+            )
         text_rect = text.get_frect(topleft=(100, 50))
         self.surf.blit(text, text_rect)
         screen.blit(self.surf, self.rect)
@@ -521,9 +533,19 @@ class OddzialDefend(Oddzial):
         self.surf.fill("white")
         for pozycja in self.pozycje_group:
             pozycja.display(self.surf, self.squad.color)
-        text = AssetManager.get_font("consolas", 20).render(
-            f"obrona: {self.defense*100}%", True, "black"
-        )
+        if self.squad.wzmocnienie:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100 + 5}%", True, "black"
+            )
+        else:
+            text = AssetManager.get_font("consolas", 20).render(
+                f"obrona: {self.defense*100}%", True, "black"
+            )
         text_rect = text.get_frect(topright=(self.width - 100, 50))
         self.surf.blit(text, text_rect)
         screen.blit(self.surf, self.rect)
+
+    def update_atak_points(self):
+        for pozycja in self.pozycje_group:
+            if pozycja.wojownik is not None:
+                pozycja.wojownik.atak_points = pozycja.wojownik.jednostka["atak_points"]

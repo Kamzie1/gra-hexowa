@@ -7,3 +7,4 @@ from .turn import Turn
 from .buttons import Button, SquadButtonDisplay, Rotate, Wzmocnienie
 from .squadDisplay import SquadDisplay
 from .attackDisplay import AttackDisplay
+from .inzynier import InzynierButton, InzynierBuild

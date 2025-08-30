@@ -12,6 +12,8 @@ from projekt.swiat import (
     SquadDisplay,
     AttackDisplay,
     Wzmocnienie,
+    InzynierBuild,
+    InzynierButton,
 )
 from projekt.player import Player
 from projekt.narzedzia import oblicz_pos, TurnDisplay, KoniecGry, MouseDisplay, Display
@@ -19,16 +21,24 @@ from projekt.flag import Flag
 from projekt.network import Client
 from .assetMenager import AssetManager
 from .animationMenager import AnimationMenager
+from projekt.jednostki import Squad
 
 
 class Gra:
     def __init__(self):
 
         # obiekty
-        Mapa(0)
+        Mapa(
+            0,
+            (
+                -Client().player.pos[0] + srodek[0],
+                -Client().player.pos[1] + srodek[1],
+            ),
+        )
         Client().mapa = Mapa(0)
         Mini_map()
         AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
+        self.inzynierBuild = InzynierBuild(Width / 2, Height / 2, srodek)
         Resource()
         Turn()
         SideMenu()
@@ -45,6 +55,9 @@ class Gra:
         self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
         self.wzmocnienieButton = Wzmocnienie(
             80, 80, "blue", (srodek[0] + 150, Height - 50)
+        )
+        self.inzynierButton = InzynierButton(
+            80, 80, "red", (srodek[0] + 250, Height - 50)
         )
 
     # metoda uruchamiająca grę
@@ -69,7 +82,7 @@ class Gra:
         if SquadDisplay().show:
             SquadDisplay().update(pygame.mouse.get_pos())
 
-        if Mapa().move_flag is not None:
+        if Mapa().move_flag is not None and isinstance(Mapa().move_flag, Squad):
             if self.squadButtonDisplay.rect.collidepoint(mouse_pos):
                 MouseDisplay().update(mouse_pos, "Statystyki oddziału")
 
@@ -80,6 +93,8 @@ class Gra:
                 MouseDisplay().update(
                     mouse_pos, "Wzmocnij oddział (+5% obrony) za 4 ruchu"
                 )
+            if Mapa().move_flag.inzynier():
+                self.inzynierButton.hover(mouse_pos)
 
         if AttackDisplay().show:
             AttackDisplay().hover(pygame.mouse.get_pos())
@@ -110,13 +125,18 @@ class Gra:
         for jednostka in Mapa().army_group:
             jednostka.draw(Mapa().mapSurf)
 
-        if not Mapa().move_flag is None:
+        if not Mapa().move_flag is None and isinstance(Mapa().move_flag, Squad):
             screen.blit(self.squadButtonDisplay.image, self.squadButtonDisplay.rect)
             if Client().player.id == Mapa().move_flag.owner_id:
                 screen.blit(self.rotateButton.image, self.rotateButton.rect)
                 screen.blit(self.wzmocnienieButton.image, self.wzmocnienieButton.rect)
+                if Mapa().move_flag.inzynier():
+                    self.inzynierButton.draw(screen)
         if AttackDisplay().show:
             AttackDisplay().display(screen)
+
+        if self.inzynierBuild.show:
+            self.inzynierBuild.draw(screen)
 
         Turn().draw(screen)
 
@@ -143,17 +163,26 @@ class Gra:
                     mouse_pos,
                     self.squadButtonDisplay,
                     self.rotateButton,
+                    self.wzmocnienieButton,
+                    self.inzynierButton,
+                    self.inzynierBuild,
                     SideMenu().dirty,
                     SideMenu().reset,
                 )
 
                 Turn().event(mouse_pos)
                 Resource().event(mouse_pos)
-                self.squadButtonDisplay.event(mouse_pos, Mapa().move_flag)
-                self.rotateButton.event(Mapa().move_flag, mouse_pos, Client().player.id)
-                self.wzmocnienieButton.event(
-                    Mapa().move_flag, mouse_pos, Client().player.id
-                )
+                if isinstance(Mapa().move_flag, Squad):
+                    self.squadButtonDisplay.event(mouse_pos, Mapa().move_flag)
+                    self.rotateButton.event(
+                        Mapa().move_flag, mouse_pos, Client().player.id
+                    )
+                    self.wzmocnienieButton.event(
+                        Mapa().move_flag, mouse_pos, Client().player.id
+                    )
+                    self.inzynierButton.event(
+                        mouse_pos, Mapa().move_flag, self.inzynierBuild
+                    )
 
                 if SquadDisplay().show:
                     SquadDisplay().event(

@@ -139,7 +139,7 @@ class SquadDisplay(metaclass=Singleton):
     def display_description(self):
         pos = (self.pos[0] / 2, 0)
         wojownik = self.selected.wojownik
-        self.display_text((50, 30), pos, wojownik.name, self.font)
+        self.display_text((50, 60), pos, wojownik.name, self.font)
         statystyki = f"""
         zdrowie : {wojownik.zdrowie}
         morale: {wojownik.morale}
@@ -151,11 +151,12 @@ class SquadDisplay(metaclass=Singleton):
         zasięg : {wojownik.bronie[0]["range"]}
         koszt ataku : {wojownik.bronie[0]["koszt_ataku"]} 
         punkty ataku : {wojownik.atak_points}
+        jedzenie: {wojownik.food}
 
         """
         if wojownik.name == "Medyk":
             statystyki += f"specjalne: uzdrawia \n co rundę wszystkie jednostki \n w formacji o {wojownik.jednostka['heal']} hp"
-        self.display_text((self.width / 32, 100), pos, statystyki, self.wojownik_font)
+        self.display_text((self.width / 32, 120), pos, statystyki, self.wojownik_font)
 
     def display_text(self, offset, pos, text, font):
         text_surf = font.render(text, True, "black")
@@ -184,7 +185,10 @@ class SquadDisplay(metaclass=Singleton):
         for pozycja in self.positions_group:
             if pozycja.rect.collidepoint(mouse_pos):
                 if self.selected is not None and self.selected.wojownik is not None:
-                    if squad.owner_id != id or self.selected.wojownik.name == "Fort":
+                    if (
+                        squad.owner_id != id
+                        or self.selected.wojownik.jednostka["ruch"] == 0
+                    ):
                         return
                     self.swap(pozycja, squad)
                 self.selected = pozycja
@@ -220,6 +224,7 @@ class SquadDisplay(metaclass=Singleton):
         info["owner_id"] = squad.owner_id
         info["pos"] = squad.pos
         info["strategy"] = squad.strategy
+        info["team"] = squad.team
         info["wzmocnienie"] = squad.wzmocnienie
         info["jednostki"] = []
         jednostka = self.selected.wojownik.get_data()

@@ -215,7 +215,7 @@ class PoleRekrutacji(Pole):
                 jednostka,
                 id,
                 self.button_group,
-                f"{jednostka["nazwa"]}",
+                f"{jednostka["nazwa"]} \nfood: {jednostka["food"]}",
             )
             x += 175
             id += 1

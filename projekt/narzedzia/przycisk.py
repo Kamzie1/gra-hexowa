@@ -61,3 +61,19 @@ class ColorSwitch(Switch):
     def draw(self, id, screen):
         self.surf.fill(self.forms[id])
         screen.blit(self.surf, self.rect)
+
+
+class TeamSwitch:
+    def __init__(self, width, height, pos):
+        self.surf = pygame.Surface((width, height))
+        self.rect = self.surf.get_frect(bottomright=pos)
+        self.pos = pos
+        self.font = AssetManager.get_font("consolas", 20)
+
+    def draw(self, id, screen):
+        self.surf.fill("white")
+        display = self.font.render(f"Team{id}", True, "black")
+        display_rect = display.get_rect(topleft=(5, 5))
+        self.surf.blit(display, display_rect)
+
+        screen.blit(self.surf, self.rect)

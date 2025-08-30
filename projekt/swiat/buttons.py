@@ -166,7 +166,8 @@ class Recruit(Button):
         info["owner_id"] = Client().player.id
         info["pos"] = (5000, 5000)
         info["strategy"] = 0
-        info["wzmocnienie"] = 0
+        info["wzmocnienie"] = False
+        info["team"] = Client().player.team
         info["jednostki"] = []
         jednostka = self.jednostka
         jednostka["array_pos"] = 3

@@ -8,6 +8,7 @@
       wzrok: Oczy
       pancerz: 8
       atak_points: 10
+      food: 10
       red: Ciezki_kopijnik.png
       blue: Ciezki_kopijnik blue.png
       cost: 
@@ -29,11 +30,33 @@
       wzrok: Lornetka
       pancerz: 10
       atak_points: 20
+      food: 0
       red: rec2.png
       blue: rec2.png
       id: 0
       kategoria: specjalne
-
+    
+    - nazwa: Wieża Obserwacyjna
+      zdrowie: 100
+      morale: 90
+      ruch: 0
+      bronie:
+        - Rece
+      wzrok: Lornetka
+      pancerz: 5
+      atak_points: 0
+      food: 0
+      red: rec2.png
+      blue: rec2.png
+      id: 1
+      cost:
+        srebro: 50
+        stal: 50
+        zloto: 0
+        medale: 1
+        food: 0
+      kategoria: specjalne
+      
   budynek:
     - nazwa: Miasto
       image: miasto.png
@@ -100,5 +123,23 @@
       ruch : 3
       obrona: 0.45
 
+    - nazwa: Droga
+      image: droga.png
+      earn:
+        zloto: 0
+        srebro: 0
+        stal: 0
+        food: 0
+      cost:
+        zloto: 0
+        srebro: 50
+        stal: 5
+        food: 0
+        medale: 0
+      heal: 0
+      id: 5
+      kategoria: budynek
+      ruch : 2
+      obrona: 0.3
 
 

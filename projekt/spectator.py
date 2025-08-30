@@ -30,7 +30,7 @@ class Spectator:
     def __init__(self):
 
         # obiekty
-        Mapa(1)
+        Mapa(1, srodek)
         Client().mapa = Mapa(0)
         Mini_map()
         Resource()

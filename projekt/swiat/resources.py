@@ -31,6 +31,13 @@ class Resource(metaclass=Singleton):
             if button.rect.collidepoint(mouse_pos):
                 button.hover()
                 MouseDisplay().update(mouse_pos, button.description)
+        if (
+            mouse_pos[0] > 650
+            and mouse_pos[0] < 800
+            and mouse_pos[1] > 0
+            and mouse_pos[1] < resource_height
+        ):
+            MouseDisplay().update(mouse_pos, Client().player.get_hunger_description())
 
     def display(self, player):
         # icon
@@ -62,7 +69,10 @@ class Resource(metaclass=Singleton):
         text = self.font.render(display, True, font_color)
         text_rect = text.get_rect(topleft=(525, (resource_height - font_size) / 2))
         self.surf.blit(text, text_rect)
-        display = f"{player.food} (+{player.income["food"]})"
+        if player.income["food"] < 0:
+            display = f"{player.food} ({player.income["food"]})"
+        else:
+            display = f"{player.food} (+{player.income["food"]})"
         text = self.font.render(display, True, font_color)
         text_rect = text.get_rect(topleft=(700, (resource_height - font_size) / 2))
         self.surf.blit(text, text_rect)
