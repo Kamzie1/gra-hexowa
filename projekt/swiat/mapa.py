@@ -11,7 +11,7 @@ from projekt.narzedzia import (
     pozycja_myszy_na_surface,
     clicked,
 )
-from projekt.jednostki import Squad, Miasto, Wioska
+from projekt.jednostki import Squad, Miasto, Wioska, Budynek
 from projekt.assetMenager import AssetManager
 from projekt.narzedzia import Singleton
 from .attackDisplay import AttackDisplay
@@ -273,11 +273,34 @@ class Mapa(metaclass=Singleton):
             self.mury_opponent_rect,
         )
 
-    def event(self, mouse_pos, flag, squadButtonDisplay, rotateButton, dirty, reset):
+    def event(
+        self,
+        mouse_pos,
+        flag,
+        squadButtonDisplay,
+        rotateButton,
+        wzmocnienieButton,
+        inzynierButton,
+        InzynierBlock,
+        dirty,
+        reset,
+    ):
         if AttackDisplay().show:
             if AttackDisplay().rect.collidepoint(mouse_pos):
                 AttackDisplay().event(mouse_pos)
                 return
+        if InzynierBlock.show:
+            if (
+                InzynierBlock.rect.collidepoint(mouse_pos)
+                and self.move_flag is not None
+                and self.move_flag.tile is not None
+            ):
+                InzynierBlock.event(
+                    mouse_pos, self.move_flag.tile.x, self.move_flag.tile.y
+                )
+                return
+            else:
+                InzynierBlock.show = False
         if reset:
             self.move_flag = None
             self.correct_moves = None
@@ -290,10 +313,16 @@ class Mapa(metaclass=Singleton):
             if SquadDisplay().rect.collidepoint(mouse_pos):
                 return
 
-        if not self.move_flag is None:
+        if not self.move_flag is None and isinstance(self.move_flag, Squad):
             if squadButtonDisplay.rect.collidepoint(mouse_pos):
                 return
+            if wzmocnienieButton.rect.collidepoint(mouse_pos):
+                return
             if rotateButton.rect.collidepoint(mouse_pos):
+                return
+            if self.move_flag.inzynier() and inzynierButton.rect.collidepoint(
+                mouse_pos
+            ):
                 return
 
         mouse_pos = pozycja_myszy_na_surface(mouse_pos, self.origin)
@@ -322,12 +351,17 @@ class Mapa(metaclass=Singleton):
                             and self.correct_moves[tile.x][tile.y] >= 0
                         ):
                             if self.move_flag.tile is None:
-                                if tile.jednostka is None:
-                                    self.recruit(tile)
-                                elif tile.jednostka.owner_id == Client().player.id:
-                                    self.recruit_join(tile)
-                                elif tile.jednostka.owner_id == Client().opponent.id:
-                                    pass
+                                if isinstance(self.move_flag, Squad):
+                                    if tile.jednostka is None:
+                                        self.recruit(tile)
+                                    elif tile.jednostka.owner_id == Client().player.id:
+                                        self.recruit_join(tile)
+                                    elif (
+                                        tile.jednostka.owner_id == Client().opponent.id
+                                    ):
+                                        pass
+                                elif isinstance(self.move_flag, Budynek):
+                                    self.place_budynek(tile)
                             elif tile.jednostka is None:
                                 self.move(tile)
                             else:
@@ -339,7 +373,7 @@ class Mapa(metaclass=Singleton):
                                     ):
                                         self.join(tile.jednostka, self.move_flag, tile)
 
-                                elif tile.jednostka.owner_id == Client().opponent.id:
+                                elif tile.jednostka.team != Client().player.team:
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
                                     )
@@ -358,8 +392,8 @@ class Mapa(metaclass=Singleton):
                         else:
                             if not tile.jednostka is None:
                                 if (
-                                    tile.jednostka.owner_id == Client().opponent.id
-                                    and self.move_flag.owner_id == Client().player.id
+                                    tile.jednostka.team != Client().player.team
+                                    and self.move_flag.team == Client().player.team
                                 ):
                                     distance = self.attackValidate(
                                         self.move_flag, tile.jednostka
@@ -395,6 +429,15 @@ class Mapa(metaclass=Singleton):
             self.move_flag = None
             self.correct_moves = None
 
+    def place_budynek(self, tile):
+        if Client().validate_cost(self.calculate_cost(self.move_flag)):
+            Client().pay(self.calculate_cost(self.move_flag))
+            tile.budynek = self.move_flag
+            self.move_flag.pos = tile.pos
+            tile.obrona = self.move_flag.budynek["obrona"]
+            tile.koszt_ruchu = self.move_flag.budynek["ruch"]
+            self.move_flag.tile = tile
+
     def move(self, tile):
         if self.split is None:
             self.move_flag.tile.jednostka = None
@@ -416,8 +459,11 @@ class Mapa(metaclass=Singleton):
             Client().pay(self.calculate_cost(self.move_flag))
             self.move_flag.pos = tile.pos
             self.move_flag.tile = tile
-            self.move_flag.ruch = self.correct_moves[tile.x][tile.y]
+            for wojownik in self.move_flag.wojownicy:
+                if wojownik is not None:
+                    wojownik.ruch = 0
             tile.jednostka = self.move_flag
+            Client().player.income["food"] -= self.move_flag.food
         else:
             print("not enough money")
 
@@ -427,7 +473,11 @@ class Mapa(metaclass=Singleton):
             and len(tile.jednostka) + len(self.move_flag) <= 7
         ):
             Client().pay(self.calculate_cost(self.move_flag))
+            for wojownik in self.move_flag.wojownicy:
+                if wojownik is not None:
+                    wojownik.ruch = 0
             self.join(tile.jednostka, self.move_flag, tile)
+            Client().player.income["food"] -= self.move_flag.food
         else:
             print("not enough money")
 
@@ -436,11 +486,15 @@ class Mapa(metaclass=Singleton):
         types = ["zloto", "srebro", "stal", "medale", "food"]
         for currency in types:
             cost[currency] = 0
-        for wojownik in squad.wojownicy:
-            if wojownik is None:
-                continue
+        if isinstance(squad, Squad):
+            for wojownik in squad.wojownicy:
+                if wojownik is None:
+                    continue
+                for currency in types:
+                    cost[currency] += wojownik.jednostka["cost"][currency]
+        else:
             for currency in types:
-                cost[currency] += wojownik.jednostka["cost"][currency]
+                cost[currency] += squad.budynek["cost"][currency]
         return cost
 
     def join(self, squad1, squad2, tile):
@@ -507,6 +561,13 @@ class Mapa(metaclass=Singleton):
             else:
                 frakcja = Client().opponent.frakcja
             s = Squad(self.army_group, jednostka, tile, frakcja)
+            if s.owner_id == Client().player.id:
+                if Client().player.hunger:
+                    if Client().player.hunger < 4:
+                        s.ruch -= Client().player.hunger * 3
+                    else:
+                        s.ruch -= 9
+                        s.get_hunger(Client().player.hunger)
             if Client().turn % 2 == s.owner_id and s.medyk:
                 s.heal(frakcja["jednostka"][2]["heal"])  # medyk
             if (
@@ -538,13 +599,16 @@ class Mapa(metaclass=Singleton):
                     tile.obrona = AssetManager.get_mnoznik(
                         "mury_upgrade", Client().opponent.akcje["mury_upgrade"]
                     )
-            else:
+            elif budynek["id"] < 5:
                 b = Wioska(
                     self.building_group,
                     budynek,
                     tile,
                     frakcja,
                 )
+                tile.obrona = b.budynek["obrona"]
+            else:
+                b = Budynek(self.building_group, budynek, tile, frakcja)
                 tile.obrona = b.budynek["obrona"]
             tile.koszt_ruchu = b.budynek["ruch"]
             tile.budynek = b
@@ -566,6 +630,12 @@ class Mapa(metaclass=Singleton):
         types = ["srebro", "stal", "food", "zloto"]
         for typ in types:
             self.calculate_income_by_type(typ)
+            if typ == "food":
+                food = 0
+                for jednostka in self.army_group:
+                    if jednostka.owner_id == Client().player.id:
+                        food += jednostka.food
+                Client().player.income["food"] -= food
 
     def calculate_income_by_type(self, typ):
         Client().player.income[typ] = 0

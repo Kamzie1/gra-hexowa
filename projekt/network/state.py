@@ -26,6 +26,7 @@ def get_miasto(package, owner):
         "jednostki": [Miasto],
         "strategy": 0,
         "wzmocnienie": False,
+        "team": package["team"],
     }
 
 
@@ -33,6 +34,7 @@ def miasto_tile(x, y, miasto):
     return {
         "owner": miasto["owner"],
         "owner_id": miasto["owner_id"],
+        "team": miasto["team"],
         "pos": id_to_pos(x, y),
         "color": miasto["color"],
         "id": 0,  # tile miasta
@@ -79,6 +81,7 @@ def get_wioska(x, y):
     return {
         "owner": "none",
         "owner_id": -1,
+        "team": -1,
         "pos": id_to_pos(x, y),
         "color": "grey",
         "id": typ,  # tile wioski

@@ -8,6 +8,7 @@ class Budynek(pygame.sprite.Sprite):
     def __init__(self, group, info, tile, frakcja):
         super().__init__(group)
         self.owner_id = info["owner_id"]
+        self.team = info["team"]
         self.owner = info["owner"]
         self.color = info["color"]
         self.pos = tuple(info["pos"])

@@ -30,6 +30,7 @@ class Client(metaclass=Singleton):
             "pos": oblicz_pos(self.info[name]["x"], self.info[name]["y"]),
             "color": self.info[name]["color"],
             "id": id,
+            "team": self.info[name]["team"],
             "akcje": self.load_akcje(),
         }
 
@@ -64,13 +65,21 @@ class Client(metaclass=Singleton):
         self.import_state()
 
     def uruchom_gre(self):
-        package1 = {"x": 6, "y": 6, "frakcja": "Japonia", "color": "red", "id": 0}
+        package1 = {
+            "x": 6,
+            "y": 6,
+            "frakcja": "Japonia",
+            "color": "red",
+            "id": 0,
+            "team": 0,
+        }
         package2 = {
             "x": 10,
             "y": 10,
             "frakcja": "Prusy",
             "color": "blue",
             "id": 1,
+            "team": 1,
         }
         starting_state = create_state(package1, package2)
 

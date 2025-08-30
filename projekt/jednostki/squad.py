@@ -1,6 +1,7 @@
 import pygame
 from .wojownik import Wojownik
 from enum import Enum
+from projekt.assetMenager import AssetManager
 
 
 class Positions(Enum):
@@ -34,6 +35,7 @@ class Squad(pygame.sprite.Sprite):
     def __init__(self, group, info, tile, frakcja):
         super().__init__(group)
         self.owner_id = info["owner_id"]
+        self.team = info["team"]
         self.owner = info["owner"]
         self.color = info["color"]
         self.pos = tuple(info["pos"])
@@ -98,6 +100,27 @@ class Squad(pygame.sprite.Sprite):
             if wojownik is not None:
                 wojownik.draw(self.pos, self.hex_positions[i], screen)
             i += 1
+        if self.wzmocnienie:
+            image = AssetManager.get_asset("armor")
+            rect = image.get_frect(bottomright=(self.pos[0] + 56, self.pos[1] + 54))
+            screen.blit(image, rect)
+
+    @property
+    def food(self):
+        food = 0
+        for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
+            food += wojownik.food
+        return food
+
+    def inzynier(self) -> bool:
+        for wojownik in self.wojownicy:
+            if wojownik is None:
+                continue
+            if wojownik.name == "Inżynier":
+                return True
+        return False
 
     def get_data(self):
         info = {}
@@ -107,6 +130,7 @@ class Squad(pygame.sprite.Sprite):
         info["pos"] = self.pos
         info["strategy"] = self.strategy
         info["wzmocnienie"] = self.wzmocnienie
+        info["team"] = self.team
         info["jednostki"] = []
         for wojownik in self.wojownicy:
             if wojownik is not None:
@@ -150,10 +174,19 @@ class Squad(pygame.sprite.Sprite):
         return self
 
     def display(self, id):
-        representation = (
-            f"{self.owner} ruch: {self.ruch} wzmocnienie: {self.wzmocnienie}"
-        )
+        representation = f"{self.owner} | team: {self.team} | ruch: {self.ruch}"
         return representation
+
+    def get_hunger(self, hunger):
+        for wojownik in self.wojownicy:
+            if wojownik is not None:
+                straty = int(wojownik.zdrowie * 0.01 * (hunger - 3))
+                wojownik.zdrowie -= straty
+                if wojownik.zdrowie < 0:
+                    wojownik = None
+                    if len(self) == 0:
+                        self.kill()
+                        self.tile.jednostka = None
 
     def zdrowie(self, id, value):
         if value > 0:
