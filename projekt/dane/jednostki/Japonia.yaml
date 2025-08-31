@@ -1,5 +1,6 @@
 # Dane frakcji nr. 1
 
+  name: Japonia
   jednostka:
     - nazwa: Bodyguard
       zdrowie: 70
@@ -197,7 +198,7 @@
       ruch: 14
       bronie:
         - Rece
-      wzrok: Lornetka
+      wzrok: Oczy
       pancerz: 3
       atak_points: 2
       food: 4
@@ -256,7 +257,7 @@
         zloto: 2
         srebro: 30
         stal: 7
-        food: 1
+        food: 5
       heal: 12
       id: 0
       kategoria: budynek

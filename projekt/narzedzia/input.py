@@ -6,12 +6,12 @@ from projekt.assetMenager import AssetManager
 
 class Input:
 
-    def __init__(self, width, height, pos, color, font_color, message):
+    def __init__(self, width, height, pos, color, font_color, message, font_size=24):
         self.surf = pygame.Surface((width, height))
         self.rect = self.surf.get_frect(topleft=pos)
         self.surf.fill(color)
         self.color = color
-        self.font = AssetManager.get_font("consolas", 24)
+        self.font = AssetManager.get_font("consolas", font_size)
         self.font_color = font_color
         self.message = message
         self._display = message
@@ -57,8 +57,8 @@ class Input:
 
 
 class IntInput(Input):
-    def __init__(self, width, height, pos, color, font_color, message):
-        super().__init__(width, height, pos, color, font_color, message)
+    def __init__(self, width, height, pos, color, font_color, message, font_size=24):
+        super().__init__(width, height, pos, color, font_color, message, font_size)
 
     def draw(self, screen):
         self.surf.fill(self.color)
@@ -84,3 +84,24 @@ class IntInput(Input):
                     self.display = "0"
             elif event.unicode.isdigit():
                 self.display += event.unicode
+
+
+class CheckBox:
+    def __init__(self, width, height, pos, value=False):
+        self.surf = pygame.Surface((width, height))
+        self.rect = self.surf.get_frect(center=pos)
+        self.value = value
+        self.dirty = False
+
+    def display(self, screen):
+        if self.value:
+            pygame.draw.rect(screen, "black", self.rect)
+        else:
+            pygame.draw.rect(screen, "black", self.rect, 2)
+
+    def event(self, event, mouse_pos):
+        self.dirty = False
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            if self.rect.collidepoint(mouse_pos):
+                self.dirty = True
+                self.value = not self.value

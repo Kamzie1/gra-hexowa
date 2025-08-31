@@ -1,6 +1,6 @@
 import pygame
 from sys import exit
-from projekt.ustawienia import *  # plik z ustawieniami
+from projekt.ustawienia import *
 from projekt.swiat import (
     Mapa,
     Mini_map,
@@ -15,11 +15,9 @@ from projekt.swiat import (
     InzynierBuild,
     InzynierButton,
 )
-from projekt.player import Player
-from projekt.narzedzia import oblicz_pos, TurnDisplay, KoniecGry, MouseDisplay, Display
+from projekt.narzedzia import TurnDisplay, KoniecGry, MouseDisplay, Display
 from projekt.flag import Flag
 from projekt.network import Client
-from .assetMenager import AssetManager
 from .animationMenager import AnimationMenager
 from projekt.jednostki import Squad
 

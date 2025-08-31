@@ -6,23 +6,21 @@ from projekt.swiat import (
     Mini_map,
     Resource,
     SideMenu,
-    Turn,
     SquadButtonDisplay,
     Rotate,
     SquadDisplay,
     AttackDisplay,
+    Wzmocnienie,
+    InzynierButton,
+    InzynierBuild,
 )
-from projekt.player import Player
 from projekt.narzedzia import (
-    oblicz_pos,
     TurnDisplay,
     KoniecGry,
-    Display,
     MouseDisplay,
 )
 from projekt.flag import Flag
 from projekt.network import Client
-from .assetMenager import AssetManager
 from .animationMenager import AnimationMenager
 
 
@@ -38,11 +36,18 @@ class Spectator:
         KoniecGry(Width, Height)
         self.turn_Display = TurnDisplay(300, 34, (srodek[0] - 25, 0), "consolas", 20)
         SquadDisplay(Width / 2, Height / 2, srodek, "black")
+        self.inzynierBuild = InzynierBuild(Width / 2, Height / 2, srodek)
         self.squadButtonDisplay = SquadButtonDisplay(
             80, 80, "blue", (srodek[0] - 50, Height - 50)
         )
         self.rotateButton = Rotate(80, 80, "red", (srodek[0] + 50, Height - 50))
         AttackDisplay(Width / 1.2, Height / 1.2, srodek, "black")
+        self.wzmocnienieButton = Wzmocnienie(
+            80, 80, "blue", (srodek[0] + 150, Height - 50)
+        )
+        self.inzynierButton = InzynierButton(
+            80, 80, "red", (srodek[0] + 250, Height - 50)
+        )
 
     # metoda uruchamiająca grę
     def run(self, screen):
@@ -113,6 +118,11 @@ class Spectator:
                     mouse_pos,
                     self.squadButtonDisplay,
                     self.rotateButton,
+                    self.wzmocnienieButton,
+                    self.inzynierButton,
+                    self.inzynierBuild,
+                    SideMenu().dirty,
+                    SideMenu().reset,
                 )
 
                 Resource().event(mouse_pos)

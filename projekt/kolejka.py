@@ -8,6 +8,7 @@ from projekt.narzedzia import (
     ColorSwitch,
     IntInput,
     TeamSwitch,
+    CheckBox,
 )
 from projekt.ustawienia import Width, Height, srodek
 import random
@@ -69,20 +70,20 @@ class Kolejka:
         for user in Client().room["users"]:
             if not user["name"] == Client().name:
                 self.drawOpponentDisplay(x, y, user)
-                x += 250
-                if x > self.w:
+                x += 200
+                if x > self.w / 2 + 155:
                     x = 0
-                    y += 350
+                    y += 250
             else:
                 self.playerCard.draw(Client().name, self.content)
 
         for user in Client().room["spectators"]:
             if not user["name"] == Client().name:
                 self.drawOpponentDisplay(x, y, user)
-                x += 250
-                if x > self.w:
+                x += 200
+                if x > self.w / 2 + 155:
                     x = 0
-                    y += 350
+                    y += 250
             else:
                 self.playerCard.draw(Client().name, self.content)
 
@@ -140,13 +141,18 @@ class Kolejka:
                 "rivers": 2,
                 "wioski": int(self.ustawienia.wioski.display),
                 "gold": int(self.ustawienia.gold.display),
+                "srebro": int(self.ustawienia.srebro.display),
+                "stal": int(self.ustawienia.stal.display),
+                "food": int(self.ustawienia.food.display),
+                "medale": int(self.ustawienia.medale.display),
                 "space-between": 10,
                 "from-border": 5,
             },
             "ready": self.ready.value,
-            "fraction": self.playerCard.frakcje[self.playerCard.fraction],
+            "frakcja": self.playerCard.frakcje[self.playerCard.fraction],
             "color": self.playerCard.colors[self.playerCard.color],
             "team": self.playerCard.team,
+            "ifPogoda": self.ustawienia.pogoda.value,
         }
 
     def drawOpponentDisplay(self, x, y, user):
@@ -159,7 +165,7 @@ class Kolejka:
         team = self.font.render(f"Team{user["team"]}", True, "black")
         team_rect = team.get_rect(bottomright=(140, 220))
 
-        fraction = self.font.render(user["fraction"], True, "black")
+        fraction = self.font.render(user["frakcja"], True, "black")
         fraction_rect = fraction.get_rect(bottomright=(140, 250))
 
         surf.blit(text, text_rect)
@@ -210,24 +216,49 @@ class Ustawienia:
     def __init__(self):
         self.surf = pygame.Surface((Width / 7, Height / 2))
         self.rect = self.surf.get_frect(topright=(Width / 1.5, 0))
-        self.wioskiLabel = Display(Width / 8, 50, (0, 0), "consolas", 32)
-        self.wioski = IntInput(Width / 8, 50, (0, 60), "grey", "black", "15")
-        self.goldLabel = Display(Width / 8, 50, (0, 120), "consolas", 32)
-        self.gold = IntInput(Width / 8, 50, (0, 180), "grey", "black", "1000")
+        self.wioskiLabel = Display(Width / 8, 20, (0, 0), "consolas", 16)
+        self.wioski = IntInput(Width / 8, 20, (0, 30), "grey", "black", "15", 16)
+        self.goldLabel = Display(Width / 8, 20, (0, 60), "consolas", 16)
+        self.gold = IntInput(Width / 8, 20, (0, 90), "grey", "black", "1000", 16)
+        self.srebroLabel = Display(Width / 8, 20, (0, 120), "consolas", 16)
+        self.srebro = IntInput(Width / 8, 20, (0, 150), "grey", "black", "1000", 16)
+        self.stalLabel = Display(Width / 8, 20, (0, 180), "consolas", 16)
+        self.stal = IntInput(Width / 8, 20, (0, 210), "grey", "black", "1000", 16)
+        self.foodLabel = Display(Width / 8, 20, (0, 240), "consolas", 16)
+        self.food = IntInput(Width / 8, 20, (0, 270), "grey", "black", "1000", 16)
+        self.medaleLabel = Display(Width / 8, 20, (0, 300), "consolas", 16)
+        self.medale = IntInput(Width / 8, 20, (0, 330), "grey", "black", "1000", 16)
+        self.pogodaLabel = Display(Width / 16, 30, (0, 390), "consolas", 20)
+        self.pogoda = CheckBox(20, 20, (Width / 16, 405))
         self.maps = ["mapa1(30x30)", "mapa2(10x10)", "mapa3(40x40)", "random"]
         self.size = [(30, 30), (10, 10), (40, 40), (0, 0)]
         self.map_id = 0
-        self.mapaSwitch = Switch(Width / 8, 50, (Width / 8, 360), self.maps)
+        self.mapaSwitch = Switch(Width / 8, 50, (Width / 8, 500), self.maps)
 
     def draw(self, screen, room):
         self.map_id = room["ustawienia"]["map_id"]
         self.wioski.display = str(room["ustawienia"]["wioski"])
         self.gold.display = str(room["ustawienia"]["gold"])
+        self.srebro.display = str(room["ustawienia"]["srebro"])
+        self.stal.display = str(room["ustawienia"]["stal"])
+        self.food.display = str(room["ustawienia"]["food"])
+        self.medale.display = str(room["ustawienia"]["medale"])
+        self.pogoda.value = room["ifPogoda"]
         self.surf.fill("white")
         self.wioskiLabel.display("Wioski:", "black", self.surf)
         self.wioski.draw(self.surf)
         self.goldLabel.display("Złoto:", "black", self.surf)
         self.gold.draw(self.surf)
+        self.srebroLabel.display("Srebro:", "black", self.surf)
+        self.srebro.draw(self.surf)
+        self.stalLabel.display("Stal:", "black", self.surf)
+        self.stal.draw(self.surf)
+        self.foodLabel.display("Jedzenie:", "black", self.surf)
+        self.food.draw(self.surf)
+        self.medaleLabel.display("Medale:", "black", self.surf)
+        self.medale.draw(self.surf)
+        self.pogodaLabel.display("Pogoda:", "black", self.surf)
+        self.pogoda.display(self.surf)
         self.mapaSwitch.draw(self.map_id, self.surf)
         screen.blit(self.surf, self.rect)
 
@@ -236,6 +267,11 @@ class Ustawienia:
             mouse_pos = pozycja_myszy_na_surface(mouse_pos, (self.rect.x, self.rect.y))
             self.wioski.update(event, mouse_pos)
             self.gold.update(event, mouse_pos)
+            self.srebro.update(event, mouse_pos)
+            self.stal.update(event, mouse_pos)
+            self.food.update(event, mouse_pos)
+            self.medale.update(event, mouse_pos)
+            self.pogoda.event(event, mouse_pos)
             if (
                 event.type == pygame.MOUSEBUTTONUP
                 and event.button == 1
@@ -246,5 +282,12 @@ class Ustawienia:
                 self.dirty = True
             if self.wioski.dirty:
                 self.dirty = True
-            if self.gold.dirty:
+            if (
+                self.gold.dirty
+                or self.srebro.dirty
+                or self.stal.dirty
+                or self.food.dirty
+                or self.medale.dirty
+                or self.pogoda.dirty
+            ):
                 self.dirty = True

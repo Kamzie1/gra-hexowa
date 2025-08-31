@@ -613,7 +613,7 @@ class Mapa(metaclass=Singleton):
         for jednostka in state["jednostki"]:
             tile = self.get_tile(jednostka["pos"])
             frakcja = AssetManager.frakcja[
-                Client().users[jednostka["owner_id"]]["fraction"]
+                Client().users[jednostka["owner_id"]]["frakcja"]
             ]
             s = Squad(self.army_group, jednostka, tile, frakcja)
             if (
@@ -639,7 +639,7 @@ class Mapa(metaclass=Singleton):
         for budynek in state["budynki"]:
             tile = self.get_tile(budynek["pos"])
             frakcja = AssetManager.frakcja[
-                Client().users[budynek["owner_id"]]["fraction"]
+                Client().users[budynek["owner_id"]]["frakcja"]
             ]
             if budynek["id"] == 0:
                 b = Miasto(

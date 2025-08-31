@@ -5,22 +5,8 @@ from projekt.assetMenager import AssetManager
 
 class Player:
     def __init__(self, data):
-        self.id = data["id"]
-        self.name = data["name"]
-        self._gold = data["gold"]
-        self.srebro = data["srebro"]
-        self.stal = data["stal"]
-        self.medals = data["medals"]
-        self.food = data["food"]
-        self.team = data["team"]
-        self.hunger = 0
-        self.frakcja = data["frakcja"]
-        self.pos = data["pos"]
-        self.x = data["x"]
-        self.y = data["y"]
-        self.color = data["color"]
+        self.load(data)
         self.income = {}
-        self.akcjeMenager = AkcjeMenager(data["akcje"])
 
     @property
     def akcje(self):
@@ -69,6 +55,41 @@ class Player:
             return f"{self.hunger} dni głodu \n -{self.hunger*3} do ruchu"
         else:
             return f"{self.hunger} dni głodu \n -9 do ruchu i -{self.hunger-3}% zdrowia"
+
+    def load(self, data):
+        self.id = data["id"]
+        self.name = data["name"]
+        self._gold = data["gold"]
+        self.srebro = data["srebro"]
+        self.stal = data["stal"]
+        self.medals = data["medals"]
+        self.food = data["food"]
+        self.team = data["team"]
+        self.hunger = data["hunger"]
+        self.frakcja = data["frakcja"]
+        self.pos = data["pos"]
+        self.x = data["x"]
+        self.y = data["y"]
+        self.color = data["color"]
+        self.akcjeMenager = AkcjeMenager(data["akcje"])
+
+    def get_data(self):
+        return {
+            "name": self.name,
+            "id": self.id,
+            "gold": self.gold,
+            "srebro": self.srebro,
+            "stal": self.stal,
+            "medals": self.medals,
+            "food": self.food,
+            "hunger": self.hunger,
+            "team": self.team,
+            "frakcja": self.frakcja["name"],
+            "x": self.x,
+            "y": self.y,
+            "color": self.color,
+            "akcje": self.akcje,
+        }
 
     def __str__(self):
         return self.name

@@ -26,7 +26,7 @@ class Client(metaclass=Singleton):
             "name": self.name,
             "x": self.users[self.id]["x"],
             "y": self.users[self.id]["y"],
-            "frakcja": AssetManager.frakcja[self.users[self.id]["fraction"]],
+            "frakcja": AssetManager.frakcja[self.users[self.id]["frakcja"]],
             "num": self.users[self.id]["id"],
             "pos": oblicz_pos(self.users[self.id]["x"], self.users[self.id]["y"]),
             "color": self.users[self.id]["color"],
@@ -38,6 +38,7 @@ class Client(metaclass=Singleton):
             "medals": self.users[self.id]["medals"],
             "team": self.users[self.id]["team"],
             "akcje": self.users[self.id]["akcje"],
+            "hunger": self.users[self.id]["hunger"],
         }
 
     def load_spectator(self):
@@ -57,6 +58,7 @@ class Client(metaclass=Singleton):
             "food": 0,
             "team": -1,
             "akcje": self.load_akcje(),
+            "hunger": 0,
         }
 
     def load_akcje(self):
@@ -138,10 +140,9 @@ class Client(metaclass=Singleton):
                     self.player.id = self.id
                     self.ekran = 3
             self.state_loaded = False
-            self.player.akcje = self.users[self.id]["akcje"]
             self.turn = data["turn"]
             if self.ekran == 2:
-                self.player.gold = data["users"][self.id]["gold"]
+                self.player.load(self.load_player())
                 if self.turn % len(self.users) == self.player.id and self.turn >= len(
                     self.users
                 ):
@@ -232,18 +233,10 @@ class Client(metaclass=Singleton):
             print("new name:", self.name)
 
     def send_state(self, state):
+        self.users[self.id] = self.player.get_data()
         self.sio.emit(
             "new_state",
-            {
-                "state": state,
-                "nadawca": self.name,
-                "gold": self.player.gold,
-                "srebro": self.player.srebro,
-                "stal": self.player.stal,
-                "food": self.player.food,
-                "medals": self.player.medals,
-                "akcje": self.player.akcje,
-            },
+            {"state": state, "nadawca": self.name, "users": self.users},
         )
 
     def send_result(self, result):
