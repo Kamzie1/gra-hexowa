@@ -53,12 +53,6 @@ class Client(metaclass=Singleton):
     def import_state(self):
         print("got new state")
         self.turn += 1
-        bufor = self.player
-        self.player = self.opponent
-        self.opponent = bufor
-
-        self.user = self.player.name
-        self.id = self.player.id
 
     def send_state(self, state):
         self.state = state
@@ -74,8 +68,9 @@ class Client(metaclass=Singleton):
             "team": 0,
         }
         package2 = {
-            "x": 10,
-            "y": 10,
+            "name": "client2",
+            "x": 26,
+            "y": 26,
             "frakcja": "Prusy",
             "color": "blue",
             "id": 1,

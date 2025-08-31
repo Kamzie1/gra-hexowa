@@ -6,7 +6,7 @@ class priority_queue:
         self.queue.append(value)
 
     def pop(self):
-        maks = (-2, -2, -2)
+        maks = (-2, -2, -1000000)
         for element in self.queue:
             if element[2] > maks[2]:
                 maks = element

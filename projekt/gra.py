@@ -27,6 +27,7 @@ from projekt.network import Client
 from .assetMenager import AssetManager
 from .animationMenager import AnimationMenager
 from projekt.jednostki import Squad
+from projekt.bot import Bot
 
 
 class Gra:
@@ -36,6 +37,7 @@ class Gra:
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         pygame.display.set_caption(Title)
         AssetManager.preload_assets()
+        self.bot = Bot()
         Client().start_game(Client().uruchom_gre())
         # obiekty
         self.clock = pygame.time.Clock()
@@ -175,7 +177,7 @@ class Gra:
                     SideMenu().reset,
                 )
 
-                Turn().event(mouse_pos)
+                Turn().event(mouse_pos, self.bot)
                 Resource().event(mouse_pos, self.flag)
                 if isinstance(Mapa().move_flag, Squad):
                     self.squadButtonDisplay.event(mouse_pos, Mapa().move_flag)

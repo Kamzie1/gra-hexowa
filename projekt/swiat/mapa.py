@@ -450,7 +450,10 @@ class Mapa(metaclass=Singleton):
         if tile.budynek is not None:
             print("owning...")
             tile.budynek.own(
-                self.move_flag.owner, self.move_flag.owner_id, self.move_flag.color
+                self.move_flag.owner,
+                self.move_flag.owner_id,
+                self.move_flag.color,
+                self.move_flag.team,
             )
             self.calculate_income()
 
@@ -527,6 +530,7 @@ class Mapa(metaclass=Singleton):
                         "pos": tile.budynek.pos,
                         "color": tile.budynek.color,
                         "id": tile.budynek.id,
+                        "team": tile.budynek.team,
                     }
                     state["budynki"].append(stan_budynku)
         return state

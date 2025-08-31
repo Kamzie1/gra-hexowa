@@ -8,6 +8,7 @@ class Budynek(pygame.sprite.Sprite):
     def __init__(self, group, info, tile, frakcja):
         super().__init__(group)
         self.owner_id = info["owner_id"]
+        self.team = info["team"]
         self.owner = info["owner"]
         self.color = info["color"]
         self._pos = tuple(info["pos"])
@@ -33,7 +34,7 @@ class Budynek(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def own(self, owner, owner_id, color):
+    def own(self, owner, owner_id, color, new_team):
         return
 
 

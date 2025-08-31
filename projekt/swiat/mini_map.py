@@ -55,7 +55,7 @@ class Mini_map(metaclass=Singleton):
             for tile in tiles:
                 self.rysuj(tile)
                 if not tile.budynek is None:
-                    self.rysuj(tile.budynek)
+                    self.rysuj_budynek(tile.budynek)
                 if not tile.jednostka is None:
                     self.draw_squad(tile.jednostka.color, tile.pos)
         pygame.draw.rect(self.surf, mini_map_rect_color, self.rect, width=1)
@@ -74,3 +74,12 @@ class Mini_map(metaclass=Singleton):
         image = pygame.transform.scale_by(obiekt.image, 1.11111111 / skala)
         rect = image.get_frect(center=pos)
         self.surf.blit(image, rect)
+
+    def rysuj_budynek(self, obiekt):
+        pos = obiekt.pos
+        pos = (pos[0] / skala, pos[1] / skala)
+        image = pygame.transform.scale_by(obiekt.image, 1.11111111 / skala)
+        rect = image.get_frect(center=pos)
+        self.surf.blit(image, rect)
+        if obiekt.color != "grey" and obiekt.id < 5 and obiekt.id > 0:
+            pygame.draw.ellipse(self.surf, obiekt.color, rect, 2)

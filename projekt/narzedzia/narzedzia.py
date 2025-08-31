@@ -71,6 +71,17 @@ def id_to_pos(x, y):
     return pos
 
 
+def pos_to_id(pos):
+    if pos[0] % tile_width == 0:
+        return int((pos[0] - tile_width) / tile_width), int(
+            (pos[1] - tile_height / 2) / (tile_height / 4 * 3)
+        )
+    else:
+        return int((pos[0] - tile_width / 2) / tile_width), int(
+            (pos[1] - tile_height / 2) / (tile_height / 4 * 3)
+        )
+
+
 def calc_scaled_offset(offset, pos, skala):
     return (pos[0] + offset[0] * skala, pos[1] + offset[1] * skala)
 
