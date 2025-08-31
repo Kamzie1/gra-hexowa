@@ -6,6 +6,8 @@ Miasto = {
     "kategoria": "specjalne",
     "zdrowie": 500,
     "morale": 90,
+    "array_pos": 3,
+    "ruch": 0,
 }
 
 
@@ -18,6 +20,9 @@ def get_miasto_jednostka(client, x, y):
         "owner_id": client["id"],
         "color": client["color"],
         "jednostki": [Miasto],
+        "strategy": 0,
+        "wzmocnienie": False,
+        "team": client["team"],
     }
 
 
@@ -28,6 +33,7 @@ def miasto_tile(x, y, user):
         "pos": id_to_pos(x, y),
         "color": user["color"],
         "id": 0,  # tile miasta
+        "team": user["team"],
     }
 
 
@@ -49,13 +55,15 @@ def get_wioska(x, y):
         "owner_id": -1,
         "pos": id_to_pos(x, y),
         "color": "grey",
-        "id": 1,  # tile wioski
+        "id": random.randint(1, 4),  # tile wioski
+        "team": -1,
     }
 
 
-def generate_wioski(num, positions, starting_state):
+def generate_wioski(num, positions, starting_state, w, h):
     space = 4**2
     max_powtorzen = 1000
+    border = 1
     for _ in range(num):
         powtorzenie = 0
         x = 0
@@ -63,8 +71,8 @@ def generate_wioski(num, positions, starting_state):
         flag = False
         while True:
             flag = True
-            x = 1 + random.randint(0, 27)
-            y = 1 + random.randint(0, 27)
+            x = random.randint(border, w - border - 1)
+            y = random.randint(border, h - border - 1)
             powtorzenie += 1
             if powtorzenie > max_powtorzen:
                 return
@@ -83,17 +91,18 @@ def odl(x, y, x1, y1):
     return (x - x1) ** 2 + (y - y1) ** 2
 
 
-def get_miasto(user, positions):
+def get_miasto(user, positions, w, h):
     space = 10**2
     powtorzenie = 0
     max_powtorzen = 1000
+    border = 4
     x = 0
     y = 0
     flag = False
     while True:
         flag = True
-        x = 4 + random.randint(0, 21)
-        y = 4 + random.randint(0, 21)
+        x = random.randint(border, w - border - 1)
+        y = random.randint(border, h - border - 1)
         powtorzenie += 1
         for pos in positions:
             if odl(x, y, pos[0], pos[1]) < space:
@@ -113,11 +122,16 @@ def get_miasto(user, positions):
 
 def create_state(users, ustawienia):
     starting_state = {"jednostki": [], "budynki": []}
+    width = ustawienia["width"]
+    height = ustawienia["height"]
     pos = []
     for user in users:
-        print(user)
-        user["gold"] = 1000
-        starting_state["jednostki"].append(get_miasto(user, pos))
+        user["gold"] = ustawienia["gold"]
+        user["srebro"] = ustawienia["srebro"]
+        user["stal"] = ustawienia["stal"]
+        user["food"] = ustawienia["food"]
+        user["medals"] = ustawienia["medale"]
+        starting_state["jednostki"].append(get_miasto(user, pos, width, height))
         get_budynek_miasto(user, pos, starting_state)
-    generate_wioski(ustawienia["wioski"], pos, starting_state)
+    generate_wioski(ustawienia["wioski"], pos, starting_state, width, height)
     return starting_state
